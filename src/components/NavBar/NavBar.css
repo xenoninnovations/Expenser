@@ -1,0 +1,37 @@
+.navbar {
+  background-color: black;
+  position: fixed;
+  height: 100vh;
+  width: 18rem;
+}
+
+.profile-box {
+  display: flex;
+  justify-content: center;
+  gap: 3vw;
+  padding-top: 5vh;
+}
+
+.profile-picture {
+  height: 4rem;
+  border-radius: 50%;
+}
+
+.username-settings {
+  display: flex;
+  gap: 1vw;
+}
+
+.username {
+  color: white;
+  font-size: 24px;
+}
+
+.settings-icon {
+  width: 1.5rem;
+}
+
+.dots {
+  display: flex;
+  margin-top: 1vh;
+}

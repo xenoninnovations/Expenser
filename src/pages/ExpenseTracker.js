@@ -6,6 +6,7 @@ import dots from "../images/dots.svg";
 import { FaPen, FaTrash } from "react-icons/fa";
 
 function ExpenseTracker() {
+  //temp JSON
   const expenses = [
     {
       item: "Headphones",
@@ -14,7 +15,29 @@ function ExpenseTracker() {
       category: "Electronics",
       merchant: "Beats",
     },
+    {
+      item: "Headphones",
+      date: "July 2, 2024",
+      amount: "$2,365.00",
+      category: "Electronics",
+      merchant: "Beats",
+    },
+    {
+      item: "Headphones",
+      date: "July 2, 2024",
+      amount: "$2,365.00",
+      category: "Electronics",
+      merchant: "Beats",
+    },
+    {
+      item: "Headphones",
+      date: "July 2, 2024",
+      amount: "$2,365.00",
+      category: "Electronics",
+      merchant: "Beats",
+    },
   ];
+
   return (
     <div className="page">
       <Navbar />
@@ -23,7 +46,10 @@ function ExpenseTracker() {
           <h3>Expense Tracker</h3>
           <img src={dots} alt="dots" className="dots" />
         </div>
-        <button className="buttons">Add an expense</button>
+        <div className="expense-buttons">
+          <button className="buttons">Add an expense</button>
+          <button className="buttons">Export as CSV</button>
+        </div>
         <div className="expenses-container">
           <div className="expenses-header">
             <h2 className="expenses-title">
@@ -47,7 +73,7 @@ function ExpenseTracker() {
             </thead>
             <tbody>
               {expenses.map((expense, index) => (
-                <tr key={index}>
+                <tr key={index} className="table-row">
                   <td>{expense.item}</td>
                   <td>{expense.date}</td>
                   <td>{expense.amount}</td>

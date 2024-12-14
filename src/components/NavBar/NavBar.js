@@ -29,7 +29,7 @@ export default function NavBar() {
   return (
     <nav className="navbar">
       <section className="profile-box">
-        <img src={profileImg} alt="profile" className="profile-picture" />
+        {/* <img src={profileImg} alt="profile" className="profile-picture" /> */}
         <section className="user-sett-dots">
           <section className="username-settings">
             <h3 className="username">Fizkies Floky</h3>

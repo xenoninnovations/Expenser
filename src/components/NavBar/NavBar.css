@@ -1,12 +1,12 @@
 .navbar {
   background-color: black;
   height: 150vh;
-  width: 18rem;
+  width: 15%;
   padding-left: 2rem;
   padding-right: 2rem;
   display: flex;
   flex-direction: column;
-  gap: 20vh;
+  gap: 15vh;
 }
 
 /*Profile Section*/
@@ -18,7 +18,7 @@
 }
 
 .profile-picture {
-  height: 4rem;
+  height: 2rem;
   border-radius: 50%;
 }
 
@@ -36,9 +36,19 @@
   width: 1.5rem;
 }
 
+.settings-icon {
+  transition: transform 0.3s ease-in-out; /* Smooth transition */
+}
+
+.settings-icon:hover {
+  transform: rotate(360deg);
+}
+
+
 .dots {
   display: flex;
   margin-top: 1vh;
+  width: 5vh;
 }
 
 /*Nav items*/
@@ -46,7 +56,7 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 6vh;
+  gap: 3vh;
 }
 
 .list-group {
@@ -92,16 +102,20 @@
 
 .list-icon {
   margin-right: 15px;
+  width: 15px;
 }
 
 .list-item {
   color: #fff;
-  font-size: 20px;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 10px 0px;
 }
 
 .collapse-icon {
   padding-right: 5px;
   transition: transform 0.3s;
+  width: 15px;
 }
 
 .collapse-icon.open {
@@ -115,12 +129,13 @@
   flex-direction: column;
   gap: 1.25rem; /* Adjust gap to match the desired spacing */
   position: relative;
+  margin-top: 2vh;
   margin-left: 0; /* Remove margin to align with the left border */
 }
 
 .mini-item {
   color: #fff;
-  font-size: 18px;
+  font-size: 12px;
   cursor: pointer;
   padding-left: 1rem;
   position: relative;
@@ -148,6 +163,7 @@
 
 .mini-item:hover {
   text-decoration: underline;
+  color:#FFDA16;
 }
 
 .mini-nav {

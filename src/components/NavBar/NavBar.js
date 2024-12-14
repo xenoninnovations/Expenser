@@ -122,6 +122,13 @@ export default function NavBar() {
           )}
         </section>
       </ul>
+
+      <div>
+        <section id="auth">
+          <a href="/signin">Signin</a> <br/>
+          <a href="/signup">Signup</a>
+        </section>
+      </div>
     </nav>
   );
 }

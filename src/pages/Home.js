@@ -9,7 +9,7 @@ function Home() {
         <Navbar />
 
         <div className='page-content'>
-
+          
         </div>
     </div>
   )

@@ -65,7 +65,7 @@ export default function NavBar() {
           </section>
           {isBudgetingOpen && (
             <ul className="mini-nav">
-              <li className="mini-item">Expense Tracker</li>
+              <a href="/expensetracker"><li className="mini-item">Expense Tracker</li></a>
               <li className="mini-item">Income/Revenue</li>
               <li className="mini-item">Savings</li>
               <li className="mini-item">Transactions</li>
@@ -114,7 +114,7 @@ export default function NavBar() {
           </section>
           {isBookKeepingOpen && (
             <ul className="mini-nav">
-              <li className="mini-item">Expense Tracker</li>
+              <a href="/expensetracker"><li className="mini-item">Expense Tracker</li></a>
               <li className="mini-item">Income/Revenue</li>
               <li className="mini-item">Savings</li>
               <li className="mini-item">Transactions</li>

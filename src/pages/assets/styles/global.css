@@ -41,8 +41,10 @@ a {
   padding: 1vh;
   -webkit-box-shadow: 0px 9px 21px 1px rgba(0, 0, 0, 0.4);
   box-shadow: 0px 9px 21px 1px rgba(0, 0, 0, 0.4);
+  width: 100%;
 }
 
 .label {
-  padding-right: 3vw;
+  display: flex;
+  flex-direction: column;
 }

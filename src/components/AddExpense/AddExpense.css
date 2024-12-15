@@ -23,6 +23,9 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
   position: relative;
   color: #fff; /* Ensure text is readable on transparent background */
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
 }
 
 .modal-content form {
@@ -38,7 +41,6 @@
   border-radius: 5px;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  margin-top: 1rem;
 }
 
 .add-expense-button {
@@ -49,6 +51,5 @@
   padding: 0.5rem 1rem;
   cursor: pointer;
   margin-top: 1rem;
-  margin-right: 1rem;
 }
 

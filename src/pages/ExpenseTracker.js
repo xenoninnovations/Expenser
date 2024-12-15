@@ -28,6 +28,7 @@ function ExpenseTracker() {
     },
   ];
 
+  
   return (
     <div className="page">
       <Navbar />

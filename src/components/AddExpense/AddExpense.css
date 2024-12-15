@@ -20,18 +20,29 @@
   padding: 2rem;
   width: 400px;
   max-width: 90%;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-  position: relative;
+  box-sizing: border-box; /* Ensure padding doesn’t affect width */
   color: #fff; /* Ensure text is readable on transparent background */
   display: flex;
   flex-direction: column;
-  gap: 2vh;
+  gap: 1.5rem; /* Adjust gap for vertical spacing */
 }
 
 .modal-content form {
   display: flex;
   flex-direction: column;
-  gap: 3vh;
+  gap: 1rem;
+  width: 100%; /* Ensure the form fills the modal */
+}
+
+.field {
+  width: 100%; /* Maintain full width */
+  box-sizing: border-box; /* Prevent padding overflow */
+  padding: 0.5rem; /* Adjust padding for consistent spacing */
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
 }
 
 .close-button {
@@ -50,6 +61,4 @@
   border-radius: 5px;
   padding: 0.5rem 1rem;
   cursor: pointer;
-  margin-top: 1rem;
 }
-

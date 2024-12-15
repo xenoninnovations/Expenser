@@ -1,6 +1,5 @@
 import React from "react";
 import "./AddExpense.css";
-import "../../pages/assets/styles/global.css";
 
 function AddExpense({ closeModal }) {
   return (
@@ -26,18 +25,11 @@ function AddExpense({ closeModal }) {
           </label>
           <label className="label">
             Category:
-            <select className="field" >
+            <select className="field">
               <option value="electronics">Electronics</option>
               <option value="groceries">Groceries</option>
             </select>
           </label>
-          {/* <label className="label">
-            Repeat:
-            <div>
-              <button type="button">Yes</button>
-              <button type="button">No</button>
-            </div>
-          </label> */}
         </form>
         <button type="submit" className="add-expense-button">
           Add Expense

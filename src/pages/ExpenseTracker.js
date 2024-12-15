@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "../components/NavBar/NavBar";
-import "./assets/styles/global.css";
+import "../pages/assets/styles/global.css";
 import "./assets/styles/ExpenseTracker.css";
 import dots from "../images/dots.svg";
 import { FaPen, FaTrash } from "react-icons/fa";
+import AddExpense from "../components/AddExpense/AddExpense";
 
 function ExpenseTracker() {
-  //temp JSON
+  // State to manage modal visibility
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Sample expense data
   const expenses = [
     {
       item: "Headphones",
@@ -16,25 +20,11 @@ function ExpenseTracker() {
       merchant: "Beats",
     },
     {
-      item: "Headphones",
-      date: "July 2, 2024",
-      amount: "$2,365.00",
+      item: "Keyboard",
+      date: "July 5, 2024",
+      amount: "$150.00",
       category: "Electronics",
-      merchant: "Beats",
-    },
-    {
-      item: "Headphones",
-      date: "July 2, 2024",
-      amount: "$2,365.00",
-      category: "Electronics",
-      merchant: "Beats",
-    },
-    {
-      item: "Headphones",
-      date: "July 2, 2024",
-      amount: "$2,365.00",
-      category: "Electronics",
-      merchant: "Beats",
+      merchant: "Logitech",
     },
   ];
 
@@ -47,7 +37,10 @@ function ExpenseTracker() {
           <img src={dots} alt="dots" className="dots" />
         </div>
         <div className="expense-buttons">
-          <button className="buttons">Add an expense</button>
+          {/* Button to open modal */}
+          <button className="buttons" onClick={() => setIsModalOpen(true)}>
+            Add an expense
+          </button>
           <button className="buttons">Export as CSV</button>
         </div>
         <div className="expenses-container">
@@ -89,6 +82,8 @@ function ExpenseTracker() {
           </table>
         </div>
       </div>
+      {/* AddExpense Modal */}
+      {isModalOpen && <AddExpense closeModal={() => setIsModalOpen(false)} />}
     </div>
   );
 }

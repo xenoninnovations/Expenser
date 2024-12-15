@@ -18,7 +18,7 @@
   border: 1px solid rgba(255, 255, 255, 0.3); /* Border with transparency */
   border-radius: 10px;
   padding: 2rem;
-  width: 400px;
+  width: 50vw;
   max-width: 90%;
   box-sizing: border-box; /* Ensure padding doesn’t affect width */
   color: #fff; /* Ensure text is readable on transparent background */

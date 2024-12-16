@@ -6,6 +6,7 @@ import Signup from "./pages/auth/Signup";
 import Moreinfo from "./pages/auth/Moreinfo";
 import Forgotpassword from "./pages/auth/Forgotpassword";
 import ExpenseTracker from "./pages/ExpenseTracker";
+import IncomeRevenue from "./pages/IncomeRevenue";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/moreinfo" element={<Moreinfo />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
         <Route path="/expensetracker" element={<ExpenseTracker />} />
+        <Route path="/incomerevenue" element={<IncomeRevenue />} />
       </Routes>
     </BrowserRouter>
   );

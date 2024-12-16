@@ -1,33 +1,37 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/NavBar/NavBar";
 import "../pages/assets/styles/global.css";
 import "./assets/styles/ExpenseTracker.css";
 import dots from "../images/dots.svg";
 import { FaPen, FaTrash } from "react-icons/fa";
 import AddExpense from "../components/AddExpense/AddExpense";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "../config";
 
 function ExpenseTracker() {
   // State to manage modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expenses, setExpenses] = useState([])
 
-  // Sample expense data
-  const expenses = [
-    {
-      item: "Headphones",
-      date: "July 2, 2024",
-      amount: "$2,365.00",
-      category: "Electronics",
-      merchant: "Beats",
-    },
-    {
-      item: "Keyboard",
-      date: "July 5, 2024",
-      amount: "$150.00",
-      category: "Electronics",
-      merchant: "Logitech",
-    },
-  ];
+  useEffect(() => {
+    const loadExpenses = async () => {
+      try {
+        const expensesRef = collection(db, "expenses"); // Reference to "categories" collection
+        const querySnapshot = await getDocs(expensesRef);
 
+        // Map through documents and set categories state
+        const expensesList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setExpenses(expensesList);
+      } catch (error) {
+        console.error("Error fetching expenses: ", error);
+      }
+    };
+
+    loadExpenses();
+  }, []); // Fetch categories on component load
   
   return (
     <div className="page">
@@ -70,7 +74,7 @@ function ExpenseTracker() {
                 <tr key={index} className="table-row">
                   <td>{expense.item}</td>
                   <td>{expense.date}</td>
-                  <td>{expense.amount}</td>
+                  <td>${Number(expense.amount).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}</td>
                   <td>{expense.category}</td>
                   <td>{expense.merchant}</td>
                   <td>

@@ -32,6 +32,8 @@ function AddExpense({ closeModal, refreshExpenses }) {
     } catch (error) {
       console.error("Error adding document: ", error);
     }
+
+    window.location.reload(true);
   };
 
   useEffect(() => {

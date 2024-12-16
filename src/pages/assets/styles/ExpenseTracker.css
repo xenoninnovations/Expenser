@@ -28,6 +28,37 @@
   align-items: center;
 }
 
+.expenses-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  margin-top: 20px;
+  background-color: #f9f9f9;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.expenses-total h4 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #222;
+}
+
+.expenses-total span {
+  color: #f44336;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.expenses-total .total-icon {
+  font-size: 1.5rem;
+  color: #4caf50;
+  margin-right: 10px;
+}
+
 .expenses-title {
   margin: 0;
   font-size: 1.5rem;

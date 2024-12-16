@@ -5,46 +5,57 @@ import "./assets/styles/ExpenseTracker.css";
 import dots from "../images/dots.svg";
 import { FaPen, FaTrash } from "react-icons/fa";
 import AddExpense from "../components/AddExpense/AddExpense";
+import EditExpense from "../components/EditExpense/EditExpense";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../config";
 import { CSVLink } from "react-csv";
 
 function ExpenseTracker() {
-  // State to manage modal visibility
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // State to manage modals
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedExpenseId, setSelectedExpenseId] = useState(null);
+
   const [expenses, setExpenses] = useState([]);
   const [total, setTotal] = useState(0);
 
+  // Function to load expenses
+  const loadExpenses = async () => {
+    try {
+      const expensesRef = collection(db, "expenses");
+      const querySnapshot = await getDocs(expensesRef);
+
+      const expensesList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setExpenses(expensesList);
+    } catch (error) {
+      console.error("Error fetching expenses: ", error);
+    }
+  };
+
   useEffect(() => {
-    const loadExpenses = async () => {
-      try {
-        const expensesRef = collection(db, "expenses"); // Reference to "expenses" collection
-        const querySnapshot = await getDocs(expensesRef);
-
-        // Map through documents and set expenses state
-        const expensesList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setExpenses(expensesList);
-      } catch (error) {
-        console.error("Error fetching expenses: ", error);
-      }
-    };
-
     loadExpenses();
-  }, []); // Fetch expenses on component load
+  }, []);
 
-  // Calculate the total whenever expenses change
   useEffect(() => {
     const calculateTotal = () => {
-      const sum = expenses.reduce((acc, expense) => acc + parseFloat(expense.amount || 0), 0);
+      const sum = expenses.reduce(
+        (acc, expense) => acc + parseFloat(expense.amount || 0),
+        0
+      );
       setTotal(sum);
     };
 
     calculateTotal();
-  }, [expenses]); // Recalculate total when expenses state changes
+  }, [expenses]);
+
+  const handleEditClick = (expenseId) => {
+    setSelectedExpenseId(expenseId); // Set the selected expense ID
+    setIsEditModalOpen(true); // Open the edit modal
+  };
 
   return (
     <div className="page">
@@ -55,8 +66,7 @@ function ExpenseTracker() {
           <img src={dots} alt="dots" className="dots" />
         </div>
         <div className="expense-buttons">
-          {/* Button to open modal */}
-          <button className="buttons" onClick={() => setIsModalOpen(true)}>
+          <button className="buttons" onClick={() => setIsAddModalOpen(true)}>
             Add an expense
           </button>
           <CSVLink
@@ -67,13 +77,13 @@ function ExpenseTracker() {
             Export as CSV
           </CSVLink>
         </div>
-        <div className="expenses-container">
-          <div className="expenses-header">
-            <h2 className="expenses-title">
+        <div className="table-container">
+          <div className="table-header">
+            <h2 className="table-title">
               <span className="yellow-bar"></span> My Expenses
             </h2>
           </div>
-          <table className="expenses-table">
+          <table className="global-table">
             <thead>
               <tr>
                 {[
@@ -82,27 +92,30 @@ function ExpenseTracker() {
                   "Amount",
                   "Category",
                   "Merchant",
-                  "Invoice",
+                  "Actions",
                 ].map((head) => (
                   <th key={head}>{head} ⬍</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {expenses.map((expense, index) => (
-                <tr key={index} className="table-row">
+              {expenses.map((expense) => (
+                <tr key={expense.id} className="table-row">
                   <td>{expense.item}</td>
                   <td>{expense.date}</td>
                   <td>
                     $
                     {Number(expense.amount)
                       .toFixed(2)
-                      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+                      .replace(/(\\d)(?=(\\d{3})+(?!\\d))/g, "$1,")}
                   </td>
                   <td>{expense.category}</td>
                   <td>{expense.merchant}</td>
                   <td>
-                    <FaPen className="icon edit-icon" />
+                    <FaPen
+                      className="icon edit-icon"
+                      onClick={() => handleEditClick(expense.id)}
+                    />
                     <FaTrash className="icon delete-icon" />
                   </td>
                 </tr>
@@ -115,11 +128,26 @@ function ExpenseTracker() {
             <span className="total-icon">💰</span>
             The <span>total</span> of your Expenses:
           </h4>
-          <h4>${total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h4>
+          <h4>
+            ${total.toFixed(2).replace(/(\\d)(?=(\\d{3})+(?!\\d))/g, "$1,")}
+          </h4>
         </div>
       </div>
       {/* AddExpense Modal */}
-      {isModalOpen && <AddExpense closeModal={() => setIsModalOpen(false)} />}
+      {isAddModalOpen && (
+        <AddExpense
+          closeModal={() => setIsAddModalOpen(false)}
+          refreshExpenses={loadExpenses}
+        />
+      )}
+      {/* EditExpense Modal */}
+      {isEditModalOpen && (
+        <EditExpense
+          closeModal={() => setIsEditModalOpen(false)}
+          expenseId={selectedExpenseId}
+          refreshExpenses={loadExpenses}
+        />
+      )}
     </div>
   );
 }

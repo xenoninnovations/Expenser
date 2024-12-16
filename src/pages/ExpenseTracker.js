@@ -6,6 +6,7 @@ import dots from "../images/dots.svg";
 import { FaPen, FaTrash } from "react-icons/fa";
 import AddExpense from "../components/AddExpense/AddExpense";
 import EditExpense from "../components/EditExpense/EditExpense";
+import DeleteExpense from "../components/DeleteExpense/DeleteExpense";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../config";
 import { CSVLink } from "react-csv";
@@ -14,6 +15,7 @@ function ExpenseTracker() {
   // State to manage modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedExpenseId, setSelectedExpenseId] = useState(null);
 
   const [expenses, setExpenses] = useState([]);
@@ -55,6 +57,11 @@ function ExpenseTracker() {
   const handleEditClick = (expenseId) => {
     setSelectedExpenseId(expenseId); // Set the selected expense ID
     setIsEditModalOpen(true); // Open the edit modal
+  };
+
+  const handleDeleteClick = (expenseId) => {
+    setSelectedExpenseId(expenseId); // Set the selected expense ID
+    setIsDeleteModalOpen(true); // Open the delete modal
   };
 
   return (
@@ -107,7 +114,7 @@ function ExpenseTracker() {
                     $
                     {Number(expense.amount)
                       .toFixed(2)
-                      .replace(/(\\d)(?=(\\d{3})+(?!\\d))/g, "$1,")}
+                      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
                   </td>
                   <td>{expense.category}</td>
                   <td>{expense.merchant}</td>
@@ -116,7 +123,10 @@ function ExpenseTracker() {
                       className="icon edit-icon"
                       onClick={() => handleEditClick(expense.id)}
                     />
-                    <FaTrash className="icon delete-icon" />
+                    <FaTrash
+                      className="icon delete-icon"
+                      onClick={() => handleDeleteClick(expense.id)}
+                    />
                   </td>
                 </tr>
               ))}
@@ -128,9 +138,7 @@ function ExpenseTracker() {
             <span className="total-icon">💰</span>
             The <span>total</span> of your Expenses:
           </h4>
-          <h4>
-            ${total.toFixed(2).replace(/(\\d)(?=(\\d{3})+(?!\\d))/g, "$1,")}
-          </h4>
+          <h4>${total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h4>
         </div>
       </div>
       {/* AddExpense Modal */}
@@ -144,6 +152,14 @@ function ExpenseTracker() {
       {isEditModalOpen && (
         <EditExpense
           closeModal={() => setIsEditModalOpen(false)}
+          expenseId={selectedExpenseId}
+          refreshExpenses={loadExpenses}
+        />
+      )}
+      {/* DeleteExpense Modal */}
+      {isDeleteModalOpen && (
+        <DeleteExpense
+          closeModal={() => setIsDeleteModalOpen(false)}
           expenseId={selectedExpenseId}
           refreshExpenses={loadExpenses}
         />

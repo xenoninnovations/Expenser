@@ -6,7 +6,7 @@ import {
   getDocs,
   getDoc,
 } from "firebase/firestore";
-import "./EditExpense.css";
+import "../../pages/assets/styles/ExpenseTracker.css";
 import { db } from "../../config.js";
 
 function EditExpense({ closeModal, expenseId, refreshExpenses }) {

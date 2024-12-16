@@ -7,6 +7,7 @@ import { FaPen, FaTrash } from "react-icons/fa";
 import AddExpense from "../components/AddExpense/AddExpense";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../config";
+import { CSVLink, CSVDownload } from "react-csv";
 
 function ExpenseTracker() {
   // State to manage modal visibility
@@ -32,7 +33,12 @@ function ExpenseTracker() {
 
     loadExpenses();
   }, []); // Fetch categories on component load
-  
+  const csvData = [
+    ["firstname", "lastname", "email"],
+    ["Ahmed", "Tomi", "ah@smthing.co.com"],
+    ["Raed", "Labes", "rl@smthing.co.com"],
+    ["Yezzi", "Min l3b", "ymin@cocococo.com"]
+  ];
   return (
     <div className="page">
       <Navbar />
@@ -46,7 +52,7 @@ function ExpenseTracker() {
           <button className="buttons" onClick={() => setIsModalOpen(true)}>
             Add an expense
           </button>
-          <button className="buttons">Export as CSV</button>
+          <CSVLink filename={"your-expenses"} data={csvData} className="buttons">Export as CSV</CSVLink>
         </div>
         <div className="expenses-container">
           <div className="expenses-header">

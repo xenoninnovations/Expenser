@@ -7,24 +7,26 @@ import { FaPen, FaTrash } from "react-icons/fa";
 import AddExpense from "../components/AddExpense/AddExpense";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../config";
-import { CSVLink, CSVDownload } from "react-csv";
+import { CSVLink } from "react-csv";
 
 function ExpenseTracker() {
   // State to manage modal visibility
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [expenses, setExpenses] = useState([])
+  const [expenses, setExpenses] = useState([]);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     const loadExpenses = async () => {
       try {
-        const expensesRef = collection(db, "expenses"); // Reference to "categories" collection
+        const expensesRef = collection(db, "expenses"); // Reference to "expenses" collection
         const querySnapshot = await getDocs(expensesRef);
 
-        // Map through documents and set categories state
+        // Map through documents and set expenses state
         const expensesList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
+
         setExpenses(expensesList);
       } catch (error) {
         console.error("Error fetching expenses: ", error);
@@ -32,13 +34,18 @@ function ExpenseTracker() {
     };
 
     loadExpenses();
-  }, []); // Fetch categories on component load
-  const csvData = [
-    ["firstname", "lastname", "email"],
-    ["Ahmed", "Tomi", "ah@smthing.co.com"],
-    ["Raed", "Labes", "rl@smthing.co.com"],
-    ["Yezzi", "Min l3b", "ymin@cocococo.com"]
-  ];
+  }, []); // Fetch expenses on component load
+
+  // Calculate the total whenever expenses change
+  useEffect(() => {
+    const calculateTotal = () => {
+      const sum = expenses.reduce((acc, expense) => acc + parseFloat(expense.amount || 0), 0);
+      setTotal(sum);
+    };
+
+    calculateTotal();
+  }, [expenses]); // Recalculate total when expenses state changes
+
   return (
     <div className="page">
       <Navbar />
@@ -52,7 +59,13 @@ function ExpenseTracker() {
           <button className="buttons" onClick={() => setIsModalOpen(true)}>
             Add an expense
           </button>
-          <CSVLink filename={"your-expenses"} data={csvData} className="buttons">Export as CSV</CSVLink>
+          <CSVLink
+            filename={"your-expenses"}
+            data={expenses}
+            className="buttons"
+          >
+            Export as CSV
+          </CSVLink>
         </div>
         <div className="expenses-container">
           <div className="expenses-header">
@@ -80,7 +93,12 @@ function ExpenseTracker() {
                 <tr key={index} className="table-row">
                   <td>{expense.item}</td>
                   <td>{expense.date}</td>
-                  <td>${Number(expense.amount).toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}</td>
+                  <td>
+                    $
+                    {Number(expense.amount)
+                      .toFixed(2)
+                      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+                  </td>
                   <td>{expense.category}</td>
                   <td>{expense.merchant}</td>
                   <td>
@@ -91,6 +109,13 @@ function ExpenseTracker() {
               ))}
             </tbody>
           </table>
+        </div>
+        <div className="expenses-total">
+          <h4>
+            <span className="total-icon">💰</span>
+            The <span>total</span> of your Expenses:
+          </h4>
+          <h4>${total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h4>
         </div>
       </div>
       {/* AddExpense Modal */}

@@ -29,6 +29,9 @@ a {
   padding: 2vh;
   -webkit-box-shadow: 0px 9px 21px 1px rgba(0, 0, 0, 0.4);
   box-shadow: 0px 9px 21px 1px rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+  text-align: center;
+  font-size: 14px;
 }
 
 .field {

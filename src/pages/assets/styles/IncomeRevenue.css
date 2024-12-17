@@ -11,10 +11,21 @@
   display: flex;
   align-items: center;
   border-radius: 15px;
+  justify-content: space-between;
 }
 
 .inc-rev-title {
   margin: 0;
   font-size: 1.5rem;
   font-weight: 400;
+  width: 50%;
+  
+}
+
+.inc-rev-total {
+  font-size: 50px;
+}
+
+.yellow-bar.inc-rev {
+  height: 3.5rem;
 }

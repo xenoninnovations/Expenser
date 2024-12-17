@@ -22,18 +22,16 @@ function AddExpense({ closeModal, refreshExpenses }) {
     e.preventDefault();
 
     try {
-      // Add the expense data to the "expenses" collection
       const collectionRef = collection(db, "expenses");
-      await addDoc(collectionRef, formData);
+      await addDoc(collectionRef, {
+        ...formData,
+        date: new Date(formData.date).toISOString().split("T")[0], // Save in ISO format
+      });
       console.log("Expense added successfully");
-
-      // Close modal after submission
       closeModal();
     } catch (error) {
       console.error("Error adding document: ", error);
     }
-
-    window.location.reload(true);
   };
 
   useEffect(() => {

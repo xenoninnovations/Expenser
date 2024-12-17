@@ -5,8 +5,8 @@ import Signin from "./pages/auth/Signin";
 import Signup from "./pages/auth/Signup";
 import Moreinfo from "./pages/auth/Moreinfo";
 import Forgotpassword from "./pages/auth/Forgotpassword";
-import ExpenseTracker from "./pages/ExpenseTracker";
-import IncomeRevenue from "./pages/IncomeRevenue";
+import ExpenseTracker from "./pages/expensetracker/ExpenseTracker";
+import IncomeRevenue from "./pages/incomerevenue/IncomeRevenue";
 
 function App() {
   return (

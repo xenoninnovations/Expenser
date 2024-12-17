@@ -104,3 +104,23 @@
   padding: 0.5rem 1rem;
   cursor: pointer;
 }
+.filters {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem; /* Spacing between dropdowns and button */
+  margin-bottom: 1.5rem; /* Space below the filter section */
+}
+
+.filters select,
+.filters input {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #333;
+  outline: none;
+  transition: border-color 0.3s;
+  width: auto;
+}

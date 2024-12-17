@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "../components/NavBar/NavBar";
-import "../pages/assets/styles/global.css";
-import "./assets/styles/ExpenseTracker.css";
-import dots from "../images/dots.svg";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "../../config";
+import Navbar from "../../components/NavBar/NavBar";
+import "../assets/styles/global.css";
+import "../assets/styles/ExpenseTracker.css";
+import dots from "../../images/dots.svg";
 import { FaPen, FaTrash } from "react-icons/fa";
-import AddExpense from "../components/AddExpense/AddExpense";
-import EditExpense from "../components/EditExpense/EditExpense";
-import DeleteExpense from "../components/DeleteExpense/DeleteExpense";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../config";
+import AddExpense from "../../components/AddExpense/AddExpense";
+import EditExpense from "../../components/EditExpense/EditExpense";
+import DeleteExpense from "../../components/DeleteExpense/DeleteExpense";
 import { CSVLink } from "react-csv";
 
 function ExpenseTracker() {
-  // State to manage modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -21,26 +20,52 @@ function ExpenseTracker() {
   const [expenses, setExpenses] = useState([]);
   const [total, setTotal] = useState(0);
 
-  // Function to load expenses
-  const loadExpenses = async () => {
-    try {
-      const expensesRef = collection(db, "expenses");
-      const querySnapshot = await getDocs(expensesRef);
+  // State for month and year selection
+  const [month, setMonth] = useState(new Date().getMonth() + 1); // Default to current month
+  const [year, setYear] = useState(new Date().getFullYear()); // Default to current year
 
+  // Function to load expenses filtered by month and year
+  const loadExpenses = async (selectedMonth, selectedYear) => {
+    try {
+      const startOfMonth = new Date(selectedYear, selectedMonth - 1, 1);
+      const endOfMonth = new Date(selectedYear, selectedMonth, 0);
+
+      const expensesRef = collection(db, "expenses");
+      const q = query(
+        expensesRef,
+        where("date", ">=", startOfMonth.toISOString().split("T")[0]),
+        where("date", "<=", endOfMonth.toISOString().split("T")[0])
+      );
+
+      const querySnapshot = await getDocs(q);
       const expensesList = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-
       setExpenses(expensesList);
     } catch (error) {
       console.error("Error fetching expenses: ", error);
     }
   };
 
+  // Function to load all expenses (no filters)
+  const loadAllExpenses = async () => {
+    try {
+      const expensesRef = collection(db, "expenses");
+      const querySnapshot = await getDocs(expensesRef);
+      const expensesList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setExpenses(expensesList);
+    } catch (error) {
+      console.error("Error fetching all expenses: ", error);
+    }
+  };
+
   useEffect(() => {
-    loadExpenses();
-  }, []);
+    loadExpenses(month, year);
+  }, [month, year]); // Reload whenever month or year changes
 
   useEffect(() => {
     const calculateTotal = () => {
@@ -55,13 +80,13 @@ function ExpenseTracker() {
   }, [expenses]);
 
   const handleEditClick = (expenseId) => {
-    setSelectedExpenseId(expenseId); // Set the selected expense ID
-    setIsEditModalOpen(true); // Open the edit modal
+    setSelectedExpenseId(expenseId);
+    setIsEditModalOpen(true);
   };
 
   const handleDeleteClick = (expenseId) => {
-    setSelectedExpenseId(expenseId); // Set the selected expense ID
-    setIsDeleteModalOpen(true); // Open the delete modal
+    setSelectedExpenseId(expenseId);
+    setIsDeleteModalOpen(true);
   };
 
   return (
@@ -72,6 +97,7 @@ function ExpenseTracker() {
           <h3>Expense Tracker</h3>
           <img src={dots} alt="dots" className="dots" />
         </div>
+
         <div className="expense-buttons">
           <button className="buttons" onClick={() => setIsAddModalOpen(true)}>
             Add an expense
@@ -83,6 +109,40 @@ function ExpenseTracker() {
           >
             Export as CSV
           </CSVLink>
+        </div>
+        <div className="filters">
+          <select
+            value={month}
+            onChange={(e) => setMonth(Number(e.target.value))}
+            className="dropdown"
+          >
+            {Array.from({ length: 12 }, (_, i) => (
+              <option key={i + 1} value={i + 1}>
+                {new Date(0, i).toLocaleString("en-US", { month: "long" })}
+              </option>
+            ))}
+          </select>
+          <input
+            type="number"
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+            min="2000"
+            max={new Date().getFullYear()}
+            className="dropdown"
+          />
+          <button onClick={() => loadExpenses(month, year)} className="buttons">
+            Filter
+          </button>
+          <button
+            onClick={() => {
+              setMonth(new Date().getMonth() + 1); // Reset month to current
+              setYear(new Date().getFullYear()); // Reset year to current
+              loadAllExpenses(); // Fetch all records
+            }}
+            className="buttons"
+          >
+            Clear filters
+          </button>
         </div>
         <div className="table-container">
           <div className="table-header">
@@ -138,30 +198,29 @@ function ExpenseTracker() {
             <span className="total-icon">💰</span>
             The <span>total</span> of your Expenses:
           </h4>
-          <h4>${total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h4>
+          <h4>
+            ${total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+          </h4>
         </div>
       </div>
-      {/* AddExpense Modal */}
       {isAddModalOpen && (
         <AddExpense
           closeModal={() => setIsAddModalOpen(false)}
-          refreshExpenses={loadExpenses}
+          refreshExpenses={() => loadExpenses(month, year)}
         />
       )}
-      {/* EditExpense Modal */}
       {isEditModalOpen && (
         <EditExpense
           closeModal={() => setIsEditModalOpen(false)}
           expenseId={selectedExpenseId}
-          refreshExpenses={loadExpenses}
+          refreshExpenses={() => loadExpenses(month, year)}
         />
       )}
-      {/* DeleteExpense Modal */}
       {isDeleteModalOpen && (
         <DeleteExpense
           closeModal={() => setIsDeleteModalOpen(false)}
           expenseId={selectedExpenseId}
-          refreshExpenses={loadExpenses}
+          refreshExpenses={() => loadExpenses(month, year)}
         />
       )}
     </div>

@@ -1,8 +1,8 @@
 import React from "react";
-import "./assets/styles/IncomeRevenue.css";
-import "./assets/styles/global.css";
-import Navbar from "../components/NavBar/NavBar";
-import dots from "../images/dots.svg";
+import "../assets/styles/IncomeRevenue.css";
+import "../assets/styles/global.css";
+import Navbar from "../../components/NavBar/NavBar";
+import dots from "../../images/dots.svg";
 
 function IncomeRevenue() {
   return (

@@ -15,16 +15,14 @@ function IncomeRevenue() {
         </div>
         <div className="inc-rev-totals">
           <div className="inc-rev-header">
-            <h2 className="inc-rev-title">
-              <span className="yellow-bar"></span> Your total income
-            </h2>
-            <span className="">$3000</span>
+            <span className="yellow-bar inc-rev"></span>
+            <h2 className="inc-rev-title">Your total income</h2>
+            <span className="inc-rev-total">$ 0.00</span>
           </div>
           <div className="inc-rev-header">
-            <h2 className="inc-rev-title">
-              <span className="yellow-bar"></span> Your total revenue
-            </h2>
-            <span className="">$3000</span>
+            <span className="yellow-bar inc-rev"></span>
+            <h2 className="inc-rev-title">Your total income</h2>
+            <span className="inc-rev-total">$ 0.00</span>
           </div>
         </div>
         {/** Revenue table */}

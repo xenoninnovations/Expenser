@@ -1,0 +1,23 @@
+.buttons {
+  cursor: pointer;
+  width: 15vw;
+  background-color: #222222;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-weight: 500;
+  padding: 2vh;
+  -webkit-box-shadow: 0px 9px 21px 1px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 9px 21px 1px rgba(0, 0, 0, 0.4);
+  text-decoration: none;
+  font-size: 14px;
+
+  display: flex; /* Flexbox layout */
+  align-items: center; /* Vertically center icon and text */
+  justify-content: center; /* Center the content as a whole */
+  gap: 8px; /* Space between icon and text */
+}
+
+.buttons span {
+  text-align: center; /* Center the text horizontally */
+}

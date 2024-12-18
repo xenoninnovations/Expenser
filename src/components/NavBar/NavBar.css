@@ -1,7 +1,7 @@
 .navbar {
   background-color: black;
   height: 150vh;
-  width: 15%;
+  width: fit-content;
   padding-left: 5vh;
   padding-right: 5vh;
   display: flex;

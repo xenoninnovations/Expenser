@@ -5,11 +5,12 @@ import Navbar from "../../components/NavBar/NavBar";
 import "../assets/styles/global.css";
 import "../assets/styles/ExpenseTracker.css";
 import dots from "../../images/dots.svg";
-import { FaPen, FaTrash } from "react-icons/fa";
+import { FaPen, FaTrash, FaPlus, FaFileExport } from "react-icons/fa";
 import AddExpense from "../../components/AddExpense/AddExpense";
 import EditExpense from "../../components/EditExpense/EditExpense";
 import DeleteExpense from "../../components/DeleteExpense/DeleteExpense";
 import { CSVLink } from "react-csv";
+import GlobalButton from "../../components/GlobalButton/GlobalButton";
 
 function ExpenseTracker() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -89,6 +90,12 @@ function ExpenseTracker() {
     setIsDeleteModalOpen(true);
   };
 
+  const handleClearFilterClick = () => {
+    setMonth(new Date().getMonth() + 1); // Reset month to current
+    setYear(new Date().getFullYear()); // Reset year to current
+    loadAllExpenses(); // Fetch all records
+  };
+
   return (
     <div className="page">
       <Navbar />
@@ -99,14 +106,20 @@ function ExpenseTracker() {
         </div>
 
         <div className="expense-buttons">
-          <button className="buttons" onClick={() => setIsAddModalOpen(true)}>
-            Add an expense
-          </button>
+          <GlobalButton
+            bg={"#222222"}
+            textColor={"white"}
+            icon={FaPlus}
+            text={"Add an expense"}
+            onClick={() => setIsAddModalOpen(true)}
+          />
+
           <CSVLink
             filename={"your-expenses"}
             data={expenses}
             className="buttons"
           >
+            <FaFileExport />
             Export as CSV
           </CSVLink>
         </div>
@@ -130,19 +143,13 @@ function ExpenseTracker() {
             max={new Date().getFullYear()}
             className="dropdown"
           />
-          <button onClick={() => loadExpenses(month, year)} className="buttons">
-            Filter
-          </button>
-          <button
-            onClick={() => {
-              setMonth(new Date().getMonth() + 1); // Reset month to current
-              setYear(new Date().getFullYear()); // Reset year to current
-              loadAllExpenses(); // Fetch all records
-            }}
-            className="buttons"
-          >
-            Clear filters
-          </button>
+          <GlobalButton
+            bg={"#222222"}
+            textColor={"white"}
+            icon={FaTrash}
+            text={"Clear filters"}
+            onClick={() => handleClearFilterClick()}
+          />
         </div>
         <div className="table-container">
           <div className="table-header">
@@ -198,9 +205,7 @@ function ExpenseTracker() {
             <span className="total-icon">💰</span>
             The <span>total</span> of your Expenses:
           </h4>
-          <h4>
-            ${total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
-          </h4>
+          <h4>${total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h4>
         </div>
       </div>
       {isAddModalOpen && (

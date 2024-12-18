@@ -8,6 +8,8 @@ import budgetingIcon from "../../images/budgeting.svg";
 import timeIcon from "../../images/time.svg";
 import bookIcon from "../../images/bookkeeping.svg";
 import collapseIcon from "../../images/collapse.svg";
+import GlobalButton from "../GlobalButton/GlobalButton";
+import { FaRegUser, FaUser } from "react-icons/fa";
 
 export default function NavBar() {
   const [isBudgetingOpen, setIsBudgetingOpen] = useState(false);
@@ -118,12 +120,10 @@ export default function NavBar() {
           </section>
           {isBookKeepingOpen && (
             <ul className="mini-nav">
-              <a href="/expensetracker">
-                <li className="mini-item">Expense Tracker</li>
-              </a>
-              <li className="mini-item">Income/Revenue</li>
-              <li className="mini-item">Savings</li>
-              <li className="mini-item">Transactions</li>
+              <li className="mini-item">Item</li>
+              <li className="mini-item">Item</li>
+              <li className="mini-item">Item</li>
+              <li className="mini-item">Item</li>
             </ul>
           )}
         </section>
@@ -131,8 +131,23 @@ export default function NavBar() {
 
       <div>
         <section id="auth">
-          <a href="/signin">Signin</a> <br />
-          <a href="/signup">Signup</a>
+          <GlobalButton
+            bg={"#ffb316"}
+            textColor={"white"}
+            icon={FaUser}
+            text={"Sign in"}
+            onClick={null}
+            link={"/signin"}
+          />
+          <br /> <br />
+          <GlobalButton
+            bg={"#ffb316"}
+            textColor={"white"}
+            icon={FaRegUser}
+            text={"Sign up"}
+            onClick={null}
+            link={"/signup"}
+          />
         </section>
       </div>
     </nav>

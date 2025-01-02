@@ -45,7 +45,7 @@ export default function NavBar() {
       <ul className="nav-list">
         <section className="list-dashboard">
           <img src={dashboardIcon} alt="dashboard icon" className="list-icon" />
-          <li className="list-item">Dashboard</li>
+          <a href="/"><li className="list-item">Dashboard</li></a>
         </section>
         <section className="list-group">
           <section className="main-nav" onClick={toggleBudgeting}>
@@ -114,10 +114,13 @@ export default function NavBar() {
           </section>
           {isBookKeepingOpen && (
             <ul className="mini-nav">
-              <a href="/expensetracker"><li className="mini-item">Expense Tracker</li></a>
-              <li className="mini-item">Income/Revenue</li>
-              <li className="mini-item">Savings</li>
-              <li className="mini-item">Transactions</li>
+              <a href="/clientmanagement"><li className="mini-item">Client Management</li></a>
+              <li className="mini-item">Cost Breakdown</li>
+              <li className="mini-item">Invoicing & Payments</li>
+              <li className="mini-item">Transaction Tracking</li>
+              <li className="mini-item">Reports & Analytics</li>
+              <li className="mini-item">Tax Preparation</li>
+              <li className="mini-item">Recurring Entries</li>
             </ul>
           )}
         </section>

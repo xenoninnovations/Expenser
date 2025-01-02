@@ -1,0 +1,28 @@
+.fields {
+    width: 5vw;
+    background-color: #ffffff;
+    color: #222222;
+    border: none;
+    border-radius: 9px;
+    font-weight: 500;
+    padding: 1vh;
+    -webkit-box-shadow: 0px 9px 21px 1px rgba(0, 0, 0, 0.4);
+    box-shadow: 0px 9px 21px 1px rgba(207, 207, 207, 0.4);
+    width: 100%;
+  }
+
+.clientSubmit{
+    display: flex;
+    flex-direction: column;
+    gap: 5vh;
+}
+
+.form-section-content{
+    display: flex;
+    flex-direction: row;
+    gap: 2vh;
+}
+
+.form-section-content .fields{
+    width: 39vw;
+}

@@ -6,6 +6,9 @@ import Signup from "./pages/auth/Signup";
 import Moreinfo from "./pages/auth/Moreinfo";
 import Forgotpassword from "./pages/auth/Forgotpassword";
 import ExpenseTracker from "./pages/ExpenseTracker";
+import Timetracker from "./pages/time-tracking/Timetracking";
+import Clientmanagement from './pages/book-keeping/Clientmanagement';
+import AddClientForm from './pages/book-keeping/Addclientform';
 
 function App() {
   return (
@@ -17,6 +20,9 @@ function App() {
         <Route path="/moreinfo" element={<Moreinfo />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
         <Route path="/expensetracker" element={<ExpenseTracker />} />
+        <Route path="/timetracker" element={ <Timetracker /> } />
+        <Route path="/clientmanagement" element={ <Clientmanagement /> } />
+        <Route path="/addclientform" element={ <AddClientForm /> } />
       </Routes>
     </BrowserRouter>
   );

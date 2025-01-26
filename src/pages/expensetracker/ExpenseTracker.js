@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../config";
 import Navbar from "../../components/NavBar/NavBar";
 import "../assets/styles/global.css";
@@ -19,66 +19,37 @@ function ExpenseTracker() {
   const [selectedExpenseId, setSelectedExpenseId] = useState(null);
 
   const [expenseData, setExpenseData] = useState([]);
-  const [total, setTotal] = useState(0);
+  const [totalExpense, setTotalExpense] = useState(0);
 
-  // State for month and year selection
-  const [month, setMonth] = useState(new Date().getMonth() + 1); // Default to current month
-  const [year, setYear] = useState(new Date().getFullYear()); // Default to current year
-
-  // Function to load expenses filtered by month and year
-  const loadExpenses = async (selectedMonth, selectedYear) => {
+  // Function to load all expenses
+  const loadAllExpenses = async () => {
     try {
-      const startOfMonth = new Date(selectedYear, selectedMonth - 1, 1);
-      const endOfMonth = new Date(selectedYear, selectedMonth, 0);
-
       const expensesRef = collection(db, "expenses");
-      const q = query(
-        expensesRef,
-        where("date", ">=", startOfMonth.toISOString().split("T")[0]),
-        where("date", "<=", endOfMonth.toISOString().split("T")[0])
-      );
+      const querySnapshot = await getDocs(expensesRef);
 
-      const querySnapshot = await getDocs(q);
-      const expensesList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const expensesList = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          amount: parseFloat(data.amount || 0), // Ensure amount is a number
+          date: data.date ? new Date(data.date).toLocaleDateString() : "N/A", // Format date
+        };
+      });
+
       setExpenseData(expensesList);
+
+      // Calculate total expense
+      const total = expensesList.reduce((sum, expense) => sum + (expense.amount || 0), 0);
+      setTotalExpense(total);
     } catch (error) {
       console.error("Error fetching expenses: ", error);
     }
   };
 
-  // Function to load all expenses (no filters)
-  const loadAllExpenses = async () => {
-    try {
-      const expensesRef = collection(db, "expenses");
-      const querySnapshot = await getDocs(expensesRef);
-      const expensesList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setExpenseData(expensesList);
-    } catch (error) {
-      console.error("Error fetching all expenses: ", error);
-    }
-  };
-
   useEffect(() => {
-    loadExpenses(month, year);
-  }, [month, year]); // Reload whenever month or year changes
-
-  useEffect(() => {
-    const calculateTotal = () => {
-      const sum = expenseData.reduce(
-        (acc, expense) => acc + parseFloat(expense.amount || 0),
-        0
-      );
-      setTotal(sum);
-    };
-
-    calculateTotal();
-  }, [expenseData]);
+    loadAllExpenses();
+  }, []); // Run on component mount
 
   const handleEditClick = (expenseId) => {
     setSelectedExpenseId(expenseId);
@@ -90,12 +61,6 @@ function ExpenseTracker() {
     setIsDeleteModalOpen(true);
   };
 
-  const handleClearFilterClick = () => {
-    setMonth(new Date().getMonth() + 1); // Reset month to current
-    setYear(new Date().getFullYear()); // Reset year to current
-    loadAllExpenses(); // Fetch all records
-  };
-
   return (
     <div className="page">
       <Navbar />
@@ -105,9 +70,21 @@ function ExpenseTracker() {
           <img src={dots} alt="dots" className="dots" />
         </div>
 
+        <div className="revexp-totals">
+          <div className="revexp-header">
+            <span className="yellow-bar exp"></span>
+            <h2 className="revexp-title">Your total expenses</h2>
+            <span className="revexp-total">
+              <strong>
+                ${totalExpense.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              </strong>
+            </span>
+          </div>
+        </div>
+
         <div className="expense-buttons">
           <CSVLink
-            filename={"your-expenses"}
+            filename={"your-expenses.csv"}
             data={expenseData}
             className="buttons"
           >
@@ -115,34 +92,7 @@ function ExpenseTracker() {
             Export as CSV
           </CSVLink>
         </div>
-        <div className="filters">
-          <select
-            value={month}
-            onChange={(e) => setMonth(Number(e.target.value))}
-            className="dropdown"
-          >
-            {Array.from({ length: 12 }, (_, i) => (
-              <option key={i + 1} value={i + 1}>
-                {new Date(0, i).toLocaleString("en-US", { month: "long" })}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
-            min="2000"
-            max={new Date().getFullYear()}
-            className="dropdown"
-          />
-          <GlobalButton
-            bg={"#222222"}
-            textColor={"white"}
-            icon={FaTrash}
-            text={"Clear filters"}
-            onClick={() => handleClearFilterClick()}
-          />
-        </div>
+
         <div className="table-container">
           <div className="table-header exp">
             <div className="exp-spaced">
@@ -176,16 +126,16 @@ function ExpenseTracker() {
               {expenseData.length > 0 ? (
                 expenseData.map((expense) => (
                   <tr key={expense.id} className="table-row">
-                    <td>{expense.item}</td>
+                    <td>{expense.item || "N/A"}</td>
                     <td>{expense.date}</td>
                     <td>
                       $
-                      {Number(expense.amount)
+                      {expense.amount
                         .toFixed(2)
                         .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
                     </td>
-                    <td>{expense.category}</td>
-                    <td>{expense.merchant}</td>
+                    <td>{expense.category || "N/A"}</td>
+                    <td>{expense.merchant || "N/A"}</td>
                     <td>
                       <FaPen
                         className="icon edit-icon"
@@ -200,38 +150,38 @@ function ExpenseTracker() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5">No expense data available...</td>
+                  <td colSpan="6">No expense data available...</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-        <div className="expenses-total">
-          <h4>
-            <span className="total-icon">💰</span>
-            The <span>total</span> of your Expenses:
-          </h4>
-          <h4>${total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</h4>
-        </div>
       </div>
+
       {isAddModalOpen && (
         <AddExpense
-          closeModal={() => setIsAddModalOpen(false)}
-          refreshExpenses={() => loadExpenses(month, year)}
+          closeModal={() => {
+            setIsAddModalOpen(false);
+            loadAllExpenses(); // Refresh after adding
+          }}
         />
       )}
       {isEditModalOpen && (
         <EditExpense
-          closeModal={() => setIsEditModalOpen(false)}
+          closeModal={() => {
+            setIsEditModalOpen(false);
+            loadAllExpenses(); // Refresh after editing
+          }}
           expenseId={selectedExpenseId}
-          refreshExpenses={() => loadExpenses(month, year)}
         />
       )}
       {isDeleteModalOpen && (
         <DeleteExpense
-          closeModal={() => setIsDeleteModalOpen(false)}
+          closeModal={() => {
+            setIsDeleteModalOpen(false);
+            loadAllExpenses(); // Refresh after deletion
+          }}
           expenseId={selectedExpenseId}
-          refreshExpenses={() => loadExpenses(month, year)}
         />
       )}
     </div>

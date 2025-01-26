@@ -9,6 +9,7 @@ import ExpenseTracker from "./pages/ExpenseTracker";
 import Timetracker from "./pages/time-tracking/Timetracking";
 import Clientmanagement from './pages/book-keeping/Clientmanagement';
 import AddClientForm from './pages/book-keeping/Addclientform';
+import ClientInfo from './pages/book-keeping/ClientInfo';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/moreinfo" element={<Moreinfo />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
+        <Route path="/client/:id" element={<ClientInfo />} />
         <Route path="/expensetracker" element={<ExpenseTracker />} />
         <Route path="/timetracker" element={ <Timetracker /> } />
         <Route path="/clientmanagement" element={ <Clientmanagement /> } />

@@ -105,11 +105,11 @@ function EditRevenue({ closeModal, revenueId }) {
             />
           </label>
 
-          <button type="submit" className="add-expense-button">
+          <button type="submit" className="modal-button save">
             Save Changes
           </button>
         </form>
-        <button className="close-button" onClick={closeModal}>
+        <button className="cancel-button" onClick={closeModal}>
           Close
         </button>
       </div>

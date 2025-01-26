@@ -1,6 +1,5 @@
 import React from "react";
 import { doc, deleteDoc } from "firebase/firestore";
-import "../../pages/assets/styles/RevenueTracker.css";
 import { db } from "../../config.js";
 
 function DeleteRevenue({ closeModal, revenueId, refreshRevenue }) {
@@ -27,7 +26,7 @@ function DeleteRevenue({ closeModal, revenueId, refreshRevenue }) {
           undone.
         </p>
         <div className="button-group">
-          <button className="delete-button" onClick={handleDelete}>
+          <button className="modal-button del" onClick={handleDelete}>
             Confirm Delete
           </button>
           <button className="cancel-button" onClick={closeModal}>

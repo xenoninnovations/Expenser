@@ -2,24 +2,22 @@ import React, { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../config";
 import Navbar from "../../components/NavBar/NavBar";
-import "../assets/styles/IncomeRevenue.css";
+import "../assets/styles/RevenueTracker.css";
 import dots from "../../images/dots.svg";
 import GlobalButton from "../../components/GlobalButton/GlobalButton";
-import AddIncome from "../../components/AddIncome/AddIncome";
-import EditIncome from "../../components/EditIncome/EditIncome";
-import DeleteIncome from "../../components/DeleteIncome/DeleteIncome";
+import AddRevenue from "../../components/AddRevenue/AddRevenue";
+import EditRevenue from "../../components/EditRevenue/EditRevenue";
+import DeleteRevenue from "../../components/DeleteRevenue/DeleteRevenue";
 import { FaPen, FaTrash, FaPlus } from "react-icons/fa";
 
 function IncomeRevenue() {
-  const [incomeData, setIncomeData] = useState([]);
-  const [totalIncome, setTotalIncome] = useState(0);
   const [revenueData, setRevenueData] = useState([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
 
-  const [isAddIncomeModalOpen, setIsAddIncomeModalOpen] = useState(false);
-  const [isEditIncomeModalOpen, setIsEditIncomeModalOpen] = useState(false);
-  const [isDeleteIncomeModalOpen, setIsDeleteIncomeModalOpen] = useState(false);
-  const [selectedIncomeId, setSelectedIncomeId] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   const formatDate = (date) => {
     if (!date) return "N/A";
@@ -30,31 +28,6 @@ function IncomeRevenue() {
       return new Date(date).toLocaleDateString(); // String date
     } catch {
       return "N/A"; // Fallback for invalid dates
-    }
-  };
-
-  const fetchIncomeData = async () => {
-    try {
-      const incomeRef = collection(db, "income");
-      const querySnapshot = await getDocs(incomeRef);
-      const incomeList = querySnapshot.docs.map((doc) => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          amount: parseFloat(data.amount), // Ensure amount is a number
-          date: formatDate(data.date),
-        };
-      });
-      setIncomeData(incomeList);
-
-      const total = incomeList.reduce(
-        (sum, income) => sum + (income.amount || 0),
-        0
-      );
-      setTotalIncome(total);
-    } catch (error) {
-      console.error("Error fetching income data: ", error);
     }
   };
 
@@ -83,18 +56,17 @@ function IncomeRevenue() {
     }
   };
 
-  const handleEditClick = (incomeId) => {
-    setSelectedIncomeId(incomeId);
-    setIsEditIncomeModalOpen(true);
+  const handleEditClick = (revenueId) => {
+    setSelectedId(revenueId);
+    setIsEditModalOpen(true);
   };
 
-  const handleDeleteClick = (incomeId) => {
-    setSelectedIncomeId(incomeId);
-    setIsDeleteIncomeModalOpen(true);
+  const handleDeleteClick = (revenueId) => {
+    setSelectedId(revenueId);
+    setIsDeleteModalOpen(true);
   };
 
   useEffect(() => {
-    fetchIncomeData();
     fetchRevenueData();
   }, []);
 
@@ -103,20 +75,11 @@ function IncomeRevenue() {
       <Navbar />
       <div className="page-content">
         <div className="header">
-          <h3>Income and Revenue Tracker</h3>
+          <h3>Revenue Tracker</h3>
           <img src={dots} alt="dots" className="dots" />
         </div>
 
         <div className="inc-rev-totals">
-          <div className="inc-rev-header">
-            <span className="yellow-bar inc-rev"></span>
-            <h2 className="inc-rev-title">
-              Your total <strong>income</strong>
-            </h2>
-            <span className="inc-rev-total">
-              ${totalIncome.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-            </span>
-          </div>
           <div className="inc-rev-header">
             <span className="yellow-bar inc-rev"></span>
             <h2 className="inc-rev-title">
@@ -131,14 +94,14 @@ function IncomeRevenue() {
         <div className="table-container">
           <div className="table-header inc-rev">
             <h2 className="table-title">
-              <span className="yellow-bar"></span> My Income
+              <span className="yellow-bar"></span> My Revenue
             </h2>
             <GlobalButton
               bg={"white"}
               textColor={"#222222"}
               icon={FaPlus}
-              text={"Add an Income"}
-              onClick={() => setIsAddIncomeModalOpen(true)}
+              text={"Add a Revenue"}
+              onClick={() => setIsAddModalOpen(true)}
             />
           </div>
           <table className="global-table">
@@ -152,62 +115,62 @@ function IncomeRevenue() {
               </tr>
             </thead>
             <tbody>
-              {incomeData.length > 0 ? (
-                incomeData.map((income) => (
-                  <tr key={income.id} className="table-row">
-                    <td>{income.source || "N/A"}</td>
-                    <td>{income.date}</td>
+              {revenueData.length > 0 ? (
+                revenueData.map((revenue) => (
+                  <tr key={revenue.id} className="table-row">
+                    <td>{revenue.source || "N/A"}</td>
+                    <td>{revenue.date}</td>
                     <td>
                       $
-                      {income.amount
+                      {revenue.amount
                         .toFixed(2)
                         .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                     </td>
-                    <td>{income.note || "N/A"}</td>
+                    <td>{revenue.note || "N/A"}</td>
                     <td>
                       <FaPen
                         className="icon edit-icon"
-                        onClick={() => handleEditClick(income.id)}
+                        onClick={() => handleEditClick(revenue.id)}
                       />
                       <FaTrash
                         className="icon delete-icon"
-                        onClick={() => handleDeleteClick(income.id)}
+                        onClick={() => handleDeleteClick(revenue.id)}
                       />
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5">No income data available...</td>
+                  <td colSpan="5">No revenue data available...</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-        {isAddIncomeModalOpen && (
-          <AddIncome
+        {isAddModalOpen && (
+          <AddRevenue
             closeModal={() => {
-              setIsAddIncomeModalOpen(false);
-              fetchIncomeData(); // Refresh income list
+              setIsAddModalOpen(false);
+              fetchRevenueData();
             }}
           />
         )}
-        {isEditIncomeModalOpen && (
-          <EditIncome
+        {isEditModalOpen && (
+          <EditRevenue
             closeModal={() => {
-              setIsEditIncomeModalOpen(false);
-              fetchIncomeData(); // Refresh income list
+              setIsEditModalOpen(false);
+              fetchRevenueData();
             }}
-            incomeId={selectedIncomeId}
+            revenueId={selectedId}
           />
         )}
-        {isDeleteIncomeModalOpen && (
-          <DeleteIncome
+        {isDeleteModalOpen && (
+          <DeleteRevenue
             closeModal={() => {
-              setIsDeleteIncomeModalOpen(false);
-              fetchIncomeData(); // Refresh income list
+              setIsDeleteModalOpen(false);
+              fetchRevenueData(); 
             }}
-            incomeId={selectedIncomeId}
+            revenueId={selectedId}
           />
         )}
       </div>

@@ -1,38 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { doc, updateDoc, getDoc } from "firebase/firestore";
-import "../../pages/assets/styles/ExpenseTracker.css";
+import React, { useState } from "react";
+import { collection, addDoc } from "firebase/firestore";
+import "../../pages/assets/styles/RevenueTracker.css";
 import { db } from "../../config.js";
+import { Timestamp } from "firebase/firestore";
 
-function EditIncome({ closeModal, incomeId }) {
+function AddRevenue({ closeModal }) {
   const [formData, setFormData] = useState({
     date: "",
     source: "",
     amount: "",
     note: "",
   });
-
-  useEffect(() => {
-    const loadIncome = async () => {
-      try {
-        const incomeRef = doc(db, "income", incomeId);
-        const incomeSnapshot = await getDoc(incomeRef);
-        if (incomeSnapshot.exists()) {
-          const data = incomeSnapshot.data();
-          setFormData({
-            ...data,
-            amount: parseFloat(data.amount).toFixed(2), // Ensure number format
-            date: data.date ? new Date(data.date).toISOString().split("T")[0] : "", // Format date for input
-          });
-        } else {
-          console.error("No such income found!");
-        }
-      } catch (error) {
-        console.error("Error fetching income: ", error);
-      }
-    };
-
-    loadIncome();
-  }, [incomeId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,22 +21,23 @@ function EditIncome({ closeModal, incomeId }) {
     e.preventDefault();
 
     try {
-      const incomeRef = doc(db, "income", incomeId);
-      await updateDoc(incomeRef, {
+      const collectionRef = collection(db, "revenue");
+      await addDoc(collectionRef, {
         ...formData,
-        amount: parseFloat(formData.amount), // Convert back to number
+        date: Timestamp.fromDate(new Date(formData.date)), // Save as Firestore Timestamp
+        amount: parseFloat(formData.amount), // Ensure amount is saved as a number
       });
-      console.log("Income updated successfully");
+      console.log("Revenue added successfully");
       closeModal();
     } catch (error) {
-      console.error("Error updating document: ", error);
+      console.error("Error adding document: ", error);
     }
   };
 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>Edit Income</h2>
+        <h2>Add an Revenue</h2>
         <form onSubmit={handleSubmit}>
           <label className="label">
             Transaction Date:
@@ -104,9 +83,8 @@ function EditIncome({ closeModal, incomeId }) {
               required
             />
           </label>
-
           <button type="submit" className="add-expense-button">
-            Save Changes
+            Add Revenue
           </button>
         </form>
         <button className="close-button" onClick={closeModal}>
@@ -117,4 +95,4 @@ function EditIncome({ closeModal, incomeId }) {
   );
 }
 
-export default EditIncome;
+export default AddRevenue;

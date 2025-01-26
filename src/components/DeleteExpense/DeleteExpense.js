@@ -1,6 +1,6 @@
 import React from "react";
 import { doc, deleteDoc } from "firebase/firestore";
-import "../../pages/assets/styles/ExpenseTracker.css";
+import "../../pages/assets/styles/RevenueTracker.css";
 import { db } from "../../config.js";
 
 function DeleteExpense({ closeModal, expenseId, refreshExpenses }) {

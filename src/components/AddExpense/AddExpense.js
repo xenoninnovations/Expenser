@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { collection, addDoc, getDocs } from "firebase/firestore";
-import "../../pages/assets/styles/ExpenseTracker.css";
+import "../../pages/assets/styles/RevenueTracker.css";
 import { db } from "../../config.js";
 
 function AddExpense({ closeModal, refreshExpenses }) {

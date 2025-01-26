@@ -124,3 +124,14 @@
   transition: border-color 0.3s;
   width: auto;
 }
+
+.table-header.exp {
+  display: flex;
+  justify-content: space-between;
+}
+
+.exp-spaced {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

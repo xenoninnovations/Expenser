@@ -79,23 +79,24 @@ function IncomeRevenue() {
           <img src={dots} alt="dots" className="dots" />
         </div>
 
-        <div className="inc-rev-totals">
-          <div className="inc-rev-header">
-            <span className="yellow-bar inc-rev"></span>
-            <h2 className="inc-rev-title">
+        <div className="rev-totals">
+          <div className="rev-header">
+            <span className="yellow-bar rev"></span>
+            <h2 className="rev-title">
               Your total <strong>revenue</strong>
             </h2>
-            <span className="inc-rev-total">
+            <span className="rev-total">
               ${totalRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
             </span>
           </div>
         </div>
 
         <div className="table-container">
-          <div className="table-header inc-rev">
-            <h2 className="table-title">
-              <span className="yellow-bar"></span> My Revenue
-            </h2>
+          <div className="table-header rev">
+            <div className="rev-spaced">
+              <span className="yellow-bar rev"></span>
+              <h2 className="table-title">My Revenue</h2>
+            </div>
             <GlobalButton
               bg={"white"}
               textColor={"#222222"}
@@ -107,11 +108,15 @@ function IncomeRevenue() {
           <table className="global-table">
             <thead>
               <tr>
-                {["Source", "Transaction date", "Amount", "Note", "Actions"].map(
-                  (head) => (
-                    <th key={head}>{head} ⬍</th>
-                  )
-                )}
+                {[
+                  "Source",
+                  "Transaction date",
+                  "Amount",
+                  "Note",
+                  "Actions",
+                ].map((head) => (
+                  <th key={head}>{head} ⬍</th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -168,7 +173,7 @@ function IncomeRevenue() {
           <DeleteRevenue
             closeModal={() => {
               setIsDeleteModalOpen(false);
-              fetchRevenueData(); 
+              fetchRevenueData();
             }}
             revenueId={selectedId}
           />

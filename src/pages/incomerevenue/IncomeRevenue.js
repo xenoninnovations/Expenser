@@ -8,7 +8,7 @@ import GlobalButton from "../../components/GlobalButton/GlobalButton";
 import AddIncome from "../../components/AddIncome/AddIncome";
 import EditIncome from "../../components/EditIncome/EditIncome";
 import DeleteIncome from "../../components/DeleteIncome/DeleteIncome";
-import { FaPen, FaTrash, FaPlus, FaFileExport } from "react-icons/fa";
+import { FaPen, FaTrash, FaPlus } from "react-icons/fa";
 
 function IncomeRevenue() {
   const [incomeData, setIncomeData] = useState([]);
@@ -42,13 +42,14 @@ function IncomeRevenue() {
         return {
           id: doc.id,
           ...data,
+          amount: parseFloat(data.amount), // Ensure amount is a number
           date: formatDate(data.date),
         };
       });
       setIncomeData(incomeList);
 
       const total = incomeList.reduce(
-        (sum, income) => sum + (parseFloat(income.amount) || 0),
+        (sum, income) => sum + (income.amount || 0),
         0
       );
       setTotalIncome(total);
@@ -66,13 +67,14 @@ function IncomeRevenue() {
         return {
           id: doc.id,
           ...data,
+          amount: parseFloat(data.amount), // Ensure amount is a number
           date: formatDate(data.date),
         };
       });
       setRevenueData(revenueList);
 
       const total = revenueList.reduce(
-        (sum, revenue) => sum + (parseFloat(revenue.amount) || 0),
+        (sum, revenue) => sum + (revenue.amount || 0),
         0
       );
       setTotalRevenue(total);
@@ -157,11 +159,9 @@ function IncomeRevenue() {
                     <td>{income.date}</td>
                     <td>
                       $
-                      {typeof income.amount === "number"
-                        ? income.amount
-                            .toFixed(2)
-                            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                        : "0.00"}
+                      {income.amount
+                        .toFixed(2)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
                     </td>
                     <td>{income.note || "N/A"}</td>
                     <td>
@@ -178,7 +178,7 @@ function IncomeRevenue() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4">No income data available...</td>
+                  <td colSpan="5">No income data available...</td>
                 </tr>
               )}
             </tbody>
@@ -194,13 +194,19 @@ function IncomeRevenue() {
         )}
         {isEditIncomeModalOpen && (
           <EditIncome
-            closeModal={() => setIsEditIncomeModalOpen(false)}
+            closeModal={() => {
+              setIsEditIncomeModalOpen(false);
+              fetchIncomeData(); // Refresh income list
+            }}
             incomeId={selectedIncomeId}
           />
         )}
         {isDeleteIncomeModalOpen && (
           <DeleteIncome
-            closeModal={() => setIsDeleteIncomeModalOpen(false)}
+            closeModal={() => {
+              setIsDeleteIncomeModalOpen(false);
+              fetchIncomeData(); // Refresh income list
+            }}
             incomeId={selectedIncomeId}
           />
         )}

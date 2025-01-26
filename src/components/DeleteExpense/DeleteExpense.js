@@ -27,7 +27,7 @@ function DeleteExpense({ closeModal, expenseId, refreshExpenses }) {
           undone.
         </p>
         <div className="button-group">
-          <button className="delete-button" onClick={handleDelete}>
+          <button className="modal-button del" onClick={handleDelete}>
             Confirm Delete
           </button>
           <button className="cancel-button" onClick={closeModal}>

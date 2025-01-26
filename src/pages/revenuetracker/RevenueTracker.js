@@ -79,14 +79,14 @@ function IncomeRevenue() {
           <img src={dots} alt="dots" className="dots" />
         </div>
 
-        <div className="rev-totals">
-          <div className="rev-header">
+        <div className="revexp-totals">
+          <div className="revexp-header">
             <span className="yellow-bar rev"></span>
-            <h2 className="rev-title">
-              Your total <strong>revenue</strong>
-            </h2>
-            <span className="rev-total">
-              ${totalRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+            <h2 className="revexp-title">Your total revenue</h2>
+            <span className="revexp-total">
+              <strong>
+                ${totalRevenue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              </strong>
             </span>
           </div>
         </div>

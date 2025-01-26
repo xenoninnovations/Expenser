@@ -166,3 +166,30 @@ a {
   background: rgb(255, 179, 22);
   color: white;
 }
+
+.revexp-totals{
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Header Styles */
+.revexp-header {
+  background-color: #222;
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  border-radius: 15px;
+  justify-content: space-between;
+}
+
+.revexp-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  width: 50%;
+}
+
+.revexp-total {
+  font-size: 30px;
+}

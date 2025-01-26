@@ -90,6 +90,7 @@ export default function NavBar() {
           </section>
           {isTimeTrackingOpen && (
             <ul className="mini-nav">
+              <li className="mini-item"><a href="/timetracker">Time Tracker</a></li>
               <li className="mini-item">Calendar</li>
               <li className="mini-item">Automations</li>
               <li className="mini-item">Time Sheets</li>

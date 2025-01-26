@@ -4,16 +4,22 @@ import { db } from "../../config";
 import Navbar from "../../components/NavBar/NavBar";
 import "../assets/styles/IncomeRevenue.css";
 import dots from "../../images/dots.svg";
-import { FaPlus } from "react-icons/fa";
 import GlobalButton from "../../components/GlobalButton/GlobalButton";
 import AddIncome from "../../components/AddIncome/AddIncome";
+import EditIncome from "../../components/EditIncome/EditIncome";
+import DeleteIncome from "../../components/DeleteIncome/DeleteIncome";
+import { FaPen, FaTrash, FaPlus, FaFileExport } from "react-icons/fa";
 
 function IncomeRevenue() {
   const [incomeData, setIncomeData] = useState([]);
   const [totalIncome, setTotalIncome] = useState(0);
   const [revenueData, setRevenueData] = useState([]);
   const [totalRevenue, setTotalRevenue] = useState(0);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const [isAddIncomeModalOpen, setIsAddIncomeModalOpen] = useState(false);
+  const [isEditIncomeModalOpen, setIsEditIncomeModalOpen] = useState(false);
+  const [isDeleteIncomeModalOpen, setIsDeleteIncomeModalOpen] = useState(false);
+  const [selectedIncomeId, setSelectedIncomeId] = useState(null);
 
   const formatDate = (date) => {
     if (!date) return "N/A";
@@ -75,6 +81,16 @@ function IncomeRevenue() {
     }
   };
 
+  const handleEditClick = (incomeId) => {
+    setSelectedIncomeId(incomeId);
+    setIsEditIncomeModalOpen(true);
+  };
+
+  const handleDeleteClick = (incomeId) => {
+    setSelectedIncomeId(incomeId);
+    setIsDeleteIncomeModalOpen(true);
+  };
+
   useEffect(() => {
     fetchIncomeData();
     fetchRevenueData();
@@ -120,15 +136,17 @@ function IncomeRevenue() {
               textColor={"#222222"}
               icon={FaPlus}
               text={"Add an Income"}
-              onClick={() => setIsAddModalOpen(true)}
+              onClick={() => setIsAddIncomeModalOpen(true)}
             />
           </div>
           <table className="global-table">
             <thead>
               <tr>
-                {["Source", "Transaction date", "Amount", "Note"].map((head) => (
-                  <th key={head}>{head} ⬍</th>
-                ))}
+                {["Source", "Transaction date", "Amount", "Note", "Actions"].map(
+                  (head) => (
+                    <th key={head}>{head} ⬍</th>
+                  )
+                )}
               </tr>
             </thead>
             <tbody>
@@ -146,6 +164,16 @@ function IncomeRevenue() {
                         : "0.00"}
                     </td>
                     <td>{income.note || "N/A"}</td>
+                    <td>
+                      <FaPen
+                        className="icon edit-icon"
+                        onClick={() => handleEditClick(income.id)}
+                      />
+                      <FaTrash
+                        className="icon delete-icon"
+                        onClick={() => handleDeleteClick(income.id)}
+                      />
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -156,12 +184,24 @@ function IncomeRevenue() {
             </tbody>
           </table>
         </div>
-        {isAddModalOpen && (
+        {isAddIncomeModalOpen && (
           <AddIncome
             closeModal={() => {
-              setIsAddModalOpen(false);
+              setIsAddIncomeModalOpen(false);
               fetchIncomeData(); // Refresh income list
             }}
+          />
+        )}
+        {isEditIncomeModalOpen && (
+          <EditIncome
+            closeModal={() => setIsEditIncomeModalOpen(false)}
+            incomeId={selectedIncomeId}
+          />
+        )}
+        {isDeleteIncomeModalOpen && (
+          <DeleteIncome
+            closeModal={() => setIsDeleteIncomeModalOpen(false)}
+            incomeId={selectedIncomeId}
           />
         )}
       </div>

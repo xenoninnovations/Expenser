@@ -18,7 +18,7 @@ function ExpenseTracker() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedExpenseId, setSelectedExpenseId] = useState(null);
 
-  const [expenses, setExpenses] = useState([]);
+  const [expenseData, setExpenseData] = useState([]);
   const [total, setTotal] = useState(0);
 
   // State for month and year selection
@@ -43,7 +43,7 @@ function ExpenseTracker() {
         id: doc.id,
         ...doc.data(),
       }));
-      setExpenses(expensesList);
+      setExpenseData(expensesList);
     } catch (error) {
       console.error("Error fetching expenses: ", error);
     }
@@ -58,7 +58,7 @@ function ExpenseTracker() {
         id: doc.id,
         ...doc.data(),
       }));
-      setExpenses(expensesList);
+      setExpenseData(expensesList);
     } catch (error) {
       console.error("Error fetching all expenses: ", error);
     }
@@ -70,7 +70,7 @@ function ExpenseTracker() {
 
   useEffect(() => {
     const calculateTotal = () => {
-      const sum = expenses.reduce(
+      const sum = expenseData.reduce(
         (acc, expense) => acc + parseFloat(expense.amount || 0),
         0
       );
@@ -78,7 +78,7 @@ function ExpenseTracker() {
     };
 
     calculateTotal();
-  }, [expenses]);
+  }, [expenseData]);
 
   const handleEditClick = (expenseId) => {
     setSelectedExpenseId(expenseId);
@@ -106,17 +106,9 @@ function ExpenseTracker() {
         </div>
 
         <div className="expense-buttons">
-          <GlobalButton
-            bg={"#222222"}
-            textColor={"white"}
-            icon={FaPlus}
-            text={"Add an expense"}
-            onClick={() => setIsAddModalOpen(true)}
-          />
-
           <CSVLink
             filename={"your-expenses"}
-            data={expenses}
+            data={expenseData}
             className="buttons"
           >
             <FaFileExport />
@@ -152,10 +144,18 @@ function ExpenseTracker() {
           />
         </div>
         <div className="table-container">
-          <div className="table-header">
-            <h2 className="table-title">
-              <span className="yellow-bar"></span> My Expenses
-            </h2>
+          <div className="table-header exp">
+            <div className="exp-spaced">
+              <span className="yellow-bar exp"></span>
+              <h2 className="table-title">My Expenses</h2>
+            </div>
+            <GlobalButton
+              bg={"white"}
+              textColor={"#222222"}
+              icon={FaPlus}
+              text={"Add an Expense"}
+              onClick={() => setIsAddModalOpen(true)}
+            />
           </div>
           <table className="global-table">
             <thead>
@@ -173,30 +173,36 @@ function ExpenseTracker() {
               </tr>
             </thead>
             <tbody>
-              {expenses.map((expense) => (
-                <tr key={expense.id} className="table-row">
-                  <td>{expense.item}</td>
-                  <td>{expense.date}</td>
-                  <td>
-                    $
-                    {Number(expense.amount)
-                      .toFixed(2)
-                      .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
-                  </td>
-                  <td>{expense.category}</td>
-                  <td>{expense.merchant}</td>
-                  <td>
-                    <FaPen
-                      className="icon edit-icon"
-                      onClick={() => handleEditClick(expense.id)}
-                    />
-                    <FaTrash
-                      className="icon delete-icon"
-                      onClick={() => handleDeleteClick(expense.id)}
-                    />
-                  </td>
+              {expenseData.length > 0 ? (
+                expenseData.map((expense) => (
+                  <tr key={expense.id} className="table-row">
+                    <td>{expense.item}</td>
+                    <td>{expense.date}</td>
+                    <td>
+                      $
+                      {Number(expense.amount)
+                        .toFixed(2)
+                        .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+                    </td>
+                    <td>{expense.category}</td>
+                    <td>{expense.merchant}</td>
+                    <td>
+                      <FaPen
+                        className="icon edit-icon"
+                        onClick={() => handleEditClick(expense.id)}
+                      />
+                      <FaTrash
+                        className="icon delete-icon"
+                        onClick={() => handleDeleteClick(expense.id)}
+                      />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5">No expense data available...</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

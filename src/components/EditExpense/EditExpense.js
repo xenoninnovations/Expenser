@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  updateDoc,
+  getDocs,
+  getDoc,
+} from "firebase/firestore";
 import "../../pages/assets/styles/RevenueTracker.css";
 import { db } from "../../config.js";
 
-function AddExpense({ closeModal, refreshExpenses }) {
+function EditExpense({ closeModal, expenseId, refreshExpenses }) {
   const [formData, setFormData] = useState({
     date: "",
     item: "",
@@ -12,7 +18,45 @@ function AddExpense({ closeModal, refreshExpenses }) {
     merchant: "",
   });
   const [categories, setCategories] = useState([]); // State for storing categories
-  
+
+  useEffect(() => {
+    const loadExpense = async () => {
+      try {
+        const expenseRef = doc(db, "expenses", expenseId);
+        const expenseSnapshot = await getDoc(expenseRef);
+        if (expenseSnapshot.exists()) {
+          setFormData(expenseSnapshot.data());
+        } else {
+          console.error("No such expense found!");
+        }
+      } catch (error) {
+        console.error("Error fetching expense: ", error);
+      }
+    };
+
+    loadExpense();
+  }, [expenseId]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categoriesRef = collection(db, "categories"); // Pass db here correctly
+        const querySnapshot = await getDocs(categoriesRef);
+
+        // Map through documents and set categories state
+        const categoriesList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          name: doc.data().name || "Unnamed Category", // Default name if missing
+        }));
+        setCategories(categoriesList);
+      } catch (error) {
+        console.error("Error fetching categories: ", error);
+      }
+    };
+
+    loadCategories();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -22,42 +66,22 @@ function AddExpense({ closeModal, refreshExpenses }) {
     e.preventDefault();
 
     try {
-      const collectionRef = collection(db, "expenses");
-      await addDoc(collectionRef, {
-        ...formData,
-        date: new Date(formData.date).toISOString().split("T")[0], // Save in ISO format
-      });
-      console.log("Expense added successfully");
+      const expenseRef = doc(db, "expenses", expenseId);
+      await updateDoc(expenseRef, formData);
+      console.log("Expense updated successfully");
+
+      // Close modal and refresh expenses after submission
       closeModal();
+      refreshExpenses && refreshExpenses();
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Error updating document: ", error);
     }
   };
-
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const categoriesRef = collection(db, "categories"); // Reference to "categories" collection
-        const querySnapshot = await getDocs(categoriesRef);
-
-        // Map through documents and set categories state
-        const categoriesList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setCategories(categoriesList);
-      } catch (error) {
-        console.error("Error fetching categories: ", error);
-      }
-    };
-
-    loadCategories();
-  }, []); // Fetch categories on component load
 
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>Add an Expense</h2>
+        <h2>Edit Expense</h2>
         <form onSubmit={handleSubmit}>
           <label className="label">
             Transaction Date:
@@ -122,8 +146,9 @@ function AddExpense({ closeModal, refreshExpenses }) {
               ))}
             </select>
           </label>
+
           <button type="submit" className="add-expense-button">
-            Add Expense
+            Save Changes
           </button>
         </form>
         <button className="close-button" onClick={closeModal}>
@@ -134,4 +159,4 @@ function AddExpense({ closeModal, refreshExpenses }) {
   );
 }
 
-export default AddExpense;
+export default EditExpense;

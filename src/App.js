@@ -5,11 +5,12 @@ import Signin from "./pages/auth/Signin";
 import Signup from "./pages/auth/Signup";
 import Moreinfo from "./pages/auth/Moreinfo";
 import Forgotpassword from "./pages/auth/Forgotpassword";
-import ExpenseTracker from "./pages/ExpenseTracker";
 import Timetracker from "./pages/time-tracking/Timetracking";
 import Clientmanagement from './pages/book-keeping/Clientmanagement';
 import AddClientForm from './pages/book-keeping/Addclientform';
 import ClientInfo from './pages/book-keeping/ClientInfo';
+import ExpenseTracker from "./pages/expensetracker/ExpenseTracker";
+import RevenueTracker from "./pages/revenuetracker/RevenueTracker";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/timetracker" element={ <Timetracker /> } />
         <Route path="/clientmanagement" element={ <Clientmanagement /> } />
         <Route path="/addclientform" element={ <AddClientForm /> } />
+        <Route path="/revenuetracker" element={<RevenueTracker />} />
       </Routes>
     </BrowserRouter>
   );

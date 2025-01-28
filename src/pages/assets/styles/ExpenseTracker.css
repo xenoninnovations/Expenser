@@ -9,25 +9,6 @@
   justify-content: space-between;
 }
 
-/* Container Styles */
-.expenses-container {
-  border-radius: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-  background-color: #fff;
-  overflow: hidden;
-  -webkit-box-shadow: 0px 9px 21px 1px rgba(0, 0, 0, 0.4);
-  box-shadow: 0px 9px 21px 1px rgba(0, 0, 0, 0.4);
-}
-
-/* Header Styles */
-.expenses-header {
-  background-color: #222;
-  color: #fff;
-  padding: 10px 20px;
-  display: flex;
-  align-items: center;
-}
-
 .expenses-total {
   display: flex;
   justify-content: space-between;
@@ -59,55 +40,87 @@
   margin-right: 10px;
 }
 
-.expenses-title {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 400;
-}
-
-.yellow-bar {
-  display: inline-block;
-  background-color: #ffda16;
-  width: 7px;
-  height: 1.5rem;
-  margin-right: 10px;
-  border-radius: 10px;
-}
-
-/* Table Styles */
-.expenses-table {
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  border-collapse: collapse;
-  text-align: left;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent dark overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.expenses-table th,
-.expenses-table td {
-  padding: 12px 16px;
-  border-bottom: 1px solid #ddd;
+.modal-content {
+  background: rgba(255, 255, 255, 0.2); /* Semi-transparent white background */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
+  -webkit-backdrop-filter: blur(10px); /* Frosted glass effect for Safari */
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Border with transparency */
+  border-radius: 10px;
+  padding: 2rem;
+  width: 50vw;
+  max-width: 90%;
+  box-sizing: border-box; /* Ensure padding doesn’t affect width */
+  color: #fff; /* Ensure text is readable on transparent background */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Adjust gap for vertical spacing */
 }
 
-.expenses-table th {
-  background-color: #f9f9f9;
-  opacity: 0.5;
-  font-size: 10px;
-  font-weight: 400;
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%; /* Ensure the form fills the modal */
 }
 
-.table-row:hover {
-  background-color: #f1f1f1;
+.field {
+  width: 100%; /* Maintain full width */
+  box-sizing: border-box; /* Prevent padding overflow */
+  padding: 0.5rem; /* Adjust padding for consistent spacing */
 }
 
-.icon {
+.label {
+  display: flex;
+  flex-direction: column;
+}
+
+.close-button {
+  background: rgba(255, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
   cursor: pointer;
-  margin-right: 10px;
+}
+
+.add-expense-button {
+  background: rgba(255, 255, 0, 0.8);
+  color: black;
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+.filters {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem; /* Spacing between dropdowns and button */
+  margin-bottom: 1.5rem; /* Space below the filter section */
+}
+
+.filters select,
+.filters input {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
   color: #333;
-}
-
-.edit-icon:hover {
-  color: #4caf50;
-}
-
-.delete-icon:hover {
-  color: #f44336;
+  outline: none;
+  transition: border-color 0.3s;
+  width: auto;
 }

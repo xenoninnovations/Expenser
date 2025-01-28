@@ -1,0 +1,42 @@
+.inc-rev-totals{
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Header Styles */
+.inc-rev-header {
+  background-color: #222;
+  color: #fff;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  border-radius: 15px;
+  justify-content: space-between;
+}
+
+.inc-rev-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  width: 50%;
+  
+}
+
+.inc-rev-total {
+  font-size: 45px;
+}
+
+.yellow-bar.inc-rev {
+  height: 3.5rem;
+}
+
+.buttons.white {
+  background-color: white;
+  color: #222;
+  padding: 1.25vh;
+}
+
+.table-header.inc-rev {
+  display: flex;
+  justify-content: space-between;
+}

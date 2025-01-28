@@ -8,6 +8,8 @@ import budgetingIcon from "../../images/budgeting.svg";
 import timeIcon from "../../images/time.svg";
 import bookIcon from "../../images/bookkeeping.svg";
 import collapseIcon from "../../images/collapse.svg";
+import GlobalButton from "../GlobalButton/GlobalButton";
+import { FaRegUser, FaUser } from "react-icons/fa";
 
 export default function NavBar() {
   const [isBudgetingOpen, setIsBudgetingOpen] = useState(false);
@@ -169,6 +171,13 @@ export default function NavBar() {
           )}
         </section>
       </ul>
+
+      <div>
+        <section id="auth">
+          <a href="/signin">Signin</a> <br/>
+          <a href="/signup">Signup</a>
+        </section>
+      </div>
     </nav>
   );
 }

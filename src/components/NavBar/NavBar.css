@@ -1,38 +1,148 @@
+/* Ensure collapsed navbar icons are centered */
+.navbar.collapsed {
+  align-items: center; /* Centers items inside */
+  text-align: center;
+}
+
+.navbar.collapsed .nav-list {
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar.collapsed .list-icon {
+  margin: 0 auto;
+  display: block; /* Ensures it takes up full width */
+}
+
+.navbar.collapsed .list-group,
+.navbar.collapsed .list-dashboard {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Prevents extra padding from expanded state */
+.navbar.collapsed .icon-item {
+  padding-left: 0 !important;
+}
+
+
 .navbar {
   background-color: black;
+  display: flex;
+  justify-content: space-between;
   height: 100vh;
-  width: fit-content;
+  width: 250px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: width 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+/* Auto-collapse when screen size is 2503px or smaller */
+@media screen and (max-width: 2503px) {
+  .navbar {
+    width: 60px;
+  }
+}
+
+/* Expanded Navbar */
+.navbar.expanded {
+  width: 250px;
   display: flex;
   flex-direction: column;
-  align-items: start;
-  margin: 0;
-  padding-right: 2vh;
-  gap: 0vh;
-  position: fixed;
-  z-index: 10;
-  top: 0;
+  justify-content: start;
+  gap: 10vh !important;
 }
 
+/* Collapsed Navbar */
+.navbar.collapsed {
+  width: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  gap: 10vh !important;
+}
+
+/* Hide text when navbar is collapsed */
+.navbar.collapsed .list-item,
+.navbar.collapsed .mini-nav {
+  display: none;
+}
+
+/* Ensures Content Doesn't Overlap */
+.main-content {
+  margin-left: 250px;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.navbar.collapsed ~ .main-content {
+  margin-left: 60px;
+}
+
+/* Profile Section */
 .profile-box {
   display: flex;
-  gap: 3vw;
-  padding-top: 5vh;
-  padding-left: 22px !important;
+  gap: 1rem;
+  padding: 20px;
+  width: 100%;
+  align-items: center;
 }
 
-.profile-picture {
-  height: 2rem;
-  border-radius: 50%;
+.profile-box img {
+  width: 30px;
+  cursor: pointer;
 }
 
-.username-settings {
+/* Main Navigation Items */
+.list-group {
   display: flex;
-  gap: 1vw;
+  flex-direction: column;
+  width: 100%;
 }
 
-.username {
-  color: white;
-  font-size: 15px;
+.main-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.list-icon {
+  width: 24px;
+  margin-right: 15px;
+}
+
+.collapse-icon {
+  width: 15px;
+  transition: transform 0.3s;
+}
+
+.collapse-icon.open {
+  transform: rotate(180deg);
+}
+
+/* Mini Navigation */
+.mini-nav {
+  padding-left: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
+.profile-box img {
+  width: 30px;
+  cursor: pointer;
+}
+
+.username-settings{
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
 }
 
 .settings-icon {
@@ -47,11 +157,64 @@
   transform: rotate(360deg);
 }
 
-
 .dots {
   display: flex;
-  margin-top: 1vh;
   width: 5vh;
+  padding: 0px;
+}
+
+/* Main Navigation Items */
+.list-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.collapse-icon {
+  width: 15px;
+  transition: transform 0.3s;
+}
+
+.collapse-icon.open {
+  transform: rotate(180deg);
+}
+
+/* Mini Navigation */
+.mini-nav {
+  padding-left: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.profile-box {
+  display: flex;
+  /* padding-top: 5vh;
+  padding-left: 22px !important; */
+}
+
+.profile-picture {
+  height: 2rem;
+  border-radius: 50%;
+}
+
+.username-settings {
+  display: flex;
+
+}
+
+.username {
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
 }
 
 /*Nav items*/
@@ -108,16 +271,10 @@
   transition: background-color 0.5s;
 }
 
-.list-icon {
-  margin-right: 15px;
-  width: 15px;
-
-}
-
 .list-item {
   color: #fff;
   font-weight: 600;
-  font-size: 24px;
+  font-size: 22px;
   padding: 10px 0px;
   width: 100%;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;

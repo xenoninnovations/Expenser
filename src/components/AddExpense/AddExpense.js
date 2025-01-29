@@ -12,7 +12,7 @@ function AddExpense({ closeModal, refreshExpenses }) {
     merchant: "",
   });
   const [categories, setCategories] = useState([]); // State for storing categories
-
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });

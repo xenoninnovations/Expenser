@@ -97,7 +97,10 @@ export default function NavBar() {
               <li className="mini-item">
                 <a href="/expensetracker">Expense Tracker</a>
               </li>
-              <li className="mini-item">Income/Revenue</li>
+              <li className="mini-item">
+              <a href="/revenuetracker">Revenue Tracker</a>
+                
+                </li>
               <li className="mini-item">Savings</li>
               <li className="mini-item">Transactions</li>
             </ul>

@@ -54,7 +54,7 @@ function Clientmanagement() {
               <span className="yellow-bar"></span> Client List
             </h2>
           </div>
-        <table className="expenses-table">
+        <table className="global-table">
           <thead>
             <tr>
               {[

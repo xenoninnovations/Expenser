@@ -8,6 +8,7 @@ import budgetingIcon from "../../images/budgeting.svg";
 import timeIcon from "../../images/time.svg";
 import bookIcon from "../../images/bookkeeping.svg";
 import collapseIcon from "../../images/collapse.svg";
+import docIcon from "../../images/docIcon.svg";
 import GlobalButton from "../GlobalButton/GlobalButton";
 import { FaRegUser, FaUser } from "react-icons/fa";
 
@@ -55,18 +56,18 @@ export default function NavBar() {
       <ul className="nav-list">
         <section className="list-group">
           <section className="main-nav">
-          <section className="icon-item">
-            <img
-              src={dashboardIcon}
-              alt="dashboard icon"
-              className="list-icon"
-            />
-            {isNavExpanded && (
-              <a href="/">
-                <li className="list-item">Dashboard</li>
-              </a>
-            )}
-          </section>
+            <section className="icon-item">
+              <img
+                src={dashboardIcon}
+                alt="dashboard icon"
+                className="list-icon"
+              />
+              {isNavExpanded && (
+                <a href="/">
+                  <li className="list-item">Dashboard</li>
+                </a>
+              )}
+            </section>
           </section>
         </section>
 
@@ -98,9 +99,8 @@ export default function NavBar() {
                 <a href="/expensetracker">Expense Tracker</a>
               </li>
               <li className="mini-item">
-              <a href="/revenuetracker">Revenue Tracker</a>
-                
-                </li>
+                <a href="/revenuetracker">Revenue Tracker</a>
+              </li>
               <li className="mini-item">Savings</li>
               <li className="mini-item">Transactions</li>
             </ul>
@@ -173,11 +173,20 @@ export default function NavBar() {
             </ul>
           )}
         </section>
-      </ul>
 
+        {/** Document Drafting */}
+        <section className="list-group">
+          <section className="main-nav">
+            <section className="icon-item">
+              <img src={docIcon} alt="document icon" className="list-icon" />
+              <li className="list-item"><a href="/doc-drafting">Doc Drafting</a></li>
+            </section>
+          </section>
+        </section>
+      </ul>
       <div>
         <section id="auth">
-          <a href="/signin">Signin</a> <br/>
+          <a href="/signin">Signin</a> <br />
           <a href="/signup">Signup</a>
         </section>
       </div>

@@ -126,12 +126,12 @@ function DocDrafting() {
           {/* Invisible PDF Download Link - Clicked when form is submitted */}
           <PDFDownloadLink
             document={<CreatePdf formData={formData} />}
-            fileName={`${formData.firstName}_${formData.lastName}_Doc.pdf`}
+            fileName={`${formData.firstName}_${formData.lastName}_Contract.pdf`}
           >
             {({ loading, url, blob }) => (
               <a
                 href={url}
-                download={`${formData.firstName}_${formData.lastName}_Doc.pdf`}
+                download={`${formData.firstName}_${formData.lastName}_Contract.pdf`}
                 style={{ display: "none" }}
                 ref={pdfDownloadRef}
               >

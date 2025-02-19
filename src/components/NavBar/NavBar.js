@@ -168,6 +168,8 @@ export default function NavBar() {
               <li className="mini-item">
                 <a href="/clientmanagement">Client Management</a>
               </li>
+              <li className="mini-item">Emails</li>
+              <li className="mini-item">Invoicing & Payments</li>
               <li className="mini-item">Cost Breakdown</li>
               <li className="mini-item">Invoicing & Payments</li>
             </ul>

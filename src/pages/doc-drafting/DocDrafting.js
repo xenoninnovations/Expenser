@@ -7,9 +7,19 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 
 function DocDrafting() {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
+    region: "",
+    courtfileno: "",
     businessName: "",
+    applicant: "",
+    weekDay: "",
+    date: "",
+    month: "",
+    year: "",
+    relief: "",
+    reasonOne: "",
+    reasonTwo: "",
+    reasonThree: "",
+    relies: "",
     email: "",
     phone: "",
     address: "",
@@ -31,8 +41,19 @@ function DocDrafting() {
   const fillDemo = (e) => {
     e.preventDefault();
     setFormData({
-      firstName: "John",
-      lastName: "Doe",
+      region: "Ontario",
+      courtfileno: "4588457",
+      weekDay: "Friday",
+      reasonOne: "Lorem Ipsum1",
+      reasonTwo: "Lorem Ipsum2",
+      reasonThree: "Lorem Ipsum3",
+      date: "12",
+      month: "June",
+      businessName: "Business",
+      applicant: "Beter",
+      relief: "Lorem Ipsum Relief",
+      year: "2025",
+      relies: "Lorem Ipsum Relies On",
       businessName: "Canadian Valley",
       email: "john@vally.ca",
       phone: "4165555555",
@@ -51,11 +72,11 @@ function DocDrafting() {
         <form className="form-doc" onSubmit={handleSubmit}>
           <div className="field-wrap parts">
             <div className="field-part">
-              <label className="field-label">First Name</label>
+              <label className="field-label">Region</label>
               <input
                 className="field-input"
-                name="firstName"
-                value={formData.firstName}
+                name="region"
+                value={formData.region}
                 onChange={handleChange}
                 type="text"
                 placeholder="Enter first name"
@@ -63,55 +84,89 @@ function DocDrafting() {
               />
             </div>
             <div className="field-part">
-              <label className="field-label">Last Name</label>
+              <label className="field-label">courtfileno</label>
               <input
                 className="field-input"
-                name="lastName"
-                value={formData.lastName}
+                name="courtfileno"
+                value={formData.courtfileno}
                 onChange={handleChange}
                 type="text"
-                placeholder="Enter last name"
+                placeholder="Enter court file number"
+                required
+              />
+            </div>
+
+          </div>
+          
+          <div className="field-wrap parts">
+          <div className="field-wrap">
+              <label className="field-label">Applicant</label>
+              <input
+                className="field-input"
+                name="applicant"
+                value={formData.applicant}
+                onChange={handleChange}
+                type="text"
+                placeholder="Enter applicant name"
+                required
+              />
+            </div>
+
+            <div className="field-wrap">
+              <label className="field-label">Week Day</label>
+              <input
+                className="field-input"
+                name="weekDay"
+                value={formData.weekDay}
+                onChange={handleChange}
+                type="text"
+                placeholder="Enter Week Day"
+                required
+              />
+            </div>
+
+            <div className="field-wrap">
+              <label className="field-label">Date</label>
+              <input
+                className="field-input"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                type="number"
+                placeholder="Enter Date"
+                required
+              />
+            </div>
+
+            <div className="field-wrap">
+              <label className="field-label">Month</label>
+              <input
+                className="field-input"
+                name="month"
+                value={formData.month}
+                onChange={handleChange}
+                type="text"
+                placeholder="Enter Month"
                 required
               />
             </div>
           </div>
+
           <div className="field-wrap">
-            <label className="field-label">Business Name (if applicable)</label>
+            <label className="field-label">Year</label>
             <input
               className="field-input"
-              name="businessName"
-              value={formData.businessName}
+              name="year"
+              value={formData.year}
               onChange={handleChange}
               type="text"
-              placeholder="Business name"
-            />
-          </div>
-          <div className="field-wrap">
-            <label className="field-label">Email Address</label>
-            <input
-              className="field-input"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              type="email"
-              placeholder="Enter your email"
+              placeholder="Enter address"
               required
             />
           </div>
+
           <div className="field-wrap">
-            <label className="field-label">Phone Number</label>
-            <input
-              className="field-input"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              type="number"
-              placeholder="Enter phone number"
-              required
-            />
-          </div>
-          <div className="field-wrap">
-            <label className="field-label">Address</label>
+            <label className="field-label">Court House Address</label>
             <input
               className="field-input"
               name="address"
@@ -122,6 +177,63 @@ function DocDrafting() {
               required
             />
           </div>
+
+          <div className="field-wrap">
+            <label className="field-label">Relief</label>
+            <input
+              className="field-input"
+              name="relief"
+              value={formData.relief}
+              onChange={handleChange}
+              type="text"
+              placeholder="Enter address"
+              required
+            />
+          </div>
+
+          <div className="field-wrap">
+            <label className="field-label">Reason One</label>
+            <input
+              className="field-input"
+              name="reasonOne"
+              value={formData.reasonOne}
+              onChange={handleChange}
+              type="text"
+              placeholder="Enter address"
+              required
+            />
+          </div>
+
+          <div className="field-wrap">
+            <label className="field-label">Reason Two</label>
+            <input
+              className="field-input"
+              name="reasonTwo"
+              value={formData.reasonTwo}
+              onChange={handleChange}
+              type="text"
+              placeholder="Enter address"
+              required
+            />
+          </div>
+
+          <div className="field-wrap">
+            <label className="field-label">Relies</label>
+            <input
+              className="field-input"
+              name="relies"
+              value={formData.relies}
+              onChange={handleChange}
+              type="text"
+              placeholder="Enter address"
+              required
+            />
+          </div>
+            
+            
+            
+          
+
 
           {/* Invisible PDF Download Link - Clicked when form is submitted */}
           <PDFDownloadLink

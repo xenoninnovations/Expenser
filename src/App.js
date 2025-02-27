@@ -11,7 +11,7 @@ import AddClientForm from "./pages/book-keeping/Addclientform";
 import ClientInfo from "./pages/book-keeping/ClientInfo";
 import ExpenseTracker from "./pages/expensetracker/ExpenseTracker";
 import RevenueTracker from "./pages/revenuetracker/RevenueTracker";
-import DocDrafting from "./pages/doc-drafting/DocDrafting";
+import DocDrafting2 from "./pages/doc-drafting/DocDrafting2";
 
 function App() {
   return (
@@ -28,7 +28,7 @@ function App() {
         <Route path="/clientmanagement" element={<Clientmanagement />} />
         <Route path="/addclientform" element={<AddClientForm />} />
         <Route path="/revenuetracker" element={<RevenueTracker />} />
-        <Route path="/doc-drafting" element={<DocDrafting />} />
+        <Route path="/doc-drafting" element={<DocDrafting2 />} />
       </Routes>
     </BrowserRouter>
   );

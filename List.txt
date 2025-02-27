@@ -1,0 +1,13 @@
+List
+
+D - Client management
+D - Email API integration: open emails & send emails
+D - Link client folder to email: add clients' emails
+D - Invoicing
+D - Task management/Work flow
+D - Timeline management
+
+R - Document drafting
+R - Conflict check
+R - Docketing
+R - Client verification

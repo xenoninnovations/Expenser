@@ -18,9 +18,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: "Times-Roman",
     lineHeight: 1.5,
-    // display: "flex",
-    // flexDirection: "column",
-    // gap: "5vh",
   },
   gap: {
     height: "5vh",

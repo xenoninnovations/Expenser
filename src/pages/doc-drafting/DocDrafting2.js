@@ -5,6 +5,7 @@ import dots from "../../images/dots.svg";
 import "../assets/styles/DocDrafting.css";
 import NoticeOfApplication from "../../components/OntarioForms/NoticeOfApplication";
 import NoticeOfAppeal from "../../components/OntarioForms/NoticeOfAppeal";
+import SupplimentaryAppeal from "../../components/OntarioForms/SupplimentaryAppeal"
 
 // Sample list of forms
 const formsList = [
@@ -18,6 +19,13 @@ const formsList = [
     fields: ["region", "courtfileno", "applicant", "judge", "offences", "location", "address", "date"],
     pdfComponent: NoticeOfAppeal,
   },
+
+  {
+    title: "Supplementary Notice of Appeal",
+    fields: ["region", "courtfileno", "applicant", "date_filed", "additional_grounds", "location", "date"],
+    pdfComponent: SupplimentaryAppeal,
+  },
+  
   // Add more forms as needed
 ];
 

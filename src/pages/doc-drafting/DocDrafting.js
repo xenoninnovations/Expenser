@@ -231,9 +231,6 @@ function DocDrafting() {
           </div>
             
             
-            
-          
-
 
           {/* Invisible PDF Download Link - Clicked when form is submitted */}
           <PDFDownloadLink

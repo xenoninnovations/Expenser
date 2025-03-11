@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getStorage, ref } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -19,4 +20,10 @@ const auth = getAuth(app);
 //database
 const db = getFirestore(app);
 
-export {auth, db}
+//storage
+
+const storage = getStorage(app);
+
+const pdfRef = ref(storage, 'pdfRef');
+
+export {auth, db, storage}

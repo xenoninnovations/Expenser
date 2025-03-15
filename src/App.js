@@ -12,6 +12,9 @@ import ClientInfo from './pages/book-keeping/ClientInfo';
 import ExpenseTracker from "./pages/expensetracker/ExpenseTracker";
 import RevenueTracker from "./pages/revenuetracker/RevenueTracker";
 
+// My Changes
+import UploadPDF from "./pages/upload-pdf/UploadPDF";
+
 function App() {
   return (
     <BrowserRouter>
@@ -27,6 +30,10 @@ function App() {
         <Route path="/clientmanagement" element={ <Clientmanagement /> } />
         <Route path="/addclientform" element={ <AddClientForm /> } />
         <Route path="/revenuetracker" element={<RevenueTracker />} />
+
+        {/* My Changes */}
+        <Route path="/uploadpdf" element={<UploadPDF />} />
+
       </Routes>
     </BrowserRouter>
   );

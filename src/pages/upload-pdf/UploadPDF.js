@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
+import { getStorage, ref, listAll, getDownloadURL, getMetadata } from "firebase/storage";
+
 import { db } from "../../config";
 import Navbar from "../../components/NavBar/NavBar";
 import "../assets/styles/global.css";
@@ -9,41 +11,48 @@ import { FaPen, FaTrash, FaPlus, FaFileExport } from "react-icons/fa";
 
 // Pop-up dialog. useful for upload pdf section of my page (All good examples for me to use)
 import AddPDF from "../../components/AddPDF/AddPDF";
-
-// import AddExpense from "../../components/AddExpense/AddExpense";
-// import EditExpense from "../../components/EditExpense/EditExpense";
-// import DeleteExpense from "../../components/DeleteExpense/DeleteExpense";
-
-// import { CSVLink } from "react-csv"; //Used to generate and download CSV files in react
 import GlobalButton from "../../components/GlobalButton/GlobalButton"; // used to represent a button
 
+function formatBytes(bytes) {
+  const units = ["bytes", "KB", "MB", "GB", "TB"];
+  let index = 0;
+
+  while (bytes >= 1024 && index < units.length - 1) {
+    bytes /= 1024;
+    index++;
+  }
+
+  return `${bytes.toFixed(2)} ${units[index]}`;
+}
+
 function UploadPDF() {
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedpdfId, setSelectedPdfId] = useState(null);
-
   const [pdfCollectionData, setPdfCollectionData] = useState([]);
-  const [totalExpense, setTotalExpense] = useState(0);
 
-  // Function to load all expenses
   const loadAllPdfs = async () => {
     try {
-      const pdfCollectionRef = collection(db, "pdf_collection");//gets the list of pdf files from firebase. TODO: make pdf_collection to access
-      const querySnapshot = await getDocs(pdfCollectionRef);
+      const storage = getStorage();
+      const pdfsRef = ref(storage, 'pdfs'); // Reference to the 'pdfs' directory
 
-      const pdfCollectionList = querySnapshot.docs.map((doc) => {
-        const data = doc.data();
+      // All PDF files from the 'pdfs' directory
+      const result = await listAll(pdfsRef);
+
+      // Iterate through all the pdf files
+      const pdfCollectionList = await Promise.all(result.items.map(async (itemRef) => {
+        const url = await getDownloadURL(itemRef); // Link to download the URL version of the PDF file
+        const metadata = await getMetadata(itemRef); 
+
         return {
-          id: doc.id, //unique ID made by firebase
-          ...data,
-          amount: parseFloat(data.amount || 0), // Ensure amount is a float or number. if null, makes it 0
-          date: data.date ? new Date(data.date).toLocaleDateString() : "N/A", // Format date
+          name: itemRef.name,
+          url: url,
+          size: metadata.size, // File size in bytes
+          contentType: metadata.contentType, //Type of the file
+          updated: metadata.updated, // Last modified date
         };
-      });
+      }));
 
       setPdfCollectionData(pdfCollectionList);
-
 
     } catch (error) {
       console.error("Error fetching pdf files: ", error);
@@ -52,17 +61,7 @@ function UploadPDF() {
 
   useEffect(() => {
     loadAllPdfs();
-  }, []); // Run on component mount
-
-  const handleEditClick = (pdfId) => {
-    setSelectedPdfId(pdfId);
-    setIsEditModalOpen(true);
-  };
-
-  const handleDeleteClick = (pdfId) => {
-    setSelectedPdfId(pdfId);
-    setIsDeleteModalOpen(true);
-  };
+  }, []);
 
   return (
     <div className="page">
@@ -85,7 +84,7 @@ function UploadPDF() {
               textColor={"#222222"}
               icon={FaPlus}
               text={"Upload PDF File"}
-              onClick={() => setIsAddModalOpen(true)} //TODO: create a Modal to upload pdf file to the database
+              onClick={() => setIsAddModalOpen(true)}
             />
 
           </div>
@@ -97,7 +96,11 @@ function UploadPDF() {
               <tr>
                 {[
                   "Name",
-                  "Upload Date",
+                  "Size",
+                  "Type",
+                  "Last Updated Date",
+                  "Preview",
+
 
                 ].map((head) => (
                   <th key={head}>{head} ⬍</th>
@@ -106,32 +109,32 @@ function UploadPDF() {
             </thead>
 
             <tbody>
-              {pdfCollectionData.length > 0 ?
-                (
-                  pdfCollectionData.map((pdf_data) => (
-                    <tr key={pdf_data.id} className="table-row">
-                      <td>{pdf_data.name || "N/A"}</td>
-                      <td>{pdf_data.date}</td>
+              {pdfCollectionData.length > 0 ? (
+                pdfCollectionData.map((pdf_data) => (
+                  <tr key={pdf_data.id || pdf_data.name} className="table-row">
+                    <td>{pdf_data.name || "N/A"}</td>
+                    <td>{formatBytes(pdf_data.size) || "N/A"}</td>
+                    <td>{pdf_data.contentType.split('/')[1] || "N/A"}</td>
+                    <td>{pdf_data.updated || "N/A"}</td>
+                    <td>
+                      {pdf_data.url ? (
+                        <a href={pdf_data.url} target="_blank" rel="noopener noreferrer">
+                          Preview
+                        </a>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
 
-                      {/* <td>
-                      <FaPen
-                        className="icon edit-icon"
-                        onClick={() => handleEditClick(pdf_data.id)}
-                      />
-                      <FaTrash
-                        className="icon delete-icon"
-                        onClick={() => handleDeleteClick(pdf_data.id)}
-                      />
-                    </td> */}
-                    </tr>
-                  ))
-                )
-                : // If nothing is available
-                (
-                  <tr>
-                    <td colSpan="6">No PDF Documents Available...</td>
+
                   </tr>
-                )}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6">No PDF Documents Available...</td>
+                </tr>
+              )}
+
             </tbody>
           </table>
         </div>

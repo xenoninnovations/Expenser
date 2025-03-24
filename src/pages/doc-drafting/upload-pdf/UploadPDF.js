@@ -2,16 +2,17 @@ import React, { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { getStorage, ref, listAll, getDownloadURL, getMetadata } from "firebase/storage";
 
-import { db } from "../../config";
-import Navbar from "../../components/NavBar/NavBar";
-import "../assets/styles/global.css";
-import "../assets/styles/UploadPDF.css"; //TODO: Update this to my own css script
-import dots from "../../images/dots.svg";
-import { FaPen, FaTrash, FaPlus, FaFileExport } from "react-icons/fa";
+import { db } from "../../../config";
+import Navbar from "../../../components/NavBar/NavBar";
+import "../../../pages/assets/styles/global.css";
+import "../../../pages/assets/styles/UploadPDF.css"; //TODO: Update this to my own css script
+import dots from "../../../images/dots.svg";
+import { FaPen, FaTrash, FaPlus, FaFileExport, FaEdit } from "react-icons/fa";
 
 // Pop-up dialog. useful for upload pdf section of my page (All good examples for me to use)
-import AddPDF from "../../components/AddPDF/AddPDF";
-import GlobalButton from "../../components/GlobalButton/GlobalButton"; // used to represent a button
+import AddPDF from "../../../components/AddPDF/AddPDF";
+import GlobalButton from "../../../components/GlobalButton/GlobalButton"; // used to represent a button
+import FillForm from "../../../components/FillForm/FillForm";
 
 function formatBytes(bytes) {
   const units = ["bytes", "KB", "MB", "GB", "TB"];
@@ -26,31 +27,47 @@ function formatBytes(bytes) {
 }
 
 function UploadPDF() {
-
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isFillFormOpen, setIsFillFormOpen] = useState(false);
+  const [selectedPdf, setSelectedPdf] = useState(null);
   const [pdfCollectionData, setPdfCollectionData] = useState([]);
 
   const loadAllPdfs = async () => {
     try {
       const storage = getStorage();
-      const pdfsRef = ref(storage, 'pdfs'); // Reference to the 'pdfs' directory
+      const pdfsRef = ref(storage, 'pdfs');
 
-      // All PDF files from the 'pdfs' directory
+      // Get PDF documents from Firestore
+      const pdfsCollection = collection(db, 'pdfs');
+      const pdfsSnapshot = await getDocs(pdfsCollection);
+      
+      // Get PDF files from Storage
       const result = await listAll(pdfsRef);
 
-      // Iterate through all the pdf files
-      const pdfCollectionList = await Promise.all(result.items.map(async (itemRef) => {
-        const url = await getDownloadURL(itemRef); // Link to download the URL version of the PDF file
-        const metadata = await getMetadata(itemRef); 
+      // Create a map of storage URLs to metadata
+      const storageMap = new Map();
+      for (const itemRef of result.items) {
+        const url = await getDownloadURL(itemRef);
+        const metadata = await getMetadata(itemRef);
+        storageMap.set(itemRef.name, { url, metadata });
+      }
 
+      // Combine Firestore data with Storage data
+      const pdfCollectionList = pdfsSnapshot.docs.map(doc => {
+        const data = doc.data();
+        const storageData = storageMap.get(data.name) || { url: null, metadata: null };
+        
         return {
-          name: itemRef.name,
-          url: url,
-          size: metadata.size, // File size in bytes
-          contentType: metadata.contentType, //Type of the file
-          updated: metadata.updated, // Last modified date
+          id: doc.id,
+          name: data.name,
+          url: storageData.url,
+          size: storageData.metadata?.size,
+          contentType: storageData.metadata?.contentType,
+          updated: storageData.metadata?.updated,
+          formFields: data.formFields || [],
+          originalPdfUrl: data.originalPdfUrl
         };
-      }));
+      });
 
       setPdfCollectionData(pdfCollectionList);
 
@@ -62,6 +79,15 @@ function UploadPDF() {
   useEffect(() => {
     loadAllPdfs();
   }, []);
+
+  const handleFillForm = (pdf) => {
+    if (!pdf.formFields || pdf.formFields.length === 0) {
+      alert("This PDF has no form fields to fill out.");
+      return;
+    }
+    setSelectedPdf(pdf);
+    setIsFillFormOpen(true);
+  };
 
   return (
     <div className="page">
@@ -100,8 +126,7 @@ function UploadPDF() {
                   "Type",
                   "Last Updated Date",
                   "Preview",
-
-
+                  "Actions"
                 ].map((head) => (
                   <th key={head}>{head} ⬍</th>
                 ))}
@@ -125,8 +150,14 @@ function UploadPDF() {
                         "N/A"
                       )}
                     </td>
-
-
+                    <td>
+                      <button
+                        className="action-button"
+                        onClick={() => handleFillForm(pdf_data)}
+                      >
+                        <FaEdit /> Fill Form
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -145,6 +176,17 @@ function UploadPDF() {
           closeModal={() => {
             setIsAddModalOpen(false);
             loadAllPdfs(); // Refresh after adding
+          }}
+          refreshUploadPDF={loadAllPdfs}
+        />
+      )}
+
+      {isFillFormOpen && selectedPdf && (
+        <FillForm
+          pdfData={selectedPdf}
+          onClose={() => {
+            setIsFillFormOpen(false);
+            setSelectedPdf(null);
           }}
         />
       )}

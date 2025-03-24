@@ -12,8 +12,10 @@ import ClientInfo from './pages/book-keeping/ClientInfo';
 import ExpenseTracker from "./pages/expensetracker/ExpenseTracker";
 import RevenueTracker from "./pages/revenuetracker/RevenueTracker";
 
-// My Changes
-import UploadPDF from "./pages/upload-pdf/UploadPDF";
+// Document Drafting Routes
+import UploadPDF from "./pages/doc-drafting/upload-pdf/UploadPDF";
+import Templates from "./pages/doc-drafting/templates/Templates";
+import DocumentLibrary from "./pages/doc-drafting/library/DocumentLibrary";
 
 function App() {
   return (
@@ -26,14 +28,15 @@ function App() {
         <Route path="/forgotpassword" element={<Forgotpassword />} />
         <Route path="/client/:id" element={<ClientInfo />} />
         <Route path="/expensetracker" element={<ExpenseTracker />} />
-        <Route path="/timetracker" element={ <Timetracker /> } />
-        <Route path="/clientmanagement" element={ <Clientmanagement /> } />
-        <Route path="/addclientform" element={ <AddClientForm /> } />
+        <Route path="/timetracker" element={<Timetracker />} />
+        <Route path="/clientmanagement" element={<Clientmanagement />} />
+        <Route path="/addclientform" element={<AddClientForm />} />
         <Route path="/revenuetracker" element={<RevenueTracker />} />
-
-        {/* My Changes */}
+        
+        {/* Document Drafting Routes */}
         <Route path="/uploadpdf" element={<UploadPDF />} />
-
+        <Route path="/templates" element={<Templates />} />
+        <Route path="/document-library" element={<DocumentLibrary />} />
       </Routes>
     </BrowserRouter>
   );

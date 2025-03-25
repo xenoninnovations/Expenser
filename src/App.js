@@ -16,6 +16,7 @@ import RevenueTracker from "./pages/revenuetracker/RevenueTracker";
 import UploadPDF from "./pages/doc-drafting/upload-pdf/UploadPDF";
 import Templates from "./pages/doc-drafting/templates/Templates";
 import DocumentLibrary from "./pages/doc-drafting/library/DocumentLibrary";
+import EmailViewer from './components/EmailViewer/EmailViewer';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
         <Route path="/uploadpdf" element={<UploadPDF />} />
         <Route path="/templates" element={<Templates />} />
         <Route path="/document-library" element={<DocumentLibrary />} />
+        <Route path="/email" element={<EmailViewer />} />
       </Routes>
     </BrowserRouter>
   );

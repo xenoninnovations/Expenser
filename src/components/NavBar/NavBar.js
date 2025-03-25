@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from "react";
 import "./NavBar.css";
-import profileImg from "../../images/profile.png";
-import settingsIcon from "../../images/settings.svg";
-import dots from "../../images/dots.svg";
-import dashboardIcon from "../../images/dashboard.svg";
-import budgetingIcon from "../../images/budgeting.svg";
-import timeIcon from "../../images/time.svg";
-import bookIcon from "../../images/bookkeeping.svg";
-import collapseIcon from "../../images/collapse.svg";
-import GlobalButton from "../GlobalButton/GlobalButton";
-import { FaRegUser, FaUser, FaFileAlt } from "react-icons/fa";
+import { Link, useLocation } from 'react-router-dom';
+import { 
+  FaHome, 
+  FaWallet, 
+  FaClock, 
+  FaBook, 
+  FaEnvelope,
+  FaChevronDown,
+  FaBars 
+} from 'react-icons/fa';
 
 export default function NavBar() {
   const [isBudgetingOpen, setIsBudgetingOpen] = useState(false);
-  const [isTimeTrackingOpen, setIsTimeTrackingOpen] = useState(false);
   const [isBookKeepingOpen, setIsBookKeepingOpen] = useState(false);
-  const [isDocumentDraftingOpen, setIsDocumentDraftingOpen] = useState(false);
   const [isNavExpanded, setIsNavExpanded] = useState(true);
+  const location = useLocation();
 
   // Auto-collapse on screen resize
   useEffect(() => {
@@ -34,182 +33,117 @@ export default function NavBar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const isActiveRoute = (path) => location.pathname === path;
+
+  const toggleNavbar = () => {
+    setIsNavExpanded(!isNavExpanded);
+  };
+
   return (
     <nav className={`navbar ${isNavExpanded ? "expanded" : "collapsed"}`}>
-      <section className="profile-box">
-        <img
-          src={settingsIcon}
-          alt="settings icon"
-          className="settings-icon"
-          onClick={() => setIsNavExpanded(!isNavExpanded)}
-        />
-        {isNavExpanded && (
-          <section className="user-sett-dots">
-            <section className="username-settings">
-              <h3 className="username">Fizkies Floky</h3>
-              <img src={dots} alt="dots" className="dots" />
-            </section>
-          </section>
-        )}
-      </section>
+      <div className="profile-section">
+        <div className="profile-header">
+          <h3 className="profile-name">Fizikes Floky</h3>
+          <button className="toggle-button" onClick={toggleNavbar}>
+            <FaBars />
+          </button>
+        </div>
+        <div className="profile-dots">
+          <span className="dot red"></span>
+          <span className="dot yellow"></span>
+          <span className="dot green"></span>
+        </div>
+      </div>
 
       <ul className="nav-list">
-        <section className="list-group">
-          <section className="main-nav">
-          <section className="icon-item">
-            <img
-              src={dashboardIcon}
-              alt="dashboard icon"
-              className="list-icon"
-            />
-            {isNavExpanded && (
-              <a href="/">
-                <li className="list-item">Dashboard</li>
-              </a>
-            )}
-          </section>
-          </section>
-        </section>
+        {/* Home */}
+        <li className="nav-item">
+          <Link to="/" className={isActiveRoute('/') ? 'active' : ''}>
+            <FaHome className="nav-icon" />
+            {isNavExpanded && <span>Home</span>}
+          </Link>
+        </li>
 
-        {/* Budgeting Section */}
-        <section className="list-group">
-          <section
-            className="main-nav"
+        {/* Budgeting */}
+        <li className="nav-item">
+          <div 
+            className={`nav-link ${isBudgetingOpen ? 'open' : ''} ${location.pathname.includes('/budgeting') ? 'active' : ''}`}
             onClick={() => setIsBudgetingOpen(!isBudgetingOpen)}
           >
-            <section className="icon-item">
-              <img
-                src={budgetingIcon}
-                alt="budgeting icon"
-                className="list-icon"
-              />
-              {isNavExpanded && <li className="list-item">Budgeting</li>}
-            </section>
-            {isNavExpanded && (
-              <img
-                src={collapseIcon}
-                alt="collapse icon"
-                className={`collapse-icon ${isBudgetingOpen ? "open" : ""}`}
-              />
-            )}
-          </section>
-          {isBudgetingOpen && isNavExpanded && (
-            <ul className="mini-nav">
-              <li className="mini-item">
-                <a href="/expensetracker">Expense Tracker</a>
+            <div className="nav-link-content">
+              <FaWallet className="nav-icon" />
+              {isNavExpanded && <span>Budgeting</span>}
+            </div>
+            {isNavExpanded && <FaChevronDown className={`chevron ${isBudgetingOpen ? 'open' : ''}`} />}
+          </div>
+          {isNavExpanded && isBudgetingOpen && (
+            <ul className="submenu">
+              <li className={isActiveRoute('/expensetracker') ? 'active' : ''}>
+                <Link to="/expensetracker">Expense Tracker</Link>
               </li>
-              <li className="mini-item">
-              <a href="/revenuetracker">Revenue Tracker</a>
-                
-                </li>
-              <li className="mini-item">Savings</li>
-              <li className="mini-item">Transactions</li>
+              <li className={isActiveRoute('/revenuetracker') ? 'active' : ''}>
+                <Link to="/revenuetracker">Income/Revenue</Link>
+              </li>
+              <li className={isActiveRoute('/savings') ? 'active' : ''}>
+                <Link to="/savings">Savings</Link>
+              </li>
+              <li className={isActiveRoute('/transactions') ? 'active' : ''}>
+                <Link to="/transactions">Transactions</Link>
+              </li>
             </ul>
           )}
-        </section>
+        </li>
 
-        {/* Time Tracking Section */}
-        <section className="list-group">
-          <section
-            className="main-nav"
-            onClick={() => setIsTimeTrackingOpen(!isTimeTrackingOpen)}
-          >
-            <section className="icon-item">
-              <img
-                src={timeIcon}
-                alt="time tracking icon"
-                className="list-icon"
-              />
-              {isNavExpanded && <li className="list-item">Time Tracking</li>}
-            </section>
-            {isNavExpanded && (
-              <img
-                src={collapseIcon}
-                alt="collapse icon"
-                className={`collapse-icon ${isTimeTrackingOpen ? "open" : ""}`}
-              />
-            )}
-          </section>
-          {isTimeTrackingOpen && isNavExpanded && (
-            <ul className="mini-nav">
-              <li className="mini-item">
-                <a href="/timetracker">Time Tracker</a>
-              </li>
-              <li className="mini-item">Calendar</li>
-              <li className="mini-item">Automations</li>
-              <li className="mini-item">Time Sheets</li>
-            </ul>
-          )}
-        </section>
-
-        {/* Book Keeping Section */}
-        <section className="list-group">
-          <section
-            className="main-nav"
+        {/* Book Keeping */}
+        <li className="nav-item">
+          <div 
+            className={`nav-link ${isBookKeepingOpen ? 'open' : ''} ${location.pathname.includes('/bookkeeping') ? 'active' : ''}`}
             onClick={() => setIsBookKeepingOpen(!isBookKeepingOpen)}
           >
-            <section className="icon-item">
-              <img
-                src={bookIcon}
-                alt="bookkeeping icon"
-                className="list-icon"
-              />
-              {isNavExpanded && <li className="list-item">Book Keeping</li>}
-            </section>
-            {isNavExpanded && (
-              <img
-                src={collapseIcon}
-                alt="collapse icon"
-                className={`collapse-icon ${isBookKeepingOpen ? "open" : ""}`}
-              />
-            )}
-          </section>
-          {isBookKeepingOpen && isNavExpanded && (
-            <ul className="mini-nav">
-              <li className="mini-item">
-                <a href="/clientmanagement">Client Management</a>
+            <div className="nav-link-content">
+              <FaBook className="nav-icon" />
+              {isNavExpanded && <span>Book Keeping</span>}
+            </div>
+            {isNavExpanded && <FaChevronDown className={`chevron ${isBookKeepingOpen ? 'open' : ''}`} />}
+          </div>
+          {isNavExpanded && isBookKeepingOpen && (
+            <ul className="submenu">
+              <li className={isActiveRoute('/clientmanagement') ? 'active' : ''}>
+                <Link to="/clientmanagement">Client Management</Link>
               </li>
-              <li className="mini-item">Cost Breakdown</li>
-              <li className="mini-item">Invoicing & Payments</li>
+              <li className={isActiveRoute('/conflict-check') ? 'active' : ''}>
+                <Link to="/conflict-check">Conflict Check</Link>
+              </li>
+              <li className={isActiveRoute('/document-drafting') ? 'active' : ''}>
+                <Link to="/document-drafting">Document Drafting</Link>
+              </li>
             </ul>
           )}
-        </section>
+        </li>
 
-        {/* Document Drafting Section */}
-        <section className="list-group">
-          <section
-            className="main-nav"
-            onClick={() => setIsDocumentDraftingOpen(!isDocumentDraftingOpen)}
-          >
-            <section className="icon-item">
-              <FaFileAlt className="list-icon" />
-              {isNavExpanded && <li className="list-item">Document Drafting</li>}
-            </section>
-            {isNavExpanded && (
-              <img
-                src={collapseIcon}
-                alt="collapse icon"
-                className={`collapse-icon ${isDocumentDraftingOpen ? "open" : ""}`}
-              />
-            )}
-          </section>
-          {isDocumentDraftingOpen && isNavExpanded && (
-            <ul className="mini-nav">
-              <li className="mini-item">
-                <a href="/uploadpdf">PDF Forms</a>
-              </li>
-              <li className="mini-item">Templates</li>
-              <li className="mini-item">Document Library</li>
-            </ul>
-          )}
-        </section>
+        {/* Time Tracking */}
+        <li className="nav-item">
+          <Link to="/timetracker" className={isActiveRoute('/timetracker') ? 'active' : ''}>
+            <FaClock className="nav-icon" />
+            {isNavExpanded && <span>Time Tracking</span>}
+          </Link>
+        </li>
+
+        {/* Email */}
+        <li className="nav-item">
+          <Link to="/email" className={isActiveRoute('/email') ? 'active' : ''}>
+            <FaEnvelope className="nav-icon" />
+            {isNavExpanded && <span>Email</span>}
+          </Link>
+        </li>
       </ul>
 
-      <div>
-        <section id="auth">
-          <a href="/signin">Signin</a> <br/>
-          <a href="/signup">Signup</a>
-        </section>
+      <div className="logo-section">
+        <div className="logo">
+          <div className="logo-circle"></div>
+          <div className="logo-square"></div>
+          <div className="logo-triangle"></div>
+        </div>
       </div>
     </nav>
   );

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Navbar from "../../components/NavBar/NavBar";
 import "../../pages/assets/styles/global.css";
 import "./book-keeping.css"; // Assuming this exists
-import { collection, addDoc } from "firebase/firestore";
+import { collection, getDoc, doc, setDoc } from "firebase/firestore";
 import { db } from "../../config";
 import { useNavigate } from "react-router-dom";
 
@@ -26,15 +26,23 @@ function Addclientform({ closeModal }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const collectionRef = collection(db, "clients");
-      await addDoc(collectionRef, formData);
-      console.log("Client added successfully");
+      const documentRef = doc(db, "clients", formData["emailAddress"]);
+      const document = await getDoc(documentRef);
+  
+      if (document.exists()) {
+        alert("A client with this email already exists.");
+      } else {
+        await setDoc(documentRef, formData);
+      }
+
     } catch (error) {
-      console.error("Error adding document: ", error);
+      console.error("Failed to add client", error);
+
     } finally {
       navigate("/clientmanagement");
     }
   };
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;

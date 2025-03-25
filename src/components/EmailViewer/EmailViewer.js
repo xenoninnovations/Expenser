@@ -10,7 +10,9 @@ const msalConfig = {
     auth: {
         clientId: process.env.REACT_APP_MICROSOFT_CLIENT_ID,
         authority: "https://login.microsoftonline.com/common",
-        redirectUri: "https://expenser-2335.web.app"
+        redirectUri: process.env.NODE_ENV === 'development' 
+            ? "http://localhost:3000"
+            : "https://expenser-2335.web.app"
     },
     cache: {
         cacheLocation: "sessionStorage",

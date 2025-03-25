@@ -117,6 +117,15 @@ export default function NavBar() {
               <li className={isActiveRoute('/document-drafting') ? 'active' : ''}>
                 <Link to="/document-drafting">Document Drafting</Link>
               </li>
+              <li className={isActiveRoute('/emails') ? 'active' : ''}>
+                <Link to="/emails">Emails</Link>
+              </li>
+              <li className={isActiveRoute('/invoicing') ? 'active' : ''}>
+                <Link to="/invoicing">Invoicing & Payments</Link>
+              </li>
+              <li className={isActiveRoute('/cost-breakdown') ? 'active' : ''}>
+                <Link to="/cost-breakdown">Cost Breakdown</Link>
+              </li>
             </ul>
           )}
         </li>

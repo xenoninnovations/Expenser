@@ -214,36 +214,36 @@ function Addclientform({ closeModal }) {
               </label>
             </div>
           </div>
+
           {/**Case witnesses */}
           <label className="label">
             Case witnesses (if applicable):
-            <form>
-              <label className="label">
-                <div className="form-section-content">
-                  <div>
-                    <label className="label">Witness name </label>
-                    <input
-                      className="fields"
-                      name="witnessName"
-                      type="text"
-                      value=""
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div>
-                    <label className="label">Witness contact</label>
-                    <input
-                      className="fields"
-                      name="witnessContact"
-                      type="text"
-                      value=""
-                      onChange={handleChange}
-                    />
-                  </div>
+            <label className="label">
+              <div className="form-section-content">
+                <div>
+                  <label className="label">Witness name </label>
+                  <input
+                    className="fields"
+                    name="witnessName"
+                    type="text"
+                    value=""
+                    onChange={handleChange}
+                  />
                 </div>
-              </label>
-            </form>
+                <div>
+                  <label className="label">Witness contact</label>
+                  <input
+                    className="fields"
+                    name="witnessContact"
+                    type="text"
+                    value=""
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </label>
           </label>
+
           {/**Lead Attorney */}
           <label className="label">
             Lead Attorney:
@@ -256,47 +256,84 @@ function Addclientform({ closeModal }) {
               required
             />
           </label>
+
           {/**Case Description */}
           <label className="label">
             Case description:
             <textarea
               className="fields"
-              type="text"
               name="caseDesc"
               value={formData.caseDesc}
               onChange={handleChange}
             ></textarea>
           </label>
+
           {/**Supporting Attorneys */}
           <label className="label">
             Supporting Attorneys (if applicable):
-            <form>
-              <label className="label">
-                <div className="form-section-content">
-                  <div>
-                    <label className="label">Attorney name</label>
-                    <input
-                      className="fields"
-                      name="attorniesName"
-                      type="text"
-                      value=""
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div>
-                    <label className="label">Attorney contact</label>
-                    <input
-                      className="fields"
-                      name="attorniesContact"
-                      type="text"
-                      value=""
-                      onChange={handleChange}
-                    />
-                  </div>
+            <label className="label">
+              <div className="form-section-content">
+                <div>
+                  <label className="label">Attorney name</label>
+                  <input
+                    className="fields"
+                    name="attorniesName"
+                    type="text"
+                    value=""
+                    onChange={handleChange}
+                  />
                 </div>
-              </label>
-            </form>
+                <div>
+                  <label className="label">Attorney contact</label>
+                  <input
+                    className="fields"
+                    name="attorniesContact"
+                    type="text"
+                    value=""
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+            </label>
           </label>
+
+          {/**Jurisdiction */}
+          <label className="label">
+            Jurisdiction:
+            <input
+              className="fields"
+              type="text"
+              name="jurisdiction"
+              value={formData.jurisdiction}
+              onChange={handleChange}
+              required
+            />
+          </label>
+
+          {/**Court assigned case number */}
+          <label className="label">
+            Court assigned case number (if applicable):
+            <input
+              className="fields"
+              type="text"
+              name="courtNumber"
+              value={formData.courtNumber}
+              onChange={handleChange}
+              required
+            />
+          </label>
+
+          {/**Case Notes */}
+          <label className="label">
+            Case notes:
+            <textarea
+              className="fields"
+              name="caseNotes"
+              value={formData.caseNotes}
+              onChange={handleChange}
+            ></textarea>
+          </label>
+
           <button type="submit" className="add-expense-button">
             Submit
           </button>

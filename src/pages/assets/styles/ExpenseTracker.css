@@ -3,6 +3,11 @@
   flex-direction: column;
 }
 
+td {
+  cursor: pointer;
+
+}
+
 .expense-buttons {
   display: flex;
   flex-direction: row;

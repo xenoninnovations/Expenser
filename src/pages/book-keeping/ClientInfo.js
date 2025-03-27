@@ -13,16 +13,17 @@ import { useParams } from "react-router-dom";
 import dots from "../../images/dots.svg";
 import GlobalButton from "../../components/GlobalButton/GlobalButton";
 import { FaPen, FaTrash, FaPlus, FaFileExport } from "react-icons/fa";
+import EditCase from "../../components/EditCase/EditCase";
 
 const ClientInfo = () => {
   const { id } = useParams();
   const [client, setClient] = useState(null);
+  const [selectedCase, setSelectedCase] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [caseData, setCaseData] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedExpenseId, setSelectedExpenseId] = useState(null);
 
   useEffect(() => {
     const fetchClientAndCases = async () => {
@@ -57,15 +58,35 @@ const ClientInfo = () => {
   }, [id]);
 
   const handleEditClick = (caseId) => {
-    setSelectedExpenseId(caseId);
+    setSelectedCase(caseId);
     setIsEditModalOpen(true);
   };
 
   const handleDeleteClick = (caseId) => {
-    setSelectedExpenseId(caseId);
+    setSelectedCase(caseId);
     setIsDeleteModalOpen(true);
   };
+  // Function to load all cases
+  const loadAllCases = async () => {
+    try {
+      const casesRef = collection(db, "cases");
+      const querySnapshot = await getDocs(casesRef);
 
+      const casesList = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          amount: parseFloat(data.amount || 0), // Ensure amount is a number
+          date: data.date ? new Date(data.date).toLocaleDateString() : "N/A", // Format date
+        };
+      });
+
+      setCaseData(casesList);
+    } catch (error) {
+      console.error("Error fetching cases: ", error);
+    }
+  };
   if (loading) return <p>Loading...</p>;
   if (!client) return <p>Client not found.</p>;
 
@@ -124,7 +145,7 @@ const ClientInfo = () => {
                     <td>
                       <FaPen
                         className="icon edit-icon"
-                        // onClick={() => handleEditClick(expense.id)}
+                        onClick={() => handleEditClick(caseItem.id)}
                       />
                       <FaTrash
                         className="icon delete-icon"
@@ -142,6 +163,32 @@ const ClientInfo = () => {
           </table>
         </div>
       </div>
+      {/* {isAddModalOpen && (
+        <AddExpense
+          closeModal={() => {
+            setIsAddModalOpen(false);
+            loadAllExpenses(); // Refresh after adding
+          }}
+        />
+      )} */}
+      {isEditModalOpen && (
+        <EditCase
+          closeModal={() => {
+            setIsEditModalOpen(false);
+            loadAllCases(); // Refresh after editing
+          }}
+          caseId={selectedCase}
+        />
+      )}
+      {/* {isDeleteModalOpen && (
+        <DeleteExpense
+          closeModal={() => {
+            setIsDeleteModalOpen(false);
+            loadAllExpenses(); // Refresh after deletion
+          }}
+          expenseId={selectedExpenseId}
+        />
+      )} */}
     </div>
   );
 };

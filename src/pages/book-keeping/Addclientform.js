@@ -37,7 +37,7 @@ function Addclientform({ closeModal }) {
     },
     witnesses: {
       witnessName: "",
-      witnessContact: "", 
+      witnessContact: "",
     },
   });
   const [caseTypes, setCaseTypes] = useState([]);
@@ -47,13 +47,13 @@ function Addclientform({ closeModal }) {
   const validateForm = () => {
     let tempErrors = {};
     let isValid = true;
-    
+
     // Client Information Validation
     if (!formData.clientName.trim()) {
       tempErrors.clientName = "Client name is required";
       isValid = false;
     }
-    
+
     if (!formData.emailAddress.trim()) {
       tempErrors.emailAddress = "Email is required";
       isValid = false;
@@ -61,11 +61,11 @@ function Addclientform({ closeModal }) {
       tempErrors.emailAddress = "Email is invalid";
       isValid = false;
     }
-    
+
     if (!formData.phoneNumber.trim()) {
       tempErrors.phoneNumber = "Phone number is required";
       isValid = false;
-    } else if (!/^\d{10}$/.test(formData.phoneNumber.replace(/\D/g, ''))) {
+    } else if (!/^\d{10}$/.test(formData.phoneNumber.replace(/\D/g, ""))) {
       tempErrors.phoneNumber = "Phone number must be 10 digits";
       isValid = false;
     }
@@ -75,17 +75,17 @@ function Addclientform({ closeModal }) {
       tempErrors.caseName = "Case name is required";
       isValid = false;
     }
-    
+
     if (!formData.caseType) {
       tempErrors.caseType = "Case type is required";
       isValid = false;
     }
-    
+
     if (!formData.jurisdiction.trim()) {
       tempErrors.jurisdiction = "Jurisdiction is required";
       isValid = false;
     }
-    
+
     if (!formData.leadAttorney.trim()) {
       tempErrors.leadAttorney = "Lead attorney is required";
       isValid = false;
@@ -96,7 +96,7 @@ function Addclientform({ closeModal }) {
       tempErrors.websiteUrl = "Website URL must start with http:// or https://";
       isValid = false;
     }
-    
+
     if (formData.budget && isNaN(formData.budget)) {
       tempErrors.budget = "Budget must be a number";
       isValid = false;
@@ -112,7 +112,7 @@ function Addclientform({ closeModal }) {
 
     // First validate the form
     const isValid = validateForm();
-    
+
     if (!isValid) {
       setIsSubmitting(false);
       return; // Stop submission if validation fails
@@ -126,7 +126,7 @@ function Addclientform({ closeModal }) {
       if (clientSnap.exists()) {
         setErrors({
           ...errors,
-          emailAddress: "A client with this email already exists"
+          emailAddress: "A client with this email already exists",
         });
         setIsSubmitting(false);
         return;
@@ -177,7 +177,7 @@ function Addclientform({ closeModal }) {
     } catch (error) {
       console.error("Error adding client and case:", error);
       setErrors({
-        submit: "Failed to submit form. Please try again."
+        submit: "Failed to submit form. Please try again.",
       });
     } finally {
       setIsSubmitting(false);
@@ -191,7 +191,7 @@ function Addclientform({ closeModal }) {
     if (errors[name]) {
       setErrors({
         ...errors,
-        [name]: null
+        [name]: null,
       });
     }
   };
@@ -208,6 +208,34 @@ function Addclientform({ closeModal }) {
     loadCaseTypes();
   }, []);
 
+  const handleDemo = () => {
+    setFormData({
+      clientName: "Jane Doe",
+      emailAddress: "jane@doe.com",
+      phoneNumber: "4161234567",
+      companyName: "Jane Doe Inc.",
+      websiteUrl: "https://www.janedoe.com",
+      industry: "Food and Beverage",
+      budget: "100000",
+      source: "Referral",
+      caseName: "Jane Doe v. John Doe",
+      caseType: 0,
+      jurisdiction: "Ontario",
+      caseDesc: "Jane Doe is suing John Doe for $100,000",
+      caseNotes: "Jane Doe is suing John Doe for $100,000",
+      leadAttorney: "John Doe",
+      courtNumber: "1234567890",
+      supportingAttornies: {
+        attorneyName: "Melissa Stephens",
+        attorneyContact: "4161234567",
+      },
+      witnesses: {
+        witnessName: "Caleb Smith",
+        witnessContact: "5634234567",
+      },
+    });
+  };
+
   return (
     <div className="page">
       <Navbar />
@@ -219,26 +247,30 @@ function Addclientform({ closeModal }) {
               <label className="label">
                 Full Name:
                 <input
-                  className={`fields ${errors.clientName ? 'error' : ''}`}
+                  className={`fields ${errors.clientName ? "error" : ""}`}
                   type="text"
                   name="clientName"
                   value={formData.clientName}
                   onChange={handleChange}
                   required
                 />
-                {errors.clientName && <span className="error-message">{errors.clientName}</span>}
+                {errors.clientName && (
+                  <span className="error-message">{errors.clientName}</span>
+                )}
               </label>
               <label className="label">
                 Email Address:
                 <input
-                  className={`fields ${errors.emailAddress ? 'error' : ''}`}
+                  className={`fields ${errors.emailAddress ? "error" : ""}`}
                   type="email"
                   name="emailAddress"
                   value={formData.emailAddress}
                   onChange={handleChange}
                   required
                 />
-                {errors.emailAddress && <span className="error-message">{errors.emailAddress}</span>}
+                {errors.emailAddress && (
+                  <span className="error-message">{errors.emailAddress}</span>
+                )}
               </label>
             </div>
 
@@ -247,14 +279,16 @@ function Addclientform({ closeModal }) {
                 <label className="label">
                   Phone Number:
                   <input
-                    className={`fields ${errors.phoneNumber ? 'error' : ''}`}
+                    className={`fields ${errors.phoneNumber ? "error" : ""}`}
                     type="tel"
                     name="phoneNumber"
                     value={formData.phoneNumber}
                     onChange={handleChange}
                     required
                   />
-                  {errors.phoneNumber && <span className="error-message">{errors.phoneNumber}</span>}
+                  {errors.phoneNumber && (
+                    <span className="error-message">{errors.phoneNumber}</span>
+                  )}
                 </label>
                 <label className="label">
                   Company Name:
@@ -275,13 +309,15 @@ function Addclientform({ closeModal }) {
               <label className="label">
                 Website URL:
                 <input
-                  className={`fields ${errors.websiteUrl ? 'error' : ''}`}
+                  className={`fields ${errors.websiteUrl ? "error" : ""}`}
                   type="url"
                   name="websiteUrl"
                   value={formData.websiteUrl}
                   onChange={handleChange}
                 />
-                {errors.websiteUrl && <span className="error-message">{errors.websiteUrl}</span>}
+                {errors.websiteUrl && (
+                  <span className="error-message">{errors.websiteUrl}</span>
+                )}
               </label>
               <label className="label">
                 Industry:
@@ -299,13 +335,15 @@ function Addclientform({ closeModal }) {
               <label className="label">
                 Budget:
                 <input
-                  className={`fields ${errors.budget ? 'error' : ''}`}
+                  className={`fields ${errors.budget ? "error" : ""}`}
                   type="text"
                   name="budget"
                   value={formData.budget}
                   onChange={handleChange}
                 />
-                {errors.budget && <span className="error-message">{errors.budget}</span>}
+                {errors.budget && (
+                  <span className="error-message">{errors.budget}</span>
+                )}
               </label>
               <label className="label">
                 Client Source:
@@ -327,19 +365,21 @@ function Addclientform({ closeModal }) {
               <label className="label">
                 Case name:
                 <input
-                  className={`fields ${errors.caseName ? 'error' : ''}`}
+                  className={`fields ${errors.caseName ? "error" : ""}`}
                   type="text"
                   name="caseName"
                   value={formData.caseName}
                   onChange={handleChange}
                   required
                 />
-                {errors.caseName && <span className="error-message">{errors.caseName}</span>}
+                {errors.caseName && (
+                  <span className="error-message">{errors.caseName}</span>
+                )}
               </label>
               <label className="label">
                 Case type:
                 <select
-                  className={`fields ${errors.caseType ? 'error' : ''}`}
+                  className={`fields ${errors.caseType ? "error" : ""}`}
                   name="caseType"
                   value={formData.caseType}
                   onChange={handleChange}
@@ -354,7 +394,9 @@ function Addclientform({ closeModal }) {
                     </option>
                   ))}
                 </select>
-                {errors.caseType && <span className="error-message">{errors.caseType}</span>}
+                {errors.caseType && (
+                  <span className="error-message">{errors.caseType}</span>
+                )}
               </label>
             </div>
           </div>
@@ -375,8 +417,8 @@ function Addclientform({ closeModal }) {
                         ...formData,
                         witnesses: {
                           ...formData.witnesses,
-                          witnessName: e.target.value
-                        }
+                          witnessName: e.target.value,
+                        },
                       });
                     }}
                   />
@@ -385,7 +427,7 @@ function Addclientform({ closeModal }) {
                   <label className="label">Witness contact</label>
                   <input
                     className="fields"
-                    name="witnessContact" 
+                    name="witnessContact"
                     type="text"
                     value={formData.witnesses.witnessContact}
                     onChange={(e) => {
@@ -393,8 +435,8 @@ function Addclientform({ closeModal }) {
                         ...formData,
                         witnesses: {
                           ...formData.witnesses,
-                          witnessContact: e.target.value
-                        }
+                          witnessContact: e.target.value,
+                        },
                       });
                     }}
                   />
@@ -406,14 +448,16 @@ function Addclientform({ closeModal }) {
           <label className="label">
             Lead Attorney:
             <input
-              className={`fields ${errors.leadAttorney ? 'error' : ''}`}
+              className={`fields ${errors.leadAttorney ? "error" : ""}`}
               type="text"
               name="leadAttorney"
               value={formData.leadAttorney}
               onChange={handleChange}
               required
             />
-            {errors.leadAttorney && <span className="error-message">{errors.leadAttorney}</span>}
+            {errors.leadAttorney && (
+              <span className="error-message">{errors.leadAttorney}</span>
+            )}
           </label>
 
           <label className="label">
@@ -442,8 +486,8 @@ function Addclientform({ closeModal }) {
                         ...formData,
                         supportingAttornies: {
                           ...formData.supportingAttornies,
-                          attorneyName: e.target.value
-                        }
+                          attorneyName: e.target.value,
+                        },
                       });
                     }}
                   />
@@ -460,8 +504,8 @@ function Addclientform({ closeModal }) {
                         ...formData,
                         supportingAttornies: {
                           ...formData.supportingAttornies,
-                          attorneyContact: e.target.value
-                        }
+                          attorneyContact: e.target.value,
+                        },
                       });
                     }}
                   />
@@ -473,14 +517,16 @@ function Addclientform({ closeModal }) {
           <label className="label">
             Jurisdiction:
             <input
-              className={`fields ${errors.jurisdiction ? 'error' : ''}`}
+              className={`fields ${errors.jurisdiction ? "error" : ""}`}
               type="text"
               name="jurisdiction"
               value={formData.jurisdiction}
               onChange={handleChange}
               required
             />
-            {errors.jurisdiction && <span className="error-message">{errors.jurisdiction}</span>}
+            {errors.jurisdiction && (
+              <span className="error-message">{errors.jurisdiction}</span>
+            )}
           </label>
 
           <label className="label">
@@ -504,14 +550,23 @@ function Addclientform({ closeModal }) {
             ></textarea>
           </label>
 
-          {errors.submit && <div className="error-message">{errors.submit}</div>}
+          {errors.submit && (
+            <div className="error-message">{errors.submit}</div>
+          )}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="add-expense-button"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit'}
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </button>
+          <button
+            type="button"
+            className="add-expense-button demo"
+            onClick={() => handleDemo()}
+          >
+            Demo
           </button>
         </form>
       </div>

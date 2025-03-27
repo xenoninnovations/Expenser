@@ -2,7 +2,15 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../../components/NavBar/NavBar";
 import "../../pages/assets/styles/global.css";
 import "./book-keeping.css"; // Assuming this exists
-import { collection, getDoc, doc, setDoc, getDocs } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  collection,
+  query,
+  getDocs,
+  where,
+} from "firebase/firestore";
 import { db } from "../../config";
 import { useNavigate } from "react-router-dom";
 
@@ -15,31 +23,80 @@ function Addclientform({ closeModal }) {
     companyName: "",
     websiteUrl: "",
     industry: "",
-    // businessSize: "",
-    // servicesRequired: "",
-    // budget: "",
-    // clientSource: "",
-    // preferredCommMethod: "",
-    // emailConsent: "",
+    budget: "",
+    source: "",
+    caseName: "",
+    caseType: "",
+    jurisdiction: "",
+    caseDesc: "",
+    caseNotes: "",
+    leadAttorney: "",
+    supportingAttornies: {
+      attorneyName: "",
+      attorneyContact: "",
+    },
+    witnesses: {
+      witnessName: "",
+      witnessContact: "",
+    },
   });
   const [caseTypes, setCaseTypes] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      //clients database
-      const documentRef = doc(db, "clients", formData["emailAddress"]);
-      const document = await getDoc(documentRef);
 
-      if (document.exists()) {
+    try {
+      // Check if client already exists
+      const clientRef = doc(db, "clients", formData.emailAddress);
+      const clientSnap = await getDoc(clientRef);
+
+      if (clientSnap.exists()) {
         alert("A client with this email already exists.");
-      } else {
-        await setDoc(documentRef, formData);
+        return;
       }
+
+      // Add client data to "clients" collection
+      await setDoc(clientRef, {
+        clientName: formData.clientName,
+        emailAddress: formData.emailAddress,
+        phoneNumber: formData.phoneNumber,
+        companyName: formData.companyName,
+        websiteUrl: formData.websiteUrl,
+        industry: formData.industry,
+        budget: formData.budget,
+        source: formData.clientSource,
+      });
+
+      // Add case data to "cases" collection with status 'open' and client_id
+      const caseRef = doc(collection(db, "cases"));
+
+      await setDoc(caseRef, {
+        name: formData.caseName,
+        type: formData.caseType,
+        jurisdiction: formData.jurisdiction,
+        case_desc: formData.caseDesc,
+        notes: formData.caseNotes,
+        status: "open",
+        client_id: formData.emailAddress,
+        lead_attorney: formData.leadAttorney,
+        supportingAttornies: {
+          name: formData.attorneyName,
+          contact: formData.attorneyContact,
+        },
+        witnesses: {
+          name: formData.witnessName,
+          contact: formData.witnessContact,
+        },
+        court_assigned_case_number: formData.courtNumber || "",
+        created_at: new Date(),
+      });
+
+      alert("Client and case successfully added!");
+      navigate("/");
+      closeModal && closeModal();
     } catch (error) {
-      console.error("Failed to add client", error);
-    } finally {
-      navigate("/clientmanagement");
+      console.error("Error adding client and case:", error);
+      alert("An error occurred, please try again.");
     }
   };
 
@@ -50,24 +107,15 @@ function Addclientform({ closeModal }) {
 
   useEffect(() => {
     const loadCaseTypes = async () => {
-      try {
-        const caseTypesRef = collection(db, "cases-types"); // Reference to "categories" collection
-        const querySnapshot = await getDocs(caseTypesRef);
-
-        // Map through documents and set case types state
-        const caseTypesList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setCaseTypes(caseTypesList);
-      } catch (error) {
-        console.error("Error fetching case types: ", error);
-        console.log(caseTypes);
-      }
+      const querySnapshot = await getDocs(collection(db, "cases-types"));
+      const types = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCaseTypes(types);
     };
-
     loadCaseTypes();
-  }, []); // Fetch caseTypes on component load
+  }, []);
 
   return (
     <div className="page">

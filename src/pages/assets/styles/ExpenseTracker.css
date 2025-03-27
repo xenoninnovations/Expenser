@@ -73,6 +73,12 @@ td {
   padding: 0.5rem 1rem;
   cursor: pointer;
 }
+
+.add-expense-button.demo {
+  background: red;
+  color: white;
+}
+
 .filters {
   display: flex;
   justify-content: flex-start;

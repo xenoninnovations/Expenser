@@ -42,7 +42,24 @@ function EditCase({ closeModal, caseId, refreshCases }) {
         const caseRef = doc(db, "cases", caseId);
         const caseSnapshot = await getDoc(caseRef);
         if (caseSnapshot.exists()) {
-          setFormData(caseSnapshot.data());
+          const data = caseSnapshot.data();
+          setFormData({
+            caseName: data.name,
+            caseType: data.type,
+            jurisdiction: data.jurisdiction,
+            caseDesc: data.case_desc,
+            caseNotes: data.notes,
+            leadAttorney: data.lead_attorney,
+            courtNumber: data.court_assigned_case_number,
+            supportingAttornies: {
+              attorneyName: data.supportingAttornies?.name || "",
+              attorneyContact: data.supportingAttornies?.contact || "",
+            },
+            witnesses: {
+              witnessName: data.witnesses?.name || "",
+              witnessContact: data.witnesses?.contact || "",
+            },
+          });
         } else {
           console.error("No such case found!");
         }
@@ -104,7 +121,7 @@ function EditCase({ closeModal, caseId, refreshCases }) {
             <label className="label">
               Case name:
               <input
-                className={`fields ${errors.caseName ? "error" : ""}`}
+                className="field"
                 type="text"
                 name="caseName"
                 value={formData.caseName}
@@ -118,7 +135,7 @@ function EditCase({ closeModal, caseId, refreshCases }) {
             <label className="label">
               Case type:
               <select
-                className={`fields ${errors.caseType ? "error" : ""}`}
+                className="field"
                 name="caseType"
                 value={formData.caseType}
                 onChange={handleChange}
@@ -139,54 +156,50 @@ function EditCase({ closeModal, caseId, refreshCases }) {
             </label>
           </div>
 
-          <label className="label">
-            Case witnesses (if applicable):
+          <label className="label">Case witnesses (if applicable):</label>
+          <div className="form-section-content">
             <label className="label">
-              <div className="form-section-content">
-                <div>
-                  <label className="label">Witness name </label>
-                  <input
-                    className="fields"
-                    name="witnessName"
-                    type="text"
-                    value={formData.witnesses.witnessName}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        witnesses: {
-                          ...formData.witnesses,
-                          witnessName: e.target.value,
-                        },
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <label className="label">Witness contact</label>
-                  <input
-                    className="fields"
-                    name="witnessContact"
-                    type="text"
-                    value={formData.witnesses.witnessContact}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        witnesses: {
-                          ...formData.witnesses,
-                          witnessContact: e.target.value,
-                        },
-                      });
-                    }}
-                  />
-                </div>
-              </div>
+              Witness name
+              <input
+                className="field"
+                name="witnessName"
+                type="text"
+                value={formData.witnesses.witnessName}
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    witnesses: {
+                      ...formData.witnesses,
+                      witnessName: e.target.value,
+                    },
+                  });
+                }}
+              />
             </label>
-          </label>
+            <label className="label">
+              Witness contact
+              <input
+                className="field"
+                name="witnessContact"
+                type="text"
+                value={formData.witnesses.witnessContact}
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    witnesses: {
+                      ...formData.witnesses,
+                      witnessContact: e.target.value,
+                    },
+                  });
+                }}
+              />
+            </label>
+          </div>
 
           <label className="label">
             Lead Attorney:
             <input
-              className={`fields ${errors.leadAttorney ? "error" : ""}`}
+              className={`field fields ${errors.leadAttorney ? "error" : ""}`}
               type="text"
               name="leadAttorney"
               value={formData.leadAttorney}
@@ -201,61 +214,58 @@ function EditCase({ closeModal, caseId, refreshCases }) {
           <label className="label">
             Case description:
             <textarea
-              className="fields"
+              className="field"
               name="caseDesc"
               value={formData.caseDesc}
               onChange={handleChange}
             ></textarea>
           </label>
 
-          <label className="label">
-            Supporting Attorneys (if applicable):
+          <label className="label">Supporting Attorneys (if applicable):</label>
+
+          <div className="form-section-content">
             <label className="label">
-              <div className="form-section-content">
-                <div>
-                  <label className="label">Attorney name</label>
-                  <input
-                    className="fields"
-                    name="attorneyName"
-                    type="text"
-                    value={formData.supportingAttornies.attorneyName}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        supportingAttornies: {
-                          ...formData.supportingAttornies,
-                          attorneyName: e.target.value,
-                        },
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <label className="label">Attorney contact</label>
-                  <input
-                    className="fields"
-                    name="attorneyContact"
-                    type="text"
-                    value={formData.supportingAttornies.attorneyContact}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        supportingAttornies: {
-                          ...formData.supportingAttornies,
-                          attorneyContact: e.target.value,
-                        },
-                      });
-                    }}
-                  />
-                </div>
-              </div>
+              Attorney name
+              <input
+                className="field"
+                name="attorneyName"
+                type="text"
+                value={formData.supportingAttornies.attorneyName}
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    supportingAttornies: {
+                      ...formData.supportingAttornies,
+                      attorneyName: e.target.value,
+                    },
+                  });
+                }}
+              />
             </label>
-          </label>
+            <label className="label">
+              Attorney contact
+              <input
+                className="field"
+                name="attorneyContact"
+                type="text"
+                value={formData.supportingAttornies.attorneyContact}
+                onChange={(e) => {
+                  setFormData({
+                    ...formData,
+                    supportingAttornies: {
+                      ...formData.supportingAttornies,
+                      attorneyContact: e.target.value,
+                    },
+                  });
+                }}
+              />
+            </label>
+          </div>
 
           <label className="label">
             Jurisdiction:
             <input
-              className={`fields ${errors.jurisdiction ? "error" : ""}`}
+              className={`field fields ${errors.jurisdiction ? "error" : ""}`}
               type="text"
               name="jurisdiction"
               value={formData.jurisdiction}
@@ -270,7 +280,7 @@ function EditCase({ closeModal, caseId, refreshCases }) {
           <label className="label">
             Court assigned case number (if applicable):
             <input
-              className="fields"
+              className="field"
               type="text"
               name="courtNumber"
               value={formData.courtNumber}
@@ -281,7 +291,7 @@ function EditCase({ closeModal, caseId, refreshCases }) {
           <label className="label">
             Case notes:
             <textarea
-              className="fields"
+              className="field"
               name="caseNotes"
               value={formData.caseNotes}
               onChange={handleChange}

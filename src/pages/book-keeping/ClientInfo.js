@@ -99,7 +99,7 @@ const ClientInfo = () => {
         <p>Email: {client.emailAddress}</p>
 
         <div className="header">
-          <h3>Cases Tracker</h3>
+          <h3>Cases</h3>
           <img src={dots} alt="dots" className="dots" />
         </div>
         <div className="table-container">

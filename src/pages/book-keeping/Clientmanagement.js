@@ -25,7 +25,7 @@ function Clientmanagement() {
 
         setClientList(clientsList);
 
-        console.table(clientList);
+        // console.table(clientList);
         setClientId(clientList.id);
       } catch (error) {
         console.log(error);
@@ -40,50 +40,58 @@ function Clientmanagement() {
   };
 
   useEffect(() => {
-    console.log(clientList); // Logs whenever clientList changes
+    // console.log(clientList); // Logs whenever clientList changes
   }, [clientList]);
 
   return (
     <div className="page">
       <Navbar />
       <div className="page-content">
-        <a href="/addclientform" id="link-button">Add A Client</a>
+        <a href="/addclientform" id="link-button">
+          Add A Client
+        </a>
         <div className="section-container">
           <div className="section-header">
             <h2 className="section-title">
               <span className="yellow-bar"></span> Client List
             </h2>
           </div>
-        <table className="global-table">
-          <thead>
-            <tr>
-              {[
-                "Client Name",
-                "Client Source",
-                "Email Address",
-                "Phone Number",
-                "Preferred Contact Method",
-              ].map((head) => (
-                <th key={head}>{head} ⬍ </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {clientList.map((client, index) => (
-              <tr
-                key={index}
-                className="table-row"
-                onClick={() => handleRowClick(client.id)}
-              >
-                <td>{client.clientName}</td>
-                <td>{client.clientSource}</td>
-                <td>{client.emailAddress}</td>
-                <td>{client.phoneNumber}</td>
-                <td>{client.preferredCommMethod}</td>
+          <table className="global-table">
+            <thead>
+              <tr>
+                {[
+                  "Client Name",
+                  "Client Source",
+                  "Email Address",
+                  "Phone Number",
+                  "Preferred Contact Method",
+                ].map((head) => (
+                  <th key={head}>{head} ⬍ </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {clientList.length > 0 ? (
+                clientList.map((client, index) => (
+                  <tr
+                    key={index}
+                    className="table-row"
+                    onClick={() => handleRowClick(client.id)}
+                  >
+                    <td>{client.clientName}</td>
+                    <td>{client.source}</td>
+                    <td>{client.emailAddress}</td>
+                    <td>{client.phoneNumber}</td>
+                    <td>{client.preferredCommMethod}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6">No clients data available...</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

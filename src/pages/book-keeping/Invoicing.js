@@ -7,10 +7,14 @@ import { collection, getDocs } from 'firebase/firestore';
 import NavBar from '../../components/NavBar/NavBar';
 import GlobalButton from '../../components/GlobalButton/GlobalButton';
 import { FaPlus } from 'react-icons/fa';
+import { FaFilePdf } from "react-icons/fa6";
+import { IoSend } from "react-icons/io5";
 
 export default function Invoicing() {
 
   const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] = useState(false)
+  const [isViewInvoiceModalOpen, setIsViewInvoiceModalOpen] = useState(false)
+    const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
   const [invoiceData, setInvoiceData] = useState(false);
 
   const loadAllInvoices = async () => {
@@ -38,6 +42,15 @@ export default function Invoicing() {
   useEffect(() => {
     loadAllInvoices();
   }, []);
+
+  const handleViewClick = (invoiceId) => {
+    setSelectedInvoiceId(invoiceId);
+    setIsViewInvoiceModalOpen(true);
+  };
+
+  const handleSendClick = (invoiceId) => {
+    return;
+  };
 
   return (
     <div className="page">
@@ -78,7 +91,30 @@ export default function Invoicing() {
               </tr>
             </thead>
             <tbody>
-              {/*=========================================================================================================*/}
+              {invoiceData.length > 0 ? (
+                invoiceData.map((invoice) => (
+                  <tr key={invoice.id} className='table-row'>
+                    <td>{invoice.client || "N/A"}</td>
+                    <td>{invoice.date}</td>
+                    <td>{invoice.amount.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</td>
+                    <td className={invoice.status.toLowerCase()}>{invoice.status}</td>
+                    <td>
+                      <FaFilePdf 
+                        className='icon edit-icon'
+                        onClick={() => handleViewClick(invoice.id)}
+                      />
+                      <IoSend
+                        className='icon send-icon'
+                        onClick={() => handleSendClick(invoice.id)}
+                      />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5">No invoice data available...</td>
+                </tr>
+              )}
             </tbody>
           </table>
 

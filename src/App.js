@@ -12,6 +12,12 @@ import ClientInfo from './pages/book-keeping/ClientInfo';
 import ExpenseTracker from "./pages/expensetracker/ExpenseTracker";
 import RevenueTracker from "./pages/revenuetracker/RevenueTracker";
 
+// Document Drafting Routes
+import UploadPDF from "./pages/doc-drafting/upload-pdf/UploadPDF";
+import Templates from "./pages/doc-drafting/templates/Templates";
+import DocumentLibrary from "./pages/doc-drafting/library/DocumentLibrary";
+import EmailViewer from './components/EmailViewer/EmailViewer';
+
 function App() {
   return (
     <BrowserRouter>
@@ -23,10 +29,16 @@ function App() {
         <Route path="/forgotpassword" element={<Forgotpassword />} />
         <Route path="/client/:id" element={<ClientInfo />} />
         <Route path="/expensetracker" element={<ExpenseTracker />} />
-        <Route path="/timetracker" element={ <Timetracker /> } />
-        <Route path="/clientmanagement" element={ <Clientmanagement /> } />
-        <Route path="/addclientform" element={ <AddClientForm /> } />
+        <Route path="/timetracker" element={<Timetracker />} />
+        <Route path="/clientmanagement" element={<Clientmanagement />} />
+        <Route path="/addclientform" element={<AddClientForm />} />
         <Route path="/revenuetracker" element={<RevenueTracker />} />
+        
+        {/* Document Drafting Routes */}
+        <Route path="/uploadpdf" element={<UploadPDF />} />
+        <Route path="/templates" element={<Templates />} />
+        <Route path="/document-library" element={<DocumentLibrary />} />
+        <Route path="/email" element={<EmailViewer />} />
       </Routes>
     </BrowserRouter>
   );

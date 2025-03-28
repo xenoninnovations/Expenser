@@ -28,16 +28,16 @@
 
 
 .navbar {
-  background-color: black;
-  display: flex;
-  justify-content: space-between;
+  width: 280px;
   height: 100vh;
-  width: 250px;
-  position: absolute;
+  background-color: #222222;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
   left: 0;
   top: 0;
-  transition: width 0.3s ease-in-out;
-  z-index: 1000;
+  transition: width 0.3s ease;
 }
 
 /* Auto-collapse when screen size is 2503px or smaller */
@@ -58,7 +58,7 @@
 
 /* Collapsed Navbar */
 .navbar.collapsed {
-  width: 60px;
+  width: 80px;
   display: flex;
   flex-direction: column;
   justify-content: start;
@@ -82,18 +82,40 @@
 }
 
 /* Profile Section */
-.profile-box {
+.profile-header {
   display: flex;
-  gap: 1rem;
-  padding: 20px;
-  width: 100%;
+  justify-content: space-between;
   align-items: center;
+  margin-bottom: 15px;
 }
 
-.profile-box img {
-  width: 30px;
-  cursor: pointer;
+.profile-section {
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 20px;
 }
+
+.profile-name {
+  color: #FFFFFF;
+  font-size: 18px;
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+
+.profile-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot.red { background-color: #FF4B4B; }
+.dot.yellow { background-color: #FFDA16; }
+.dot.green { background-color: #4CAF50; }
 
 /* Main Navigation Items */
 .list-group {
@@ -132,7 +154,6 @@
   flex-direction: column;
   gap: 10px;
 }
-
 
 .profile-box img {
   width: 30px;
@@ -176,7 +197,7 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 10px;
+  /* background-color: hsl(0, 0%, 100%, 0.2); */
   cursor: pointer;
 }
 
@@ -221,10 +242,12 @@
 /*Nav items*/
 .nav-list {
   list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  gap: 3vh;
-  padding-left: 0px;
+  gap: 8px;
 }
 
 .list-group {
@@ -337,4 +360,174 @@
 
 .mini-nav {
   text-align: left;
+}
+
+.nav-items {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 16px;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav-link, 
+.nav-item a {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  color: #FFFFFF;
+  text-decoration: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.nav-link {
+  justify-content: space-between;
+}
+
+.nav-link-content {
+  display: flex;
+  align-items: center;
+}
+
+.nav-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  color: #FFFFFF;
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+  color: #FFFFFF;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Submenu */
+.submenu {
+  list-style: none;
+  padding-left: 44px !important;
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.submenu li {
+  display: flex;
+  flex-direction: column;
+}
+
+.submenu a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+
+.submenu a:hover {
+  color: #FFFFFF;
+}
+
+.submenu li.active a {
+  color: #FFDA16;
+}
+
+/* Hover & Active States */
+.nav-item a:hover,
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item a.active,
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Logo Section */
+.logo-section {
+  padding: 20px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-circle,
+.logo-square,
+.logo-triangle {
+  background-color: #FFFFFF;
+  width: 12px;
+  height: 12px;
+}
+
+.logo-circle {
+  border-radius: 50%;
+}
+
+.logo-triangle {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+/* Collapsed State Adjustments */
+.navbar.collapsed .profile-name,
+.navbar.collapsed span,
+.navbar.collapsed .chevron {
+  display: none;
+}
+
+.navbar.collapsed .submenu {
+  display: none;
+}
+
+.navbar.collapsed .nav-item a,
+.navbar.collapsed .nav-link {
+  justify-content: center;
+}
+
+.navbar.collapsed .nav-icon {
+  margin-right: 0;
+}
+
+.toggle-button {
+  background: none;
+  border: none;
+  color: #FFFFFF;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.toggle-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.toggle-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Keep the toggle button visible in collapsed state */
+.navbar.collapsed .toggle-button {
+  display: flex;
 }

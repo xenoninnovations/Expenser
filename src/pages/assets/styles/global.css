@@ -163,6 +163,10 @@ a {
   color: #f44336;
 }
 
+.send-icon:hover {
+  color: #368ff4;
+}
+
 /* Container Styles */
 .table-container {
   border-radius: 10px;

@@ -13,7 +13,7 @@ function Clientmanagement() {
     name: "",
     email: "",
     phone: "",
-    caseId: ""
+    caseId: "",
   });
 
   const navigate = useNavigate();
@@ -27,11 +27,10 @@ function Clientmanagement() {
         const clientsList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
-          hasConflict: false
         }));
 
+        console.log("Loaded clients:", clientsList);
         setClientList(clientsList);
-        setClientId(clientList.id);
       } catch (error) {
         console.error("Error loading clients:", error);
       }

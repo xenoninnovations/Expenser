@@ -39,6 +39,10 @@ function Addclientform({ closeModal }) {
       witnessName: "",
       witnessContact: "",
     },
+    opposingParty: {
+      opposingPartyName: "",
+      opposingPartyEmailAddress: "",
+    },
   });
   const [caseTypes, setCaseTypes] = useState([]);
   const [errors, setErrors] = useState({});
@@ -166,11 +170,17 @@ function Addclientform({ closeModal }) {
         created_at: new Date(),
       };
 
+      const opposingPartyData = {
+        opposingPartyName: formData.opposingParty.opposingPartyName || "",
+        opposingPartyEmailAddress: formData.opposingParty.opposingPartyEmailAddress || "",
+      };
+
       // Transaction to ensure both writes succeed or none do
       await setDoc(clientRef, clientData);
       const caseRef = doc(collection(db, "cases"));
       await setDoc(caseRef, caseData);
-
+      const opposingPartyRef = doc(collection(db, "opposing"));
+      await setDoc(opposingPartyRef, opposingPartyData);
       alert("Client and case successfully added!");
       navigate("/");
       closeModal && closeModal();
@@ -232,6 +242,10 @@ function Addclientform({ closeModal }) {
       witnesses: {
         witnessName: "Caleb Smith",
         witnessContact: "5634234567",
+      },
+      opposingParty: {
+        opposingPartyName: "John Doe",
+        opposingPartyEmailAddress: "john@doe.com",
       },
     });
   };
@@ -549,6 +563,41 @@ function Addclientform({ closeModal }) {
               onChange={handleChange}
             ></textarea>
           </label>
+
+          <div className="form-section">
+            <h3>Opposing Party Information</h3>
+          </div>
+
+          <div className="form-section">
+            <div className="form-section-content">
+              <label className="label">
+                Full Name:
+                <input
+                  className={`fields ${errors.opposingPartyName ? "error" : ""}`}
+                  type="text"
+                  name="oppFullName"
+                  value={formData.opposingParty.opposingPartyName}
+                  onChange={handleChange}
+                  required
+                />
+                {errors.opposingPartyName && (
+                  <span className="error-message">{errors.opposingPartyName}</span>
+                )}
+              </label>
+
+              <label className="label">
+                Email Address:
+                <input
+                  className="fields"
+                  type="text"
+                  name="oppEmailAddress"
+                  value={formData.opposingParty.opposingPartyEmailAddress}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+            </div>
+          </div>
 
           {errors.submit && (
             <div className="error-message">{errors.submit}</div>

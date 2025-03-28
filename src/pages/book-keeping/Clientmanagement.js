@@ -3,12 +3,18 @@ import Navbar from "../../components/NavBar/NavBar";
 import "../assets/styles/global.css";
 import { db } from "../../config";
 import { CSVLink } from "react-csv";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, addDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 function Clientmanagement() {
   const [clientList, setClientList] = useState([]);
   const [clientId, setClientId] = useState([]);
+  const [opposingParty, setOpposingParty] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    caseId: ""
+  });
 
   const navigate = useNavigate();
 
@@ -21,14 +27,13 @@ function Clientmanagement() {
         const clientsList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
+          hasConflict: false
         }));
 
         setClientList(clientsList);
-
-        // console.table(clientList);
         setClientId(clientList.id);
       } catch (error) {
-        console.log(error);
+        console.error("Error loading clients:", error);
       }
     };
 
@@ -38,10 +43,6 @@ function Clientmanagement() {
   const handleRowClick = (id) => {
     navigate(`/client/${id}`);
   };
-
-  useEffect(() => {
-    // console.log(clientList); // Logs whenever clientList changes
-  }, [clientList]);
 
   return (
     <div className="page">
@@ -64,7 +65,7 @@ function Clientmanagement() {
                   "Client Source",
                   "Email Address",
                   "Phone Number",
-                  "Preferred Contact Method",
+                  "Conflict",
                 ].map((head) => (
                   <th key={head}>{head} ⬍ </th>
                 ))}
@@ -82,7 +83,7 @@ function Clientmanagement() {
                     <td>{client.source}</td>
                     <td>{client.emailAddress}</td>
                     <td>{client.phoneNumber}</td>
-                    <td>{client.preferredCommMethod}</td>
+                    <td>{client.hasConflict ? "Yes" : "No"}</td>
                   </tr>
                 ))
               ) : (

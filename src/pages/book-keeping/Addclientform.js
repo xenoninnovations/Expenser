@@ -110,33 +110,74 @@ function Addclientform({ closeModal }) {
     return isValid;
   };
 
+  const checkForConflicts = async (opposingParty) => {
+    console.log("Checking conflicts for:", opposingParty);
+
+    if (!opposingParty.opposingPartyEmailAddress) {
+      return false;
+    }
+
+    try {
+      // Check if opposing party exists as a client
+      const clientConflictQuery = query(
+        collection(db, "clients"),
+        where("emailAddress", "==", opposingParty.opposingPartyEmailAddress)
+      );
+      const clientConflictSnapshot = await getDocs(clientConflictQuery);
+      
+      // If we found a conflict, we also need to update the existing client's conflict status
+      if (!clientConflictSnapshot.empty) {
+        // Update the existing client's conflict status
+        const existingClientDoc = clientConflictSnapshot.docs[0];
+        await setDoc(doc(db, "clients", existingClientDoc.id), {
+          ...existingClientDoc.data(),
+          hasConflict: true
+        });
+      }
+
+      // Check if opposing party is involved in other cases
+      const opposingPartyQuery = query(
+        collection(db, "opposing"),
+        where("opposingPartyEmailAddress", "==", opposingParty.opposingPartyEmailAddress)
+      );
+      const opposingPartySnapshot = await getDocs(opposingPartyQuery);
+
+      const hasConflict = !clientConflictSnapshot.empty || !opposingPartySnapshot.empty;
+      console.log("Has conflict:", hasConflict);
+
+      return hasConflict;
+    } catch (error) {
+      console.error("Error checking for conflicts:", error);
+      return false;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // First validate the form
-    const isValid = validateForm();
-
-    if (!isValid) {
+    if (!validateForm()) {
       setIsSubmitting(false);
-      return; // Stop submission if validation fails
+      return;
     }
 
     try {
-      // Check if client already exists
-      const clientRef = doc(db, "clients", formData.emailAddress);
-      const clientSnap = await getDoc(clientRef);
+      // Check for conflicts first
+      const hasConflict = await checkForConflicts(formData.opposingParty);
+      console.log("Conflict check result:", hasConflict);
 
-      if (clientSnap.exists()) {
-        setErrors({
-          ...errors,
-          emailAddress: "A client with this email already exists",
-        });
-        setIsSubmitting(false);
-        return;
+      if (hasConflict) {
+        const proceed = window.confirm(
+          "WARNING: Potential conflict detected! This opposing party is either an existing client or involved in another case. Do you want to proceed anyway?"
+        );
+        
+        if (!proceed) {
+          setIsSubmitting(false);
+          return;
+        }
       }
 
-      // Create client data object
+      // Create client data object with conflict flag
       const clientData = {
         clientName: formData.clientName,
         emailAddress: formData.emailAddress,
@@ -146,9 +187,17 @@ function Addclientform({ closeModal }) {
         industry: formData.industry || "",
         budget: formData.budget || "",
         source: formData.source || "",
+        hasConflict: hasConflict,
       };
 
-      // Create case data object
+      console.log("Saving client with data:", clientData);
+
+      // Create the client document
+      const clientRef = doc(db, "clients", formData.emailAddress);
+      await setDoc(clientRef, clientData);
+
+      // Create case with reference to opposing party and conflict status
+      const caseRef = doc(collection(db, "cases"));
       const caseData = {
         name: formData.caseName,
         type: formData.caseType,
@@ -158,34 +207,41 @@ function Addclientform({ closeModal }) {
         status: "open",
         client_id: formData.emailAddress,
         lead_attorney: formData.leadAttorney,
-        supportingAttornies: {
-          name: formData.supportingAttornies.attorneyName || "",
-          contact: formData.supportingAttornies.attorneyContact || "",
-        },
-        witnesses: {
-          name: formData.witnesses.witnessName || "",
-          contact: formData.witnesses.witnessContact || "",
-        },
+        supportingAttornies: formData.supportingAttornies,
+        witnesses: formData.witnesses,
         court_assigned_case_number: formData.courtNumber || "",
         created_at: new Date(),
+        has_conflict: hasConflict,
+        opposing_party_id: formData.opposingParty.opposingPartyEmailAddress,
+        conflict_details: hasConflict ? {
+          detected_at: new Date(),
+          type: "opposing_party_conflict",
+          opposing_party_email: formData.opposingParty.opposingPartyEmailAddress,
+        } : null,
       };
-
-      const opposingPartyData = {
-        opposingPartyName: formData.opposingParty.opposingPartyName || "",
-        opposingPartyEmailAddress: formData.opposingParty.opposingPartyEmailAddress || "",
-      };
-
-      // Transaction to ensure both writes succeed or none do
-      await setDoc(clientRef, clientData);
-      const caseRef = doc(collection(db, "cases"));
       await setDoc(caseRef, caseData);
+
+      // Store opposing party with reference to case and conflict status
       const opposingPartyRef = doc(collection(db, "opposing"));
+      const opposingPartyData = {
+        opposingPartyName: formData.opposingParty.opposingPartyName,
+        opposingPartyEmailAddress: formData.opposingParty.opposingPartyEmailAddress,
+        case_id: caseRef.id,
+        client_id: formData.emailAddress,
+        has_conflict: hasConflict,
+      };
       await setDoc(opposingPartyRef, opposingPartyData);
-      alert("Client and case successfully added!");
+
+      alert(
+        hasConflict
+          ? "Client and case added successfully, but conflicts were detected!"
+          : "Client and case successfully added!"
+      );
+
       navigate("/");
       closeModal && closeModal();
     } catch (error) {
-      console.error("Error adding client and case:", error);
+      console.error("Error during submission:", error);
       setErrors({
         submit: "Failed to submit form. Please try again.",
       });
@@ -220,20 +276,21 @@ function Addclientform({ closeModal }) {
 
   const handleDemo = () => {
     setFormData({
-      clientName: "Jane Doe",
-      emailAddress: "jane@doe.com",
+      clientName: "Michael Rodriguez",
+      emailAddress: "michael@greenearthcafe.com",
       phoneNumber: "4161234567",
-      companyName: "Jane Doe Inc.",
-      websiteUrl: "https://www.janedoe.com",
+      companyName: "Green Earth Cafe",
+      websiteUrl: "https://www.greenearthcafe.com",
       industry: "Food and Beverage",
       budget: "100000",
       source: "Referral",
-      caseName: "Jane Doe v. John Doe",
+      caseName: "Michael Rodriguez v. Jane Doe",
       caseType: 0,
-      jurisdiction: "Ontario",
-      caseDesc: "Jane Doe is suing John Doe for $100,000",
-      caseNotes: "Jane Doe is suing John Doe for $100,000",
-      leadAttorney: "John Doe",
+      jurisdiction: "Federal",
+      caseDesc: "Michael is suing Jane for a contract breach.",
+      caseNotes:
+        "- Get documents from Michael - Prepare opening statement - Contact witness and prepare them",
+      leadAttorney: "Melissa Felicity",
       courtNumber: "1234567890",
       supportingAttornies: {
         attorneyName: "Melissa Stephens",
@@ -244,8 +301,40 @@ function Addclientform({ closeModal }) {
         witnessContact: "5634234567",
       },
       opposingParty: {
-        opposingPartyName: "John Doe",
-        opposingPartyEmailAddress: "john@doe.com",
+        opposingPartyName: "Jane Doe",
+        opposingPartyEmailAddress: "jane@doe.com",
+      },
+    });
+  };
+
+  const handleOpposingDemo = () => {
+    setFormData({
+      clientName: "Jane Doe",
+      emailAddress: "jane@doe.com",
+      phoneNumber: "4161234567",
+      companyName: "Jane Doe Inc.",
+      websiteUrl: "https://www.janedoe.com",
+      industry: "Food and Beverage",
+      budget: "100000",
+      source: "Referral",
+      caseName: "Jane Doe v. Michael Rodriguez",
+      caseType: 0,
+      jurisdiction: "Ontario",
+      caseDesc: "Jane Doe is counter-suing John Doe for $100,000",
+      caseNotes: "N/A",
+      leadAttorney: "Kelly Smith",
+      courtNumber: "3452341234",
+      supportingAttornies: {
+        attorneyName: "Kevin Sparks",
+        attorneyContact: "6545432345",
+      },
+      witnesses: {
+        witnessName: "Anthony Padilla",
+        witnessContact: "9879877777",
+      },
+      opposingParty: {
+        opposingPartyName: "Michael Rodriguez",
+        opposingPartyEmailAddress: "michael@greenearthcafe.com",
       },
     });
   };
@@ -573,15 +662,18 @@ function Addclientform({ closeModal }) {
               <label className="label">
                 Full Name:
                 <input
-                  className={`fields ${errors.opposingPartyName ? "error" : ""}`}
+                  className={`fields ${
+                    errors.opposingPartyName ? "error" : ""
+                  }`}
                   type="text"
-                  name="oppFullName"
-                  value={formData.opposingParty.opposingPartyName}
+                  name="opposingPartyName"
+                  value={formData.opposingParty.opposingPartyName || ""}
                   onChange={handleChange}
-                  required
                 />
                 {errors.opposingPartyName && (
-                  <span className="error-message">{errors.opposingPartyName}</span>
+                  <span className="error-message">
+                    {errors.opposingPartyName}
+                  </span>
                 )}
               </label>
 
@@ -590,10 +682,9 @@ function Addclientform({ closeModal }) {
                 <input
                   className="fields"
                   type="text"
-                  name="oppEmailAddress"
-                  value={formData.opposingParty.opposingPartyEmailAddress}
+                  name="opposingPartyEmailAddress"
+                  value={formData.opposingParty.opposingPartyEmailAddress || ""}
                   onChange={handleChange}
-                  required
                 />
               </label>
             </div>
@@ -615,7 +706,14 @@ function Addclientform({ closeModal }) {
             className="add-expense-button demo"
             onClick={() => handleDemo()}
           >
-            Demo
+            Add Client Demo
+          </button>
+          <button
+            type="button"
+            className="add-expense-button demo"
+            onClick={() => handleOpposingDemo()}
+          >
+            Add Opposing Party Demo
           </button>
         </form>
       </div>

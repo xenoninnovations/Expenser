@@ -1,0 +1,30 @@
+.client-info-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1vw;
+}
+
+.client-info-section p {
+  margin: 0;
+}
+
+.client-avatar {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 3px solid #ffda16;
+}
+
+.client-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4vw;
+}
+
+.client-info-container h1 {
+  border-bottom: 2px solid #ffda16;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+}

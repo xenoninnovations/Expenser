@@ -16,8 +16,6 @@ import {
   FaPen,
   FaTrash,
   FaPlus,
-  FaFileExport,
-  FaVoicemail,
   FaEnvelope,
   FaPhone,
 } from "react-icons/fa";
@@ -25,6 +23,8 @@ import EditCase from "../../components/EditCase/EditCase";
 import "../../pages/assets/styles/book-keeping.css";
 import "../../pages/assets/styles/ClientInfo.css";
 import avatar from "../../images/avatar.png";
+import DeleteCase from "../../components/DeleteCase/DeleteCase";
+
 
 const ClientInfo = () => {
   const { id } = useParams();
@@ -185,7 +185,7 @@ const ClientInfo = () => {
                       />
                       <FaTrash
                         className="icon delete-icon"
-                        // onClick={() => handleDeleteClick(expense.id)}
+                        onClick={() => handleDeleteClick(caseItem.id)}
                       />
                     </td>
                   </tr>
@@ -216,15 +216,15 @@ const ClientInfo = () => {
           caseId={selectedCase}
         />
       )}
-      {/* {isDeleteModalOpen && (
-        <DeleteExpense
+      {isDeleteModalOpen && (
+        <DeleteCase
           closeModal={() => {
             setIsDeleteModalOpen(false);
-            loadAllExpenses(); // Refresh after deletion
+            loadAllCases(); // Refresh after deletion
           }}
-          expenseId={selectedExpenseId}
+          caseId={selectedCase}
         />
-      )} */}
+      )}
     </div>
   );
 };

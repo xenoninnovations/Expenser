@@ -23,7 +23,7 @@
 .client-info-container{
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: self-start;
   gap: 1vw;
 }
 .client-info {

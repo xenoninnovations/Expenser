@@ -38,6 +38,7 @@
   left: 0;
   top: 0;
   transition: width 0.3s ease;
+  z-index: 1000;
 }
 
 /* Auto-collapse when screen size is 2503px or smaller */

@@ -14,6 +14,7 @@ import dots from "../../images/dots.svg";
 import GlobalButton from "../../components/GlobalButton/GlobalButton";
 import { FaPen, FaTrash, FaPlus, FaFileExport } from "react-icons/fa";
 import EditCase from "../../components/EditCase/EditCase";
+import "../../pages/assets/styles/book-keeping.css";
 
 const ClientInfo = () => {
   const { id } = useParams();

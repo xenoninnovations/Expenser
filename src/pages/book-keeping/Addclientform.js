@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../../components/NavBar/NavBar";
 import "../../pages/assets/styles/global.css";
-import "./book-keeping.css"; // Assuming this exists
+import "../../pages/assets/styles/book-keeping.css";
+
 import {
   doc,
   getDoc,

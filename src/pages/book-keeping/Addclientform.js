@@ -124,25 +124,30 @@ function Addclientform({ closeModal }) {
         where("emailAddress", "==", opposingParty.opposingPartyEmailAddress)
       );
       const clientConflictSnapshot = await getDocs(clientConflictQuery);
-      
+
       // If we found a conflict, we also need to update the existing client's conflict status
       if (!clientConflictSnapshot.empty) {
         // Update the existing client's conflict status
         const existingClientDoc = clientConflictSnapshot.docs[0];
         await setDoc(doc(db, "clients", existingClientDoc.id), {
           ...existingClientDoc.data(),
-          hasConflict: true
+          hasConflict: true,
         });
       }
 
       // Check if opposing party is involved in other cases
       const opposingPartyQuery = query(
         collection(db, "opposing"),
-        where("opposingPartyEmailAddress", "==", opposingParty.opposingPartyEmailAddress)
+        where(
+          "opposingPartyEmailAddress",
+          "==",
+          opposingParty.opposingPartyEmailAddress
+        )
       );
       const opposingPartySnapshot = await getDocs(opposingPartyQuery);
 
-      const hasConflict = !clientConflictSnapshot.empty || !opposingPartySnapshot.empty;
+      const hasConflict =
+        !clientConflictSnapshot.empty || !opposingPartySnapshot.empty;
       console.log("Has conflict:", hasConflict);
 
       return hasConflict;
@@ -170,7 +175,7 @@ function Addclientform({ closeModal }) {
         const proceed = window.confirm(
           "WARNING: Potential conflict detected! This opposing party is either an existing client or involved in another case. Do you want to proceed anyway?"
         );
-        
+
         if (!proceed) {
           setIsSubmitting(false);
           return;
@@ -213,11 +218,14 @@ function Addclientform({ closeModal }) {
         created_at: new Date(),
         has_conflict: hasConflict,
         opposing_party_id: formData.opposingParty.opposingPartyEmailAddress,
-        conflict_details: hasConflict ? {
-          detected_at: new Date(),
-          type: "opposing_party_conflict",
-          opposing_party_email: formData.opposingParty.opposingPartyEmailAddress,
-        } : null,
+        conflict_details: hasConflict
+          ? {
+              detected_at: new Date(),
+              type: "opposing_party_conflict",
+              opposing_party_email:
+                formData.opposingParty.opposingPartyEmailAddress,
+            }
+          : null,
       };
       await setDoc(caseRef, caseData);
 
@@ -225,7 +233,8 @@ function Addclientform({ closeModal }) {
       const opposingPartyRef = doc(collection(db, "opposing"));
       const opposingPartyData = {
         opposingPartyName: formData.opposingParty.opposingPartyName,
-        opposingPartyEmailAddress: formData.opposingParty.opposingPartyEmailAddress,
+        opposingPartyEmailAddress:
+          formData.opposingParty.opposingPartyEmailAddress,
         case_id: caseRef.id,
         client_id: formData.emailAddress,
         has_conflict: hasConflict,
@@ -344,6 +353,7 @@ function Addclientform({ closeModal }) {
       <Navbar />
       <div className="page-content">
         <form onSubmit={handleSubmit} className="clientSubmit">
+          {/* Client Basic Information Section */}
           <div className="form-section">
             <h3>Client Information</h3>
             <div className="form-section-content">
@@ -375,39 +385,36 @@ function Addclientform({ closeModal }) {
                   <span className="error-message">{errors.emailAddress}</span>
                 )}
               </label>
-            </div>
-
-            <div className="form-section">
-              <div className="form-section-content">
-                <label className="label">
-                  Phone Number:
-                  <input
-                    className={`fields ${errors.phoneNumber ? "error" : ""}`}
-                    type="tel"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                    required
-                  />
-                  {errors.phoneNumber && (
-                    <span className="error-message">{errors.phoneNumber}</span>
-                  )}
-                </label>
-                <label className="label">
-                  Company Name:
-                  <input
-                    className="fields"
-                    type="text"
-                    name="companyName"
-                    value={formData.companyName}
-                    onChange={handleChange}
-                  />
-                </label>
-              </div>
+              <label className="label">
+                Phone Number:
+                <input
+                  className={`fields ${errors.phoneNumber ? "error" : ""}`}
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  required
+                />
+                {errors.phoneNumber && (
+                  <span className="error-message">{errors.phoneNumber}</span>
+                )}
+              </label>
+              <label className="label">
+                Company Name:
+                <input
+                  className="fields"
+                  type="text"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleChange}
+                />
+              </label>
             </div>
           </div>
 
+          {/* Client Additional Information Section */}
           <div className="form-section">
+            <h3>Additional Client Information</h3>
             <div className="form-section-content">
               <label className="label">
                 Website URL:
@@ -432,9 +439,6 @@ function Addclientform({ closeModal }) {
                   onChange={handleChange}
                 />
               </label>
-            </div>
-
-            <div className="form-section-content">
               <label className="label">
                 Budget:
                 <input
@@ -461,9 +465,9 @@ function Addclientform({ closeModal }) {
             </div>
           </div>
 
+          {/* Case Basic Information Section */}
           <div className="form-section">
-            <h3>Case Information</h3>
-
+            <h3>Case Details</h3>
             <div className="form-section-content">
               <label className="label">
                 Case name:
@@ -501,163 +505,165 @@ function Addclientform({ closeModal }) {
                   <span className="error-message">{errors.caseType}</span>
                 )}
               </label>
+              <label className="label">
+                Jurisdiction:
+                <input
+                  className={`fields ${errors.jurisdiction ? "error" : ""}`}
+                  type="text"
+                  name="jurisdiction"
+                  value={formData.jurisdiction}
+                  onChange={handleChange}
+                  required
+                />
+                {errors.jurisdiction && (
+                  <span className="error-message">{errors.jurisdiction}</span>
+                )}
+              </label>
+              <label className="label">
+                Court assigned case number:
+                <input
+                  className="fields"
+                  type="text"
+                  name="courtNumber"
+                  value={formData.courtNumber}
+                  onChange={handleChange}
+                />
+              </label>
             </div>
           </div>
 
-          <label className="label">
-            Case witnesses (if applicable):
-            <label className="label">
-              <div className="form-section-content">
-                <div>
-                  <label className="label">Witness name </label>
-                  <input
-                    className="fields"
-                    name="witnessName"
-                    type="text"
-                    value={formData.witnesses.witnessName}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        witnesses: {
-                          ...formData.witnesses,
-                          witnessName: e.target.value,
-                        },
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <label className="label">Witness contact</label>
-                  <input
-                    className="fields"
-                    name="witnessContact"
-                    type="text"
-                    value={formData.witnesses.witnessContact}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        witnesses: {
-                          ...formData.witnesses,
-                          witnessContact: e.target.value,
-                        },
-                      });
-                    }}
-                  />
-                </div>
-              </div>
-            </label>
-          </label>
-
-          <label className="label">
-            Lead Attorney:
-            <input
-              className={`fields ${errors.leadAttorney ? "error" : ""}`}
-              type="text"
-              name="leadAttorney"
-              value={formData.leadAttorney}
-              onChange={handleChange}
-              required
-            />
-            {errors.leadAttorney && (
-              <span className="error-message">{errors.leadAttorney}</span>
-            )}
-          </label>
-
-          <label className="label">
-            Case description:
-            <textarea
-              className="fields"
-              name="caseDesc"
-              value={formData.caseDesc}
-              onChange={handleChange}
-            ></textarea>
-          </label>
-
-          <label className="label">
-            Supporting Attorneys (if applicable):
-            <label className="label">
-              <div className="form-section-content">
-                <div>
-                  <label className="label">Attorney name</label>
-                  <input
-                    className="fields"
-                    name="attorneyName"
-                    type="text"
-                    value={formData.supportingAttornies.attorneyName}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        supportingAttornies: {
-                          ...formData.supportingAttornies,
-                          attorneyName: e.target.value,
-                        },
-                      });
-                    }}
-                  />
-                </div>
-                <div>
-                  <label className="label">Attorney contact</label>
-                  <input
-                    className="fields"
-                    name="attorneyContact"
-                    type="text"
-                    value={formData.supportingAttornies.attorneyContact}
-                    onChange={(e) => {
-                      setFormData({
-                        ...formData,
-                        supportingAttornies: {
-                          ...formData.supportingAttornies,
-                          attorneyContact: e.target.value,
-                        },
-                      });
-                    }}
-                  />
-                </div>
-              </div>
-            </label>
-          </label>
-
-          <label className="label">
-            Jurisdiction:
-            <input
-              className={`fields ${errors.jurisdiction ? "error" : ""}`}
-              type="text"
-              name="jurisdiction"
-              value={formData.jurisdiction}
-              onChange={handleChange}
-              required
-            />
-            {errors.jurisdiction && (
-              <span className="error-message">{errors.jurisdiction}</span>
-            )}
-          </label>
-
-          <label className="label">
-            Court assigned case number (if applicable):
-            <input
-              className="fields"
-              type="text"
-              name="courtNumber"
-              value={formData.courtNumber}
-              onChange={handleChange}
-            />
-          </label>
-
-          <label className="label">
-            Case notes:
-            <textarea
-              className="fields"
-              name="caseNotes"
-              value={formData.caseNotes}
-              onChange={handleChange}
-            ></textarea>
-          </label>
-
+          {/* Case Description Section */}
           <div className="form-section">
-            <h3>Opposing Party Information</h3>
+            <h3>Case Description</h3>
+            <div className="form-section-content">
+              <label className="label">
+                Case description:
+                <textarea
+                  className="fields"
+                  name="caseDesc"
+                  value={formData.caseDesc}
+                  onChange={handleChange}
+                ></textarea>
+              </label>
+              <label className="label">
+                Case notes:
+                <textarea
+                  className="fields"
+                  name="caseNotes"
+                  value={formData.caseNotes}
+                  onChange={handleChange}
+                ></textarea>
+              </label>
+            </div>
           </div>
 
+          {/* Attorney Information Section */}
           <div className="form-section">
+            <h3>Attorney Information</h3>
+            <div className="form-section-content">
+              <label className="label">
+                Lead Attorney:
+                <input
+                  className={`fields ${errors.leadAttorney ? "error" : ""}`}
+                  type="text"
+                  name="leadAttorney"
+                  value={formData.leadAttorney}
+                  onChange={handleChange}
+                  required
+                />
+                {errors.leadAttorney && (
+                  <span className="error-message">{errors.leadAttorney}</span>
+                )}
+              </label>
+            </div>
+
+            <h4>Supporting Attorneys</h4>
+            <div className="form-section-content">
+              <label className="label">
+                Attorney name:
+                <input
+                  className="fields"
+                  name="attorneyName"
+                  type="text"
+                  value={formData.supportingAttornies.attorneyName}
+                  onChange={(e) => {
+                    setFormData({
+                      ...formData,
+                      supportingAttornies: {
+                        ...formData.supportingAttornies,
+                        attorneyName: e.target.value,
+                      },
+                    });
+                  }}
+                />
+              </label>
+              <label className="label">
+                Attorney contact:
+                <input
+                  className="fields"
+                  name="attorneyContact"
+                  type="text"
+                  value={formData.supportingAttornies.attorneyContact}
+                  onChange={(e) => {
+                    setFormData({
+                      ...formData,
+                      supportingAttornies: {
+                        ...formData.supportingAttornies,
+                        attorneyContact: e.target.value,
+                      },
+                    });
+                  }}
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* Witnesses Section */}
+          <div className="form-section">
+            <h3>Witnesses</h3>
+            <div className="form-section-content">
+              <label className="label">
+                Witness name:
+                <input
+                  className="fields"
+                  name="witnessName"
+                  type="text"
+                  value={formData.witnesses.witnessName}
+                  onChange={(e) => {
+                    setFormData({
+                      ...formData,
+                      witnesses: {
+                        ...formData.witnesses,
+                        witnessName: e.target.value,
+                      },
+                    });
+                  }}
+                />
+              </label>
+              <label className="label">
+                Witness contact:
+                <input
+                  className="fields"
+                  name="witnessContact"
+                  type="text"
+                  value={formData.witnesses.witnessContact}
+                  onChange={(e) => {
+                    setFormData({
+                      ...formData,
+                      witnesses: {
+                        ...formData.witnesses,
+                        witnessContact: e.target.value,
+                      },
+                    });
+                  }}
+                />
+              </label>
+            </div>
+          </div>
+
+          {/* Opposing Party Section */}
+          <div className="form-section">
+            <h3>Opposing Party Information</h3>
             <div className="form-section-content">
               <label className="label">
                 Full Name:
@@ -676,7 +682,6 @@ function Addclientform({ closeModal }) {
                   </span>
                 )}
               </label>
-
               <label className="label">
                 Email Address:
                 <input
@@ -694,27 +699,29 @@ function Addclientform({ closeModal }) {
             <div className="error-message">{errors.submit}</div>
           )}
 
-          <button
-            type="submit"
-            className="add-expense-button"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </button>
-          <button
-            type="button"
-            className="add-expense-button demo"
-            onClick={() => handleDemo()}
-          >
-            Add Client Demo
-          </button>
-          <button
-            type="button"
-            className="add-expense-button demo"
-            onClick={() => handleOpposingDemo()}
-          >
-            Add Opposing Party Demo
-          </button>
+          <div className="button-container">
+            <button
+              type="submit"
+              className="add-expense-button"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </button>
+            <button
+              type="button"
+              className="add-expense-button demo"
+              onClick={() => handleDemo()}
+            >
+              Add Client Demo
+            </button>
+            <button
+              type="button"
+              className="add-expense-button demo"
+              onClick={() => handleOpposingDemo()}
+            >
+              Add Opposing Party Demo
+            </button>
+          </div>
         </form>
       </div>
     </div>

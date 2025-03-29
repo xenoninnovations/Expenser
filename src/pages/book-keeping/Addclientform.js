@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../config";
 import { useNavigate } from "react-router-dom";
+import Modal from "../../components/Modal/Modal";
 
 function Addclientform({ closeModal }) {
   let navigate = useNavigate();
@@ -47,6 +48,9 @@ function Addclientform({ closeModal }) {
   const [caseTypes, setCaseTypes] = useState([]);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConflictModal, setShowConflictModal] = useState(false);
+  const [pendingSubmission, setPendingSubmission] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const validateForm = () => {
     let tempErrors = {};
@@ -172,16 +176,25 @@ function Addclientform({ closeModal }) {
       console.log("Conflict check result:", hasConflict);
 
       if (hasConflict) {
-        const proceed = window.confirm(
-          "WARNING: Potential conflict detected! This opposing party is either an existing client or involved in another case. Do you want to proceed anyway?"
-        );
-
-        if (!proceed) {
-          setIsSubmitting(false);
-          return;
-        }
+        setShowConflictModal(true);
+        setPendingSubmission({ hasConflict });
+        setIsSubmitting(false);
+        return;
       }
 
+      // If no conflict, proceed with submission
+      await submitForm(false);
+    } catch (error) {
+      console.error("Error during submission:", error);
+      setErrors({
+        submit: "Failed to submit form. Please try again.",
+      });
+      setIsSubmitting(false);
+    }
+  };
+
+  const submitForm = async (hasConflict) => {
+    try {
       // Create client data object with conflict flag
       const clientData = {
         clientName: formData.clientName,
@@ -241,14 +254,8 @@ function Addclientform({ closeModal }) {
       };
       await setDoc(opposingPartyRef, opposingPartyData);
 
-      alert(
-        hasConflict
-          ? "Client and case added successfully, but conflicts were detected!"
-          : "Client and case successfully added!"
-      );
-
-      navigate("/");
-      closeModal && closeModal();
+      // Instead of navigating immediately, show success modal
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Error during submission:", error);
       setErrors({
@@ -257,6 +264,18 @@ function Addclientform({ closeModal }) {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleConfirmConflict = async () => {
+    setShowConflictModal(false);
+    setIsSubmitting(true);
+    await submitForm(true);
+  };
+
+  const handleCancelConflict = () => {
+    setShowConflictModal(false);
+    setPendingSubmission(null);
+    setIsSubmitting(false);
   };
 
   const handleChange = (e) => {
@@ -346,6 +365,13 @@ function Addclientform({ closeModal }) {
         opposingPartyEmailAddress: "michael@greenearthcafe.com",
       },
     });
+  };
+
+  // Add handler for success modal close
+  const handleSuccessClose = () => {
+    setShowSuccessModal(false);
+    navigate("/");
+    closeModal && closeModal();
   };
 
   return (
@@ -724,6 +750,37 @@ function Addclientform({ closeModal }) {
           </div>
         </form>
       </div>
+
+      {/* Add success modal */}
+      <Modal
+        isOpen={showSuccessModal}
+        onClose={handleSuccessClose}
+        title="Success"
+        text="Client and case have been successfully added!"
+      >
+        <div className="button-group">
+          <button className="modal-button save" onClick={handleSuccessClose}>
+            Continue
+          </button>
+        </div>
+      </Modal>
+
+      {/* Existing conflict modal */}
+      <Modal
+        isOpen={showConflictModal}
+        onClose={handleCancelConflict}
+        title="Conflict Warning"
+        text="WARNING: Potential conflict detected! This opposing party is either an existing client or involved in another case. Do you want to proceed anyway?"
+      >
+        <div className="button-group">
+          <button className="modal-button del" onClick={handleConfirmConflict}>
+            Proceed Anyway
+          </button>
+          <button className="cancel-button" onClick={handleCancelConflict}>
+            Cancel
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

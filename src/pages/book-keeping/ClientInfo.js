@@ -12,9 +12,19 @@ import Navbar from "../../components/NavBar/NavBar";
 import { useParams } from "react-router-dom";
 import dots from "../../images/dots.svg";
 import GlobalButton from "../../components/GlobalButton/GlobalButton";
-import { FaPen, FaTrash, FaPlus, FaFileExport } from "react-icons/fa";
+import {
+  FaPen,
+  FaTrash,
+  FaPlus,
+  FaFileExport,
+  FaVoicemail,
+  FaEnvelope,
+  FaPhone,
+} from "react-icons/fa";
 import EditCase from "../../components/EditCase/EditCase";
 import "../../pages/assets/styles/book-keeping.css";
+import "../../pages/assets/styles/ClientInfo.css";
+import avatar from "../../images/avatar.png";
 
 const ClientInfo = () => {
   const { id } = useParams();
@@ -95,10 +105,21 @@ const ClientInfo = () => {
     <div className="page">
       <Navbar />
       <div className="page-content">
-        <h1>{client.clientName}</h1>
-        <p>Phone: {client.phoneNumber}</p>
-        <p>Email: {client.emailAddress}</p>
-
+        <div className="client-info">
+          <img src={avatar} alt="avatar" className="client-avatar" />
+          
+          <div className="client-info-container">
+            <h1>{client.clientName}</h1>
+            <div className="client-info-section">
+              <FaPhone />
+              <p>{client.phoneNumber}</p>
+            </div>
+            <div className="client-info-section">
+              <FaEnvelope />
+              <p>{client.emailAddress}</p>
+            </div>
+          </div>
+        </div>
         <div className="header">
           <h3>Cases</h3>
           <img src={dots} alt="dots" className="dots" />

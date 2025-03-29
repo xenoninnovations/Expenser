@@ -98,6 +98,20 @@ const ClientInfo = () => {
       console.error("Error fetching cases: ", error);
     }
   };
+
+  // Add this formatting function
+  const formatPhoneNumber = (phoneNumber) => {
+    // Remove all non-digit characters
+    const cleaned = phoneNumber?.replace(/\D/g, '');
+    
+    // Check if the number has 10 digits
+    if (cleaned?.length === 10) {
+      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+    }
+    // Return original number if it doesn't match expected format
+    return phoneNumber || 'N/A';
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!client) return <p>Client not found.</p>;
 
@@ -112,7 +126,7 @@ const ClientInfo = () => {
             <h1>{client.clientName}</h1>
             <div className="client-info-section">
               <FaPhone />
-              <p>{client.phoneNumber}</p>
+              <p>{formatPhoneNumber(client.phoneNumber)}</p>
             </div>
             <div className="client-info-section">
               <FaEnvelope />

@@ -9,6 +9,7 @@ import GlobalButton from '../../components/GlobalButton/GlobalButton';
 import { FaPlus } from 'react-icons/fa';
 import { FaFilePdf } from "react-icons/fa6";
 import { IoSend } from "react-icons/io5";
+import CreateInvoice from '../../components/CreateInvoice/CreateInvoice';
 
 export default function Invoicing() {
 
@@ -23,6 +24,7 @@ export default function Invoicing() {
       const querySnapshot = await getDocs(invoicesRef);
       const invoicesList = querySnapshot.docs.map((doc) =>{
         const data = doc.data();
+        console.log(data);
         return{
           id: doc.id,
           ...data,
@@ -30,8 +32,7 @@ export default function Invoicing() {
           date: data.date ? new Date(data.date).toLocaleDateString(): "N/A"
         }
       });
-
-      console.log(invoicesList)
+      
       setInvoiceData(invoicesList);
 
     } catch(error){
@@ -96,7 +97,7 @@ export default function Invoicing() {
                   <tr key={invoice.id} className='table-row'>
                     <td>{invoice.client || "N/A"}</td>
                     <td>{invoice.date}</td>
-                    <td>{invoice.amount.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</td>
+                    <td>${invoice.total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</td>
                     <td className={invoice.status.toLowerCase()}>{invoice.status}</td>
                     <td>
                       <FaFilePdf 
@@ -120,6 +121,15 @@ export default function Invoicing() {
 
         </div>
       </div>
+      
+    {isCreateInvoiceModalOpen && (
+      <CreateInvoice 
+        closeModal={() => {
+          setIsCreateInvoiceModalOpen(false);
+          loadAllInvoices();
+        }}
+      />
+    )}
     </div>
   )
 }

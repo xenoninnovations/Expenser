@@ -5,6 +5,7 @@ import { db } from "../../config";
 import { CSVLink } from "react-csv";
 import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Clientmanagement() {
   const [clientList, setClientList] = useState([]);
@@ -47,7 +48,9 @@ function Clientmanagement() {
     <div className="page">
       <Navbar />
       <div className="page-content">
-        <a href="/addclientform" id="link-button">Add A Client</a>
+        {/*===================REMEMBER TO MENTION THIS===================*/}
+        <a href="/addclientform" id="link-button">Add A Client (1)</a>
+        <Link to="/addclientform" id="link-button">Add A Client (2)</Link>
         <div className="section-container">
           <div className="section-header">
             <h2 className="section-title">

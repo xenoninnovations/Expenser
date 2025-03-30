@@ -196,19 +196,21 @@ a {
 }
 
 .modal-content {
-  background: rgba(255, 255, 255, 0.2); /* Semi-transparent white background */
-  backdrop-filter: blur(10px); /* Frosted glass effect */
-  -webkit-backdrop-filter: blur(10px); /* Frosted glass effect for Safari */
-  border: 1px solid rgba(255, 255, 255, 0.3); /* Border with transparency */
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 10px;
   padding: 2rem;
   width: 50vw;
   max-width: 90%;
-  box-sizing: border-box; /* Ensure padding doesn’t affect width */
-  color: #fff; /* Ensure text is readable on transparent background */
+  max-height: 80vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+  color: #fff;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Adjust gap for vertical spacing */
+  gap: 1.5rem;
 }
 
 .modal-content form {
@@ -266,4 +268,22 @@ a {
 
 .revexp-total {
   font-size: 30px;
+}
+
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
 }

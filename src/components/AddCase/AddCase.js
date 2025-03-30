@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from "react";
-import {
-  collection,
-  doc,
-  updateDoc,
-  getDocs,
-  getDoc,
-} from "firebase/firestore";
-import "../../pages/assets/styles/RevenueTracker.css";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 import { db } from "../../config.js";
 
-function EditCase({ closeModal, caseId, refreshCases }) {
+function AddCase({ closeModal, refreshCases, clientId }) {
   const [formData, setFormData] = useState({
     caseName: "",
     caseType: "",
@@ -25,7 +18,13 @@ function EditCase({ closeModal, caseId, refreshCases }) {
       witnessName: "",
       witnessContact: "",
     },
+    opposingParty: {
+      opposingPartyName: "",
+      opposingPartyEmailAddress: "",
+    },
   });
+
+  const [caseTypes, setCaseTypes] = useState([]);
 
   const [errors, setErrors] = useState({
     caseName: "",
@@ -33,63 +32,6 @@ function EditCase({ closeModal, caseId, refreshCases }) {
     jurisdiction: "",
     leadAttorney: "",
   });
-
-  const [caseTypes, setCaseTypes] = useState([]);
-
-  useEffect(() => {
-    const loadCase = async () => {
-      try {
-        const caseRef = doc(db, "cases", caseId);
-        const caseSnapshot = await getDoc(caseRef);
-        if (caseSnapshot.exists()) {
-          const data = caseSnapshot.data();
-          setFormData({
-            caseName: data.name,
-            caseType: data.type,
-            jurisdiction: data.jurisdiction,
-            caseDesc: data.case_desc,
-            caseNotes: data.notes,
-            leadAttorney: data.lead_attorney,
-            courtNumber: data.court_assigned_case_number,
-            supportingAttornies: {
-              attorneyName: data.supportingAttornies?.name || "",
-              attorneyContact: data.supportingAttornies?.contact || "",
-            },
-            witnesses: {
-              witnessName: data.witnesses?.name || "",
-              witnessContact: data.witnesses?.contact || "",
-            },
-          });
-        } else {
-          console.error("No such case found!");
-        }
-      } catch (error) {
-        console.error("Error fetching case: ", error);
-      }
-    };
-
-    loadCase();
-  }, [caseId]);
-
-  useEffect(() => {
-    const loadCaseTypes = async () => {
-      try {
-        const caseTypesRef = collection(db, "case-types"); // Pass db here correctly
-        const querySnapshot = await getDocs(caseTypesRef);
-
-        // Map through documents and set categories state
-        const caseTypesList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          name: doc.data().name || "Unnamed Case Type", // Default name if missing
-        }));
-        setCaseTypes(caseTypesList);
-      } catch (error) {
-        console.error("Error fetching case types: ", error);
-      }
-    };
-
-    loadCaseTypes();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -100,17 +42,40 @@ function EditCase({ closeModal, caseId, refreshCases }) {
     e.preventDefault();
 
     try {
-      const caseRef = doc(db, "cases", caseId);
-      await updateDoc(caseRef, formData);
-      console.log("Case updated successfully");
+      const collectionRef = collection(db, "cases");
+      await addDoc(collectionRef, {
+        client_id: clientId,
+        ...formData
+      });
 
-      // Close modal and refresh expenses after submission
+      console.log("Case added successfully");
+      // Close modal and refresh cases after submission
       closeModal();
-      refreshCases && refreshCases();
     } catch (error) {
       console.error("Error updating document: ", error);
     }
   };
+
+  useEffect(() => {
+    const loadCaseTypes = async () => {
+      try {
+        const caseTypesRef = collection(db, "cases-types"); // Pass db here correctly
+        const querySnapshot = await getDocs(caseTypesRef);
+
+        // Map through documents and set categories state
+        const caseTypesList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          name: doc.data().name || "Unnamed Case Type", // Default name if missing
+        }));
+        setCaseTypes(caseTypesList);
+        console.log(caseTypesList);
+      } catch (error) {
+        console.error("Error fetching case types: ", error);
+      }
+    };
+
+    loadCaseTypes();
+  }, []);
 
   return (
     <div className="modal-overlay">
@@ -299,7 +264,7 @@ function EditCase({ closeModal, caseId, refreshCases }) {
           </label>
 
           <button type="submit" className="modal-button save">
-            Save Changes
+            Add Case
           </button>
         </form>
         <button className="cancel-button" onClick={closeModal}>
@@ -310,4 +275,4 @@ function EditCase({ closeModal, caseId, refreshCases }) {
   );
 }
 
-export default EditCase;
+export default AddCase;

@@ -43,13 +43,26 @@ function AddCase({ closeModal, refreshCases, clientId }) {
 
     try {
       const collectionRef = collection(db, "cases");
-      await addDoc(collectionRef, {
+      const caseData = {
         client_id: clientId,
-        ...formData
-      });
+        name: formData.caseName,
+        lead_attorney: formData.leadAttorney,
+        type: formData.caseType,
+        case_desc: formData.caseDesc,
+        status: "Open",
+        jurisdiction: formData.jurisdiction,
+        notes: formData.caseNotes,
+        court_number: formData.courtNumber,
+        supporting_attorneys: formData.supportingAttornies,
+        witnesses: formData.witnesses,
+        opposing_party: formData.opposingParty,
+        created_at: new Date()
+      };
 
+      console.log("Saving case with data:", caseData);
+
+      await addDoc(collectionRef, caseData);
       console.log("Case added successfully");
-      // Close modal and refresh cases after submission
       closeModal();
     } catch (error) {
       console.error("Error updating document: ", error);

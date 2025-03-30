@@ -171,29 +171,32 @@ const ClientInfo = () => {
             </thead>
             <tbody>
               {client.cases && client.cases.length > 0 ? (
-                client.cases.map((caseItem) => (
-                  <tr key={caseItem.id} className="table-row">
-                    <td>{caseItem.id}</td>
-                    <td>{caseItem.name}</td>
-                    <td>{caseItem.lead_attorney}</td>
-                    <td>{caseItem.type}</td>
-                    <td>{caseItem.case_desc || "N/A"}</td>
-                    <td>{caseItem.status || "N/A"}</td>
-                    <td>
-                      <FaPen
-                        className="icon edit-icon"
-                        onClick={() => handleEditClick(caseItem.id)}
-                      />
-                      <FaTrash
-                        className="icon delete-icon"
-                        onClick={() => handleDeleteClick(caseItem.id)}
-                      />
-                    </td>
-                  </tr>
-                ))
+                client.cases.map((caseItem) => {
+                  console.log("Rendering case item:", caseItem);
+                  return (
+                    <tr key={caseItem.id} className="table-row">
+                      <td>{caseItem.id}</td>
+                      <td>{caseItem.name || caseItem.caseName}</td>
+                      <td>{caseItem.lead_attorney || caseItem.leadAttorney}</td>
+                      <td>{caseItem.type || caseItem.caseType}</td>
+                      <td>{caseItem.case_desc || caseItem.caseDesc || "N/A"}</td>
+                      <td>{caseItem.status || "N/A"}</td>
+                      <td>
+                        <FaPen
+                          className="icon edit-icon"
+                          onClick={() => handleEditClick(caseItem.id)}
+                        />
+                        <FaTrash
+                          className="icon delete-icon"
+                          onClick={() => handleDeleteClick(caseItem.id)}
+                        />
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
-                  <td colSpan="6">No case data available...</td>
+                  <td colSpan="7">No case data available...</td>
                 </tr>
               )}
             </tbody>

@@ -74,7 +74,7 @@ function EditCase({ closeModal, caseId, refreshCases }) {
   useEffect(() => {
     const loadCaseTypes = async () => {
       try {
-        const caseTypesRef = collection(db, "case-types"); // Pass db here correctly
+        const caseTypesRef = collection(db, "cases-types"); // Pass db here correctly
         const querySnapshot = await getDocs(caseTypesRef);
 
         // Map through documents and set categories state

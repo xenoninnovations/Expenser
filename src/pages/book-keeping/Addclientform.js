@@ -223,7 +223,7 @@ function Addclientform({ closeModal }) {
         jurisdiction: formData.jurisdiction,
         case_desc: formData.caseDesc || "",
         notes: formData.caseNotes || "",
-        status: "open",
+        status: "Open",
         client_id: formData.emailAddress,
         lead_attorney: formData.leadAttorney,
         supportingAttornies: formData.supportingAttornies,

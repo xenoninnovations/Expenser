@@ -5,7 +5,7 @@ import { db } from "../../config";
 import { CSVLink } from "react-csv";
 import { collection, getDocs, addDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-
+import { FaPlus } from "react-icons/fa";
 function Clientmanagement() {
   const [clientList, setClientList] = useState([]);
   const [clientId, setClientId] = useState([]);
@@ -47,7 +47,8 @@ function Clientmanagement() {
     <div className="page">
       <Navbar />
       <div className="page-content">
-        <a href="/addclientform" id="link-button">
+        <a href="/addclientform" className="buttons">
+        <FaPlus />
           Add A Client
         </a>
         <div className="section-container">

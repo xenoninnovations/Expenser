@@ -101,7 +101,26 @@ function EditCase({ closeModal, caseId, refreshCases }) {
 
     try {
       const caseRef = doc(db, "cases", caseId);
-      await updateDoc(caseRef, formData);
+      // Transform formData to match the database structure
+      const updatedData = {
+        name: formData.caseName,
+        type: formData.caseType,
+        jurisdiction: formData.jurisdiction,
+        case_desc: formData.caseDesc,
+        notes: formData.caseNotes,
+        lead_attorney: formData.leadAttorney,
+        court_assigned_case_number: formData.courtNumber,
+        supportingAttornies: {
+          name: formData.supportingAttornies.attorneyName,
+          contact: formData.supportingAttornies.attorneyContact,
+        },
+        witnesses: {
+          name: formData.witnesses.witnessName,
+          contact: formData.witnesses.witnessContact,
+        }
+      };
+
+      await updateDoc(caseRef, updatedData);
       console.log("Case updated successfully");
 
       // Close modal and refresh expenses after submission

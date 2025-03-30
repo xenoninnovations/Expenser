@@ -24,7 +24,7 @@ import "../../pages/assets/styles/book-keeping.css";
 import "../../pages/assets/styles/ClientInfo.css";
 import avatar from "../../images/avatar.png";
 import DeleteCase from "../../components/DeleteCase/DeleteCase";
-
+import AddCase from "../../components/AddCase/AddCase";
 
 const ClientInfo = () => {
   const { id } = useParams();
@@ -36,35 +36,35 @@ const ClientInfo = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchClientAndCases = async () => {
-      try {
-        const docRef = doc(db, "clients", id);
-        const docSnap = await getDoc(docRef);
+  const fetchClientAndCases = async () => {
+    try {
+      const docRef = doc(db, "clients", id);
+      const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-          const clientData = docSnap.data();
+      if (docSnap.exists()) {
+        const clientData = docSnap.data();
 
-          const casesRef = collection(db, "cases");
-          const q = query(casesRef, where("client_id", "==", id));
-          const querySnapshot = await getDocs(q);
+        const casesRef = collection(db, "cases");
+        const q = query(casesRef, where("client_id", "==", id));
+        const querySnapshot = await getDocs(q);
 
-          const cases = [];
-          querySnapshot.forEach((doc) => {
-            cases.push({ id: doc.id, ...doc.data() });
-          });
+        const cases = [];
+        querySnapshot.forEach((doc) => {
+          cases.push({ id: doc.id, ...doc.data() });
+        });
 
-          setClient({ ...clientData, cases });
-        } else {
-          console.log("Client not found!");
-        }
-      } catch (error) {
-        console.error("Error fetching client or cases:", error);
-      } finally {
-        setLoading(false);
+        setClient({ ...clientData, cases });
+      } else {
+        console.log("Client not found!");
       }
-    };
+    } catch (error) {
+      console.error("Error fetching client or cases:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchClientAndCases();
   }, [id]);
 
@@ -77,6 +77,7 @@ const ClientInfo = () => {
     setSelectedCase(caseId);
     setIsDeleteModalOpen(true);
   };
+
   // Function to load all cases
   const loadAllCases = async () => {
     try {
@@ -149,7 +150,7 @@ const ClientInfo = () => {
               textColor={"#222222"}
               icon={FaPlus}
               text={"Add a case"}
-              // onClick={() => setIsAddModalOpen(true)}
+              onClick={() => setIsAddModalOpen(true)}
             />
           </div>
           <table className="global-table">
@@ -199,19 +200,20 @@ const ClientInfo = () => {
           </table>
         </div>
       </div>
-      {/* {isAddModalOpen && (
-        <AddExpense
+      {isAddModalOpen && (
+        <AddCase
           closeModal={() => {
             setIsAddModalOpen(false);
-            loadAllExpenses(); // Refresh after adding
+            fetchClientAndCases();
           }}
+          clientId={id}
         />
-      )} */}
+      )}
       {isEditModalOpen && (
         <EditCase
           closeModal={() => {
             setIsEditModalOpen(false);
-            loadAllCases(); // Refresh after editing
+            fetchClientAndCases();
           }}
           caseId={selectedCase}
         />
@@ -220,7 +222,7 @@ const ClientInfo = () => {
         <DeleteCase
           closeModal={() => {
             setIsDeleteModalOpen(false);
-            loadAllCases(); // Refresh after deletion
+            fetchClientAndCases();
           }}
           caseId={selectedCase}
         />

@@ -10,6 +10,8 @@ import { FaPlus } from 'react-icons/fa';
 import { FaFilePdf } from "react-icons/fa6";
 import { IoSend } from "react-icons/io5";
 import CreateInvoice from '../../components/CreateInvoice/CreateInvoice';
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function Invoicing() {
 
@@ -24,7 +26,6 @@ export default function Invoicing() {
       const querySnapshot = await getDocs(invoicesRef);
       const invoicesList = querySnapshot.docs.map((doc) =>{
         const data = doc.data();
-        console.log(data);
         return{
           id: doc.id,
           ...data,

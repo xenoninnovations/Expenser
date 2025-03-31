@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { collection, addDoc, getDocs, where, query } from "firebase/firestore";
 import { db } from "../../config.js";
 import { FaTrash } from "react-icons/fa";
+import CreateInvoicePdf from "./CreateInvoicePdf.js";
 
 export default function CreateInvoice( { closeModal }) {
 
@@ -15,7 +16,7 @@ export default function CreateInvoice( { closeModal }) {
     services: []
   });
   const [tasks, setTasks] = useState([])
-  const [phoneNumber, setPhoneNumber] = useState("")
+  const [doc, setDoc] = useState();
 
   const handleChange = (e) => {
     setFormData({
@@ -68,16 +69,11 @@ export default function CreateInvoice( { closeModal }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    var sum = 0;
-    formData.tasks.forEach((val) => (sum += +val.total));
-    formData.services.forEach((val) => (sum += +val.total
-));
-
     try{
       const collectionRef = collection(db, "invoices");
       await addDoc(collectionRef, {
         ...formData,
-        total: sum,
+        total: calcTotal(),
         date: new Date().toISOString().split("T")[0]
       });
       closeModal();
@@ -86,6 +82,13 @@ export default function CreateInvoice( { closeModal }) {
       console.error("failed to create invoice: ", e)
     }
   };
+
+  const calcTotal = () => {
+    var sum = 0;
+    formData.tasks.forEach((val) => (sum += +val.total));
+    formData.services.forEach((val) => (sum += +val.total));
+    return sum;
+  }
 
   const deleteTask = (index) => {
     const updatedTasks = [
@@ -101,6 +104,14 @@ export default function CreateInvoice( { closeModal }) {
       ...formData.services.slice(index+1)
     ];
     setFormData({...formData, services: updatedServices});
+  }
+
+  const handleDocPreview = () => {
+    const newDoc = CreateInvoicePdf(formData);
+    setDoc(newDoc);
+    const pdfBlob = newDoc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    window.open(pdfUrl);
   }
 
   useEffect(() => {
@@ -291,9 +302,14 @@ export default function CreateInvoice( { closeModal }) {
             <button type="button" onClick={addService} className="modal-button add">
             + Add Service
           </button>
-          <button type="submit" className="modal-button save">
-            Create Invoice
-          </button>
+          <div className="field-group">
+            <button type="button" onClick={handleDocPreview} className="modal-button alt">
+              Preview PDF
+            </button>
+            <button type="submit" className="modal-button save">
+              Create Invoice
+            </button>
+          </div>
         </form>
         <button className="cancel-button" onClick={closeModal}>
           Cancel

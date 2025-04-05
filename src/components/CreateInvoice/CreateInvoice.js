@@ -130,7 +130,7 @@ export default function CreateInvoice( { closeModal }) {
     const newDoc = await CreateInvoicePdf(formData, false, invoiceId);
     const pdfBlob = newDoc.output('blob');
     const storage = getStorage();
-    const storageRef = ref(storage, `pdfs/invoices/Invoice_${invoiceId}.pdf`);
+    const storageRef = ref(storage, `pdfs/invoices/invoice_${invoiceId}.pdf`);
     uploadBytes(storageRef, pdfBlob).then((snapshot) => {
       console.log("Successfully uploaded pdf");
     })

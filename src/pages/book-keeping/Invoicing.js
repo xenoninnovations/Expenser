@@ -12,12 +12,11 @@ import { IoSend } from "react-icons/io5";
 import CreateInvoice from '../../components/CreateInvoice/CreateInvoice';
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 export default function Invoicing() {
 
   const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] = useState(false)
-  const [isViewInvoiceModalOpen, setIsViewInvoiceModalOpen] = useState(false)
-    const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
   const [invoiceData, setInvoiceData] = useState(false);
 
   const loadAllInvoices = async () => {
@@ -45,9 +44,11 @@ export default function Invoicing() {
     loadAllInvoices();
   }, []);
 
-  const handleViewClick = (invoiceId) => {
-    setSelectedInvoiceId(invoiceId);
-    setIsViewInvoiceModalOpen(true);
+  const handleViewClick = async (invoiceId) => {
+    const storage = getStorage();
+    const pathRef = ref(storage, `pdfs/invoices/invoice_${invoiceId}.pdf`)
+   const url = await getDownloadURL(pathRef);
+   window.open(url, "_blank");
   };
 
   const handleSendClick = (invoiceId) => {
@@ -95,7 +96,7 @@ export default function Invoicing() {
             <tbody>
               {invoiceData.length > 0 ? (
                 invoiceData.map((invoice) => (
-                  <tr key={invoice.id} className='table-row'>
+                  <tr key={invoice.invoiceId} className='table-row'>
                     <td>{invoice.client || "N/A"}</td>
                     <td>{invoice.date}</td>
                     <td>${invoice.total.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}</td>
@@ -103,11 +104,11 @@ export default function Invoicing() {
                     <td>
                       <FaFilePdf 
                         className='icon edit-icon'
-                        onClick={() => handleViewClick(invoice.id)}
+                        onClick={() => handleViewClick(invoice.invoiceId)}
                       />
                       <IoSend
                         className='icon send-icon'
-                        onClick={() => handleSendClick(invoice.id)}
+                        onClick={() => handleSendClick(invoice.invoiceId)}
                       />
                     </td>
                   </tr>

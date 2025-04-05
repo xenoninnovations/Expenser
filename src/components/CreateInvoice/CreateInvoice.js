@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { collection, addDoc, getDocs, where, query } from "firebase/firestore";
+import { collection, addDoc, getDocs, where, query, runTransaction, doc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { db } from "../../config.js";
 import { FaTrash } from "react-icons/fa";
 import CreateInvoicePdf from "./CreateInvoicePdf.js";
@@ -16,7 +17,6 @@ export default function CreateInvoice( { closeModal }) {
     services: []
   });
   const [tasks, setTasks] = useState([])
-  const [doc, setDoc] = useState();
 
   const handleChange = (e) => {
     setFormData({
@@ -70,12 +70,25 @@ export default function CreateInvoice( { closeModal }) {
     e.preventDefault();
 
     try{
+      const invoiceId = await runTransaction(db, async (transaction) => {
+        const counterRef = doc(db, "metadata", "invoiceNumber");
+        const counterDoc = await transaction.get(counterRef);
+
+        const currentId = counterDoc.data().current;
+        const newId = currentId + 1;
+        transaction.update(counterRef, {current: newId});
+
+        return String(newId).padStart(6, "0");
+      })
+
       const collectionRef = collection(db, "invoices");
       await addDoc(collectionRef, {
         ...formData,
         total: calcTotal(),
+        invoiceId,
         date: new Date().toISOString().split("T")[0]
       });
+      handlePdfUpload(invoiceId);
       closeModal();
 
     } catch (e) {
@@ -84,7 +97,7 @@ export default function CreateInvoice( { closeModal }) {
   };
 
   const calcTotal = () => {
-    var sum = 0;
+    let sum = 0;
     formData.tasks.forEach((val) => (sum += +val.total));
     formData.services.forEach((val) => (sum += +val.total));
     return sum;
@@ -106,12 +119,22 @@ export default function CreateInvoice( { closeModal }) {
     setFormData({...formData, services: updatedServices});
   }
 
-  const handleDocPreview = () => {
-    const newDoc = CreateInvoicePdf(formData);
-    setDoc(newDoc);
+  const handlePdfPreview = async () => {
+    const newDoc = await CreateInvoicePdf(formData, true);
     const pdfBlob = newDoc.output('blob');
     const pdfUrl = URL.createObjectURL(pdfBlob);
     window.open(pdfUrl);
+  }
+
+  const handlePdfUpload = async (invoiceId) => {
+    const newDoc = await CreateInvoicePdf(formData, false, invoiceId);
+    const pdfBlob = newDoc.output('blob');
+    const storage = getStorage();
+    const storageRef = ref(storage, `pdfs/invoices/Invoice_${invoiceId}.pdf`);
+    uploadBytes(storageRef, pdfBlob).then((snapshot) => {
+      console.log("Successfully uploaded pdf");
+    })
+
   }
 
   useEffect(() => {
@@ -303,7 +326,7 @@ export default function CreateInvoice( { closeModal }) {
             + Add Service
           </button>
           <div className="field-group">
-            <button type="button" onClick={handleDocPreview} className="modal-button alt">
+            <button type="button" onClick={handlePdfPreview} className="modal-button alt">
               Preview PDF
             </button>
             <button type="submit" className="modal-button save">

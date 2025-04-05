@@ -1,15 +1,27 @@
 import React from 'react';
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from '../../config';
 
-export default function CreateInvoicePdf(formData) {
-  const doc = new jsPDF();
+export default async function CreateInvoicePdf(formData, isPreview, invoiceId) {
+  const pdfDoc = new jsPDF();
+  let clientInfo = {};
+
+  try {
+    const docRef = doc(db, "clients", formData.client);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      clientInfo = docSnap.data();
+    }
+  } catch (e) {
+    console.error("Error fetching client: ", e);
+  }
 
   const calcTotal = () => {
     var sum = 0;
     formData.tasks.forEach((val) => (sum += +val.total));
     formData.services.forEach((val) => (sum += +val.total));
-    console.log(sum)
     return sum;
   };
 
@@ -24,29 +36,29 @@ export default function CreateInvoicePdf(formData) {
     { header: "TOTAL", dataKey: "total" },
   ];
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(15);
-  doc.text("Invoice", 105, 20, { align: "center" });
+  pdfDoc.setFont("helvetica", "bold");
+  pdfDoc.setFontSize(15);
+  pdfDoc.text(`${isPreview ? "Preview Invoice" : "Invoice"}`, 105, 20, { align: "center" });
 
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "normal");
-  doc.text("Company Name", 20, 30);
-  doc.text("Company Address", 20, 37);
-  doc.text("Company Email", 20, 44);
-  doc.text("Company Phone Number", 20, 51);
+  pdfDoc.setFontSize(10);
+  pdfDoc.setFont("helvetica", "normal");
+  pdfDoc.text("Company Name", 20, 30);
+  pdfDoc.text("Company Address", 20, 37);
+  pdfDoc.text("Company Email", 20, 44);
+  pdfDoc.text("Company Phone Number", 20, 51);
 
-  doc.text(`Invoice #: 00123`, 140, 30);
-  doc.text(`Date: ${formData.date}`, 140, 37);
+  pdfDoc.text(`${isPreview ? "Invoice #: Preview": `Invoice #: ${invoiceId}`}`, 140, 30);
+  pdfDoc.text(`Date: ${formData.date}`, 140, 37);
 
-  doc.setFont("helvetica", "bold");
-  doc.text("Bill To:", 20, 70);
-  doc.setFont("helvetica", "normal");
-  doc.text("Client Name", 20, 78);
-  doc.text("Client Address", 20, 85);
-  doc.text(`${formData.phoneNumber}`, 20, 92);
-  doc.text(`${formData.client}`, 20, 99);
+  pdfDoc.setFont("helvetica", "bold");
+  pdfDoc.text("Bill To:", 20, 70);
+  pdfDoc.setFont("helvetica", "normal");
+  pdfDoc.text(`${clientInfo.clientName || "Client Name"}`, 20, 78);
+  pdfDoc.text(`${clientInfo.address || "Client Address"}`, 20, 85);
+  pdfDoc.text(`${formData.phoneNumber || "Phone Number"}`, 20, 92);
+  pdfDoc.text(`${formData.client || "Client Email"}`, 20, 99);
 
-  autoTable(doc, {
+  autoTable(pdfDoc, {
     startY: 110,
     head: [tasksColumns.map(col => col.header)],
     body: formData.tasks.map(item => [item.taskDescription, item.duration, item.total]),
@@ -56,8 +68,8 @@ export default function CreateInvoicePdf(formData) {
     alternateRowStyles: { fillColor: [240, 240, 240] },
   });
 
-  autoTable(doc, {
-    startY: doc.lastAutoTable.finalY + 10,
+  autoTable(pdfDoc, {
+    startY: pdfDoc.lastAutoTable.finalY + 10,
     head: [servicesColumns.map(col => col.header)],
     body: formData.services.map(item => [item.service, item.term, item.total]),
     theme: "grid",
@@ -66,8 +78,8 @@ export default function CreateInvoicePdf(formData) {
     alternateRowStyles: { fillColor: [240, 240, 240] },
   });
 
-  doc.setFont("helvetica", "bold");
-  doc.text(`Balance Due: $${calcTotal().toFixed(2)}`, 140, doc.lastAutoTable.finalY + 10);
+  pdfDoc.setFont("helvetica", "bold");
+  pdfDoc.text(`Balance Due: $${calcTotal().toFixed(2)}`, 140, pdfDoc.lastAutoTable.finalY + 10);
 
-  return doc;
+  return pdfDoc;
 }

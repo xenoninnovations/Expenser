@@ -5,6 +5,16 @@
 /.pnp
 .pnp.js
 
+# Ignore cache from node modules
+node_modules/
+.cache/
+*.pack
+
+server/
+node_modules/
+.cache/
+*.pack
+
 # testing
 /coverage
 

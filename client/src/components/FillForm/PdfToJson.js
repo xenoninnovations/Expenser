@@ -4,42 +4,53 @@ import { PDFDocument, rgb } from 'pdf-lib';
 // Set up the worker for pdf.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 export async function DownloadUpdatedJsonToPdf(pdfData, jsonResult) {
-    const response = await fetch(pdfData.url);// Uses the url to inject data into the pdf file and download
+    const response = await fetch(pdfData.url);
     const arrayBuffer = await response.arrayBuffer();
     const pdfDoc = await PDFDocument.load(arrayBuffer);
     const form = pdfDoc.getForm();
 
     // Set values
     for (let i = 0; i < jsonResult.length; i++) {
-        const fieldName = jsonResult[i].inputField.fieldName;
-        const fieldValue = jsonResult[i].inputField.value;
-        const field = form.getFieldMaybe(fieldName);
+        const { fieldName, value: fieldValue, options } = jsonResult[i].inputField;
+        const field = form.getFieldMaybe?.(fieldName);
 
-        if (field) {
-            const fieldType = field.constructor.name; // This is a proper way to handle input fields
-
-            switch (fieldType) {
-                case 'PDFTextField':
-                    field.setText(fieldValue);
-                    break;
-                case 'PDFDropdown':
-                    field.select(fieldValue);
-                    break;
-                case 'PDFCheckBox':
-                    if (fieldValue === 'Off' || !fieldValue) {
-                        field.uncheck();
-                    } else {
-                        field.check();
-                    }
-                    break;
-                // Add other fields if requied
-                default:
-                    console.warn(`Unsupported field type: ${fieldType}`);
-            }
-        } else {
+        if (!field) {
             console.warn(`Field '${fieldName}' not found.`);
+            continue;
+        }
+
+        const fieldType = field.constructor.name;
+
+        switch (fieldType) {
+            case 'PDFTextField':
+                field.setText(fieldValue?.toString() || '');
+                break;
+
+            case 'PDFDropdown': {
+                const normalizedValue = fieldValue?.toString()?.trim() || '';
+                const validOptions = (options || []).map(opt => opt.exportValue || opt);
+
+                if (validOptions.includes(normalizedValue)) {
+                    field.select(normalizedValue);
+                } else {
+                    console.warn(`Invalid dropdown value: "${normalizedValue}" for field "${fieldName}". Skipping.`);
+                }
+                break;
+            }
+
+            case 'PDFCheckBox':
+                if (fieldValue === 'Off' || !fieldValue) {
+                    field.uncheck();
+                } else {
+                    field.check();
+                }
+                break;
+
+            default:
+                console.warn(`Unsupported field type: ${fieldType}`);
         }
     }
+
 
     // Make fields uneditable
     // form.flatten();

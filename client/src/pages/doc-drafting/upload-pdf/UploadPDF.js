@@ -7,28 +7,22 @@ import Navbar from "../../../components/NavBar/NavBar";
 import "../../../pages/assets/styles/global.css";
 import "../../../pages/assets/styles/UploadPDF.css"; //TODO: Update this to my own css script
 import dots from "../../../images/dots.svg";
-import { FaPen, FaTrash, FaPlus, FaFileExport, FaEdit } from "react-icons/fa";
+
+import { FaPen, FaTrash, FaPlus, FaFileExport } from "react-icons/fa";
 
 // Pop-up dialog. useful for upload pdf section of my page (All good examples for me to use)
 import AddPDF from "../../../components/AddPDF/AddPDF";
 import GlobalButton from "../../../components/GlobalButton/GlobalButton"; // used to represent a button
 import FillForm from "../../../components/FillForm/FillForm";
+import DeletePDF from "../../../components/DeletePDF/DeletePDF";
 
-function formatBytes(bytes) {
-  const units = ["bytes", "KB", "MB", "GB", "TB"];
-  let index = 0;
-
-  while (bytes >= 1024 && index < units.length - 1) {
-    bytes /= 1024;
-    index++;
-  }
-
-  return `${bytes.toFixed(2)} ${units[index]}`;
-}
 
 function UploadPDF() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isFillFormOpen, setIsFillFormOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+
   const [selectedPdf, setSelectedPdf] = useState(null);
   const [pdfCollectionData, setPdfCollectionData] = useState([]);
 
@@ -40,7 +34,7 @@ function UploadPDF() {
       // Get PDF documents from Firestore
       const pdfsCollection = collection(db, 'pdfs');
       const pdfsSnapshot = await getDocs(pdfsCollection);
-      
+
       // Get PDF files from Storage
       const result = await listAll(pdfsRef);
 
@@ -56,7 +50,7 @@ function UploadPDF() {
       const pdfCollectionList = pdfsSnapshot.docs.map(doc => {
         const data = doc.data();
         const storageData = storageMap.get(data.name) || { url: null, metadata: null };
-        
+
         return {
           id: doc.id,
           name: data.name,
@@ -89,6 +83,12 @@ function UploadPDF() {
     setIsFillFormOpen(true);
   };
 
+  const handleDelete = async (pdf) => {
+    setSelectedPdf(pdf);
+    setIsDeleteModalOpen(true);
+  };
+
+
   return (
     <div className="page">
       <Navbar />
@@ -114,7 +114,6 @@ function UploadPDF() {
             />
 
           </div>
-
 
           <table className="global-table">
 
@@ -151,12 +150,14 @@ function UploadPDF() {
                       )}
                     </td>
                     <td>
-                      <button
-                        className="action-button"
+                      <FaPen
+                        className="icon edit-icon"
                         onClick={() => handleFillForm(pdf_data)}
-                      >
-                        <FaEdit /> Fill Form
-                      </button>
+                      />
+                      <FaTrash
+                        className="icon delete-icon"
+                        onClick={() => handleDelete(pdf_data)}
+                      />
                     </td>
                   </tr>
                 ))
@@ -165,8 +166,8 @@ function UploadPDF() {
                   <td colSpan="6">No PDF Documents Available...</td>
                 </tr>
               )}
-
             </tbody>
+
           </table>
         </div>
       </div>
@@ -190,8 +191,31 @@ function UploadPDF() {
           }}
         />
       )}
+
+      {isDeleteModalOpen && selectedPdf && (
+        <DeletePDF
+          closeModal={() => {
+            setIsDeleteModalOpen(false);
+            loadAllPdfs(); // Refresh after deleting
+          }}
+          pdf={selectedPdf}
+        />
+      )}
     </div>
   );
 }
+
+function formatBytes(bytes) {
+  const units = ["bytes", "KB", "MB", "GB", "TB"];
+  let index = 0;
+
+  while (bytes >= 1024 && index < units.length - 1) {
+    bytes /= 1024;
+    index++;
+  }
+
+  return `${bytes.toFixed(2)} ${units[index]}`;
+}
+
 
 export default UploadPDF;

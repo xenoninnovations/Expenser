@@ -89,38 +89,45 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
         setLoading(true);
         setError(null);
 
+
         try {
-            // First parse the PDF
+            // Parse form fields
             const parsedFields = await parsePDF(selectedPDFFile);
             setParsedData(parsedFields);
 
-            // Then upload to Firebase Storage
-            const storageRef = ref(storage, `pdfs/${selectedPDFFile.name}`);
-            const snapshot = await uploadBytes(storageRef, selectedPDFFile);
-            const downloadURL = await getDownloadURL(snapshot.ref);
+            const formData = new FormData();
+            formData.append('pdf', selectedPDFFile);
+            formData.append('formFields', JSON.stringify(parsedFields)); // add form fields to request
 
-            // Store the parsed data in Firestore along with the PDF metadata
-            const pdfDoc = {
-                name: selectedPDFFile.name,
-                url: downloadURL,
-                size: selectedPDFFile.size,
-                contentType: selectedPDFFile.type,
-                formFields: parsedFields,
-                originalPdfUrl: downloadURL,
-                uploadedAt: new Date().toISOString()
-            };
+            // TODO: We need to create a backend login function that allows the user to sign in. 
+            //       which at the end uses the sigining information to create a JWT Token
+            //
+            // TODO: Add a middleware as a gatekeeper before the route runs
+            // TODO: Look more into this to keep the website more secure
 
-            // Add to Firestore collection
-            await addDoc(collection(db, "pdfs"), pdfDoc);
+            // const token = localStorage.getItem('authToken'); // get a JWT token
+            const response = await fetch('http://localhost:5000/upload-pdf', { //TODO: change to a server name if the website is gonna be stored on firebase hosting
+                method: 'POST',
+                body: formData,
+                // headers: {
+                //     'Authorization': `Bearer ${token}`, // Attach JWT token in the header
+                // }
+            });
 
-            // Refresh the list and close modal
-            refreshUploadPDF && refreshUploadPDF();
+            const text = await response.text();
+            const data = JSON.parse(text);
+
+            if (!response.ok) {
+                throw new Error(data.message || "Upload failed");
+            }
+            
+            if (refreshUploadPDF) await refreshUploadPDF();
             closeModal();
         } catch (error) {
-            console.error("Error processing PDF:", error);
-            setError(error.message || "Error uploading PDF. Please try again.");
+            console.error("Error uploading PDF:", error);
+            setError(error.message || "Something went wrong");
         } finally {
-            setLoading(false);
+           setLoading(false);
         }
     };
 

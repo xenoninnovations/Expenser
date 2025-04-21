@@ -199,6 +199,8 @@ function UploadPDF() {
             loadAllPdfs(); // Refresh after deleting
           }}
           pdf={selectedPdf}
+          refreshAllPdfs={loadAllPdfs}
+
         />
       )}
     </div>

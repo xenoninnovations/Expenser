@@ -257,18 +257,14 @@ input[type="text"] {
 .checkbox-container {
     display: flex;
     align-items: center;
-    /* Align checkbox and label vertically */
     gap: 8px;
-    /* Add some space between checkbox and label */
 }
 
 .checkbox-label {
     display: inline-block;
     margin-left: 8px;
-    /* Adjust if needed to create space between checkbox and label */
 }
 
 .field-input {
     margin: 0;
-    /* Remove any margin from the checkbox */
 }

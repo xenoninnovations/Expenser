@@ -131,68 +131,81 @@ function FillForm({ pdfData, onClose }) {
                     {pdfJsonData.length === 0 ? (
                         <p>Loading form…</p>
                     ) : (
-                        pdfJsonData.map((fieldObj, idx) => {
-                            const { label, inputField, associatedLabel } = fieldObj;
-                            const name = inputField.fieldName;
-                            const type = (inputField.inputType || '').toLowerCase();
-                            let value = inputField.value ?? '';
-                            const options = inputField.options || [];
-                                                        
-                            if (type === 'ch' && Array.isArray(value)) {
-                                value = value[0] || '';
-                            }
+                            (() => {
+                                const shownLabels = new Set();
+                                return pdfJsonData.map((fieldObj, idx) => {
+                                    const { label, inputField, associatedLabel } = fieldObj;
+                                    const name = inputField.fieldName;
+                                    const type = (inputField.inputType || '').toLowerCase();
+                                    let value = inputField.value ?? '';
+                                    const options = inputField.options || [];
 
-                            return (
-                                <div key={idx} className="form-field">
-                                    <div className="field-container">
+                                    if (type === 'ch' && Array.isArray(value)) {
+                                        value = value[0] || '';
+                                    }
 
-                                        <label htmlFor={name} className="field-label">
-                                            {Array.isArray(label) ? label[0] : label}
-                                        </label>
+                                    return (
+                                        <div key={idx} className="form-field">
+                                            {associatedLabel && !shownLabels.has(associatedLabel) && (
+                                                (() => {
+                                                    shownLabels.add(associatedLabel);
+                                                    return (
+                                                        <label className="associated-label">
+                                                            {associatedLabel}
+                                                        </label>
+                                                    );
+                                                })()
+                                            )}
 
-                                        {type === 'chk' ? (
-                                            <div className="checkbox-container">
-                                                <input
-                                                    type="checkbox"
-                                                    id={name}
-                                                    checked={value !== "Off" && !!value}
-                                                    onChange={e => handleInputChange(idx, e.target.checked)}
-                                                    className="field-input"
-                                                />
-                                                {Array.isArray(label) && label[1] && (
-                                                    <span className="checkbox-label">{label[1]}</span>
+
+                                            <div className="field-container">
+                                                <label htmlFor={name} className="field-label">
+                                                    {Array.isArray(label) ? label[0] : label}
+                                                </label>
+
+                                                {type === 'chk' ? (
+                                                    <div className="checkbox-container">
+                                                        <input
+                                                            type="checkbox"
+                                                            id={name}
+                                                            checked={value !== "Off" && !!value}
+                                                            onChange={e => handleInputChange(idx, e.target.checked)}
+                                                            className="field-input"
+                                                        />
+                                                        {Array.isArray(label) && label[1] && (
+                                                            <span className="checkbox-label">{label[1]}</span>
+                                                        )}
+                                                    </div>
+                                                ) : type === 'ch' ? (
+                                                    <select
+                                                        id={name}
+                                                        value={value}
+                                                        onChange={e => handleInputChange(idx, e.target.value)}
+                                                        className="field-input"
+                                                    >
+                                                        <option value="">-- select --</option>
+                                                        {options.map(opt => (
+                                                            <option key={opt} value={opt}>
+                                                                {opt}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                ) : (
+                                                    <input
+                                                        type="text"
+                                                        id={name}
+                                                        value={value}
+                                                        onChange={e => handleInputChange(idx, e.target.value)}
+                                                        className="field-input"
+                                                    />
                                                 )}
                                             </div>
-                                        ) : type === 'ch' ? (
-                                            <select
-                                                id={name}
-                                                value={value}
-                                                onChange={e => handleInputChange(idx, e.target.value)}
-                                                className="field-input"
-                                            >
-                                                <option value="">-- select --</option>
-                                                {options.map(opt => (
-                                                    <option key={opt} value={opt}>
-                                                        {opt}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                        ) : (
-                                            <input
-                                                type="text"
-                                                id={name}
-                                                value={value}
-                                                onChange={e => handleInputChange(idx, e.target.value)}
-                                                className="field-input"
-                                            />
-                                        )}
-                                    </div>
-                                </div>
-                            );
-                        })
+                                        </div>
+                                    );
+                                });
+                            })()
                     )}
                 </div>
-
 
                 {error && <div className="error">{error}</div>}
 
@@ -215,6 +228,8 @@ function FillForm({ pdfData, onClose }) {
             </div>
         </div>
     );
+
+
 }
 
 export default FillForm; 

@@ -26,8 +26,13 @@ function DeletePDF({ closeModal, pdf, refreshAllPdfs }) {
             }
             
             // Refresh the list and close modal
-            refreshAllPdfs && refreshAllPdfs();
+
+            if (refreshAllPdfs) {
+                await refreshAllPdfs();
+            }
             closeModal();
+
+
 
         } catch (error) {
           console.error("Error deleting PDF:", error);

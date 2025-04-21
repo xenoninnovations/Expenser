@@ -202,7 +202,6 @@ export async function convertPdfToJson(pdfUrl) {
 
                 if (leftLabel && rightLabel) {
                     results.push({
-                        // label: `${leftLabel} ${rightLabel}`,
                         label: [leftLabel, rightLabel],
 
                         inputField: {

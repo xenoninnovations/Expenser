@@ -44,11 +44,13 @@ function FillForm({ pdfData, onClose }) {
     }, [pdfData]);
 
     const handleInputChange = (idx, value) => {
+
         setPdfJsonData(prevData => {
             if (!prevData || !prevData[idx] || !prevData[idx].inputField) {
                 console.warn(`Invalid index or missing inputField at index ${idx}`);
                 return prevData;
             }
+
 
             const updatedData = [...prevData];
             const inputType = updatedData[idx].inputField.inputType?.toLowerCase();
@@ -121,101 +123,106 @@ function FillForm({ pdfData, onClose }) {
         );
     }
 
-    // TODO: still need to lay the form out properly. pdftojson algorithem needs to work together to create this form
     return (
         <div className="fill-form-modal">
-            <div className="fill-form-content">
+            <div className="fill-form-content" style={{ padding: '20px' }}>
                 <h2>Fill Form: {pdfData.name}</h2>
 
-                <div className="form-fields">
+                <div
+                    className="form-fields"
+
+                >
                     {pdfJsonData.length === 0 ? (
                         <p>Loading form…</p>
                     ) : (
-                            (() => {
-                                const shownLabels = new Set();
-                                return pdfJsonData.map((fieldObj, idx) => {
-                                    const { label, inputField, associatedLabel } = fieldObj;
-                                    const name = inputField.fieldName;
-                                    const type = (inputField.inputType || '').toLowerCase();
-                                    let value = inputField.value ?? '';
-                                    const options = inputField.options || [];
+                            pdfJsonData.map((fieldObj, idx) => {
+                                const { label, inputField } = fieldObj;
+                                const name = inputField.fieldName;
+                                const type = (inputField.inputType || '').toLowerCase();
+                                let value = inputField.value ?? '';
+                                const options = inputField.options || [];
+                                const { width, height } = inputField;
 
-                                    if (type === 'ch' && Array.isArray(value)) {
-                                        value = value[0] || '';
-                                    }
+                                //Ignore the ones we dont want
+                                if (type === '' || /^field\s?\d+$/i.test(label.trim().toLowerCase())) {
+                                    return null;
+                                }
 
-                                    return (
-                                        <div key={idx} className="form-field">
-                                            {associatedLabel && !shownLabels.has(associatedLabel) && (
-                                                (() => {
-                                                    shownLabels.add(associatedLabel);
-                                                    return (
-                                                        <label className="associated-label">
-                                                            {associatedLabel}
-                                                        </label>
-                                                    );
-                                                })()
+                                // Handling multi-value checkboxes
+                                if (type === 'ch' && Array.isArray(value)) {
+                                    value = value[0] || '';
+                                }
+
+                                return (
+                                <div
+                                    key={idx}
+                                    className="form-field"
+                                >
+                                    <label
+                                        htmlFor={name}
+                                        className="field-label"
+                                    >
+                                        {Array.isArray(label) ? label[0] : label}
+                                    </label>
+
+                                    {/* Render Checkbox */}
+                                    {type === 'chk' ? (
+                                        <div className="checkbox-container">
+                                            <input
+                                                type="checkbox"
+                                                id={name}
+                                                checked={value !== 'Off' && !!value}
+                                                onChange={e => handleInputChange(idx, e.target.checked)}
+                                                className="field-input"
+                                            />
+                                            {Array.isArray(label) && label[1] && (
+                                                <span className="checkbox-label">{label[1]}</span>
                                             )}
-
-
-                                            <div className="field-container">
-                                                <label htmlFor={name} className="field-label">
-                                                    {Array.isArray(label) ? label[0] : label}
-                                                </label>
-
-                                                {type === 'chk' ? (
-                                                    <div className="checkbox-container">
-                                                        <input
-                                                            type="checkbox"
-                                                            id={name}
-                                                            checked={value !== "Off" && !!value}
-                                                            onChange={e => handleInputChange(idx, e.target.checked)}
-                                                            className="field-input"
-                                                        />
-                                                        {Array.isArray(label) && label[1] && (
-                                                            <span className="checkbox-label">{label[1]}</span>
-                                                        )}
-                                                    </div>
-                                                ) : type === 'ch' ? (
-                                                    <select
-                                                        id={name}
-                                                        value={value}
-                                                        onChange={e => handleInputChange(idx, e.target.value)}
-                                                        className="field-input"
-                                                    >
-                                                        <option value="">-- select --</option>
-                                                        {options.map(opt => (
-                                                            <option key={opt} value={opt}>
-                                                                {opt}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                ) : (
-                                                    <input
-                                                        type="text"
-                                                        id={name}
-                                                        value={value}
-                                                        onChange={e => handleInputChange(idx, e.target.value)}
-                                                        className="field-input"
-                                                    />
-                                                )}
-                                            </div>
                                         </div>
-                                    );
-                                });
-                            })()
+                                    )
+                                        // Render Dropdown (Select)
+                                        : type === 'ch' ? (
+                                            <select
+                                                id={name}
+                                                value={value || ''}  // Ensure a fallback empty string if value is undefined
+                                                onChange={e => handleInputChange(idx, e.target.value)}
+                                                className="field-input select-dropdown"
+
+                                            >
+                                                <option value="">-- select --</option>
+                                                {options.map(opt => (
+                                                    <option key={opt.exportValue} value={opt.exportValue}>
+                                                        {opt.displayValue}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        )
+                                            // Render Text Input (default)
+                                            : (
+                                                <input
+                                                    type="text"
+                                                    id={name}
+                                                    value={value}
+                                                    onChange={e => handleInputChange(idx, e.target.value)}
+                                                    className="field-input"
+                                                    style={{ height: `${height * 2}px`, width: `${width * 1.5}px`, maxWidth: '100%' }}
+                                                />
+                                            )}
+                                </div>
+                            );
+                            })
                     )}
                 </div>
 
                 {error && <div className="error">{error}</div>}
 
-                <div className="button-group">
+                <div className="button-group" style={{ marginTop: '24px' }}>
                     <button
                         className="generate-button"
                         onClick={generateFilledPDF}
                         disabled={loading}
                     >
-                        {loading ? 'Generating PDF...' : 'Generate Filled PDF'}
+                        {loading ? 'Generating PDF…' : 'Generate Filled PDF'}
                     </button>
                     <button
                         className="cancel-button"
@@ -228,8 +235,6 @@ function FillForm({ pdfData, onClose }) {
             </div>
         </div>
     );
-
-
 }
 
 export default FillForm; 

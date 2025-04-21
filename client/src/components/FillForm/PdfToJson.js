@@ -16,7 +16,7 @@ export async function DownloadUpdatedJsonToPdf(pdfData, jsonResult) {
         const field = form.getFieldMaybe(fieldName);
 
         if (field) {
-            const fieldType = field.constructor.name;
+            const fieldType = field.constructor.name; // This is a proper way to handle input fields
 
             switch (fieldType) {
                 case 'PDFTextField':
@@ -68,212 +68,79 @@ export async function convertPdfToJson(pdfUrl) {
 
     const results = [];
 
+    // Loop through all the pages in the PDF
     for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
-        const textContent = await page.getTextContent();
         const annotations = await page.getAnnotations();
 
-        // Find the "Region" label
-        let regionLabel = null;
-        for (const item of textContent.items) {
-            if (item.str.trim() === "Region") {
-                const [, , , , x, y] = item.transform;
-                regionLabel = { x, y };
-                break;
-            }
-        }
+        // Loop through annotations
+        for (const annot of annotations) {
+            if (annot.fieldName) {
+                let inputType = '';
+                let fieldType = '';
 
-        if (regionLabel) {
-            // Find the nearest input field above the "Region" label
-            let nearestField = null;
-            let minDistance = Infinity;
-
-            for (const annotation of annotations) {
-                const [x1, y1, x2, y2] = annotation.rect;
-                const fieldY = (y1 + y2) / 2;
-                const fieldX = (x1 + x2) / 2;
-
-                // Check if the field is above the label and within horizontal range
-                if (fieldY > regionLabel.y && Math.abs(fieldX - regionLabel.x) < 100) {
-                    const distance = fieldY - regionLabel.y;
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        nearestField = {
-                            label: "Region",
-                            inputField: {
-                                fieldName: annotation.fieldName || "Unnamed Field",
-                                inputType: annotation.fieldType || "Unknown",
-                                value: annotation.fieldValue || "",
-                                options: annotation.options ? annotation.options.map(opt => opt.displayValue || opt.value) : []
-                            }
-                        };
-                    }
+                // Text fields (input type = 'Tx')
+                if (annot.fieldType === 'Tx') {
+                    inputType = 'txt';
+                    fieldType = 'text';
                 }
-            }
-
-            if (nearestField) {
-                results.push(nearestField);
-            }
-        }
-
-        // Find the "Court File No. (if known)" label
-        let courtFileLabel = null;
-        for (const item of textContent.items) {
-            if (item.str.trim() === "Court File No. (if known)") {
-                const [, , , , x, y] = item.transform;
-                courtFileLabel = { x, y };
-                break;
-            }
-        }
-
-        if (courtFileLabel) {
-            // Find the nearest text input field above the label
-            let nearestField = null;
-            let minDistance = Infinity;
-
-            for (const annotation of annotations) {
-                const [x1, y1, x2, y2] = annotation.rect;
-                const fieldY = (y1 + y2) / 2;
-                const fieldX = (x1 + x2) / 2;
-
-                // Check if the field is above the label, within horizontal range, and is a text field
-                if (
-                    fieldY > courtFileLabel.y &&
-                    Math.abs(fieldX - courtFileLabel.x) < 100 &&
-                    annotation.fieldType === "Tx"
-                ) {
-                    const distance = fieldY - courtFileLabel.y;
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        nearestField = {
-                            label: "Court File No. (if known)",
-                            inputField: {
-                                fieldName: annotation.fieldName || "Unnamed Field",
-                                inputType: annotation.fieldType || "Unknown",
-                                value: annotation.fieldValue || "",
-                                options: []
-                            }
-                        };
-                    }
+                // Dropdowns (input type = 'Ch')
+                else if (annot.fieldType === 'Ch') {
+                    inputType = 'ch';
+                    fieldType = 'dropdown';
                 }
-            }
-
-            if (nearestField) {
-                results.push(nearestField);
-            }
-        }
-
-        // Finding check boxes:
-        for (const annotation of annotations) {
-            if (annotation.fieldType === "Btn" && annotation.checkBox) {
-                const [x1, y1, x2, y2] = annotation.rect;
-                const centerX = (x1 + x2) / 2;
-                const centerY = (y1 + y2) / 2;
-
-                let leftLabel = null;
-                let rightLabel = null;
-
-                for (const item of textContent.items) {
-                    const [, , , , itemX, itemY] = item.transform;
-                    const text = item.str.trim();
-
-                    // Check for left label (e.g., "a)")
-                    if (
-                        itemX < centerX &&
-                        Math.abs(itemY - centerY) < 10 &&
-                        /^[a-z]\)$/.test(text)
-                    ) {
-                        leftLabel = text;
-                    }
-
-                    // Check for right label
-                    if (
-                        itemX > centerX &&
-                        Math.abs(itemY - centerY) < 10 &&
-                        text.length > 0
-                    ) {
-                        rightLabel = text;
-                    }
-
-                    if (leftLabel && rightLabel) {
-                        break;
-                    }
+                // Checkboxes (input type = 'Btn')
+                else if (annot.fieldType === 'Btn' && annot.checkBox) {
+                    inputType = 'chk';
+                    fieldType = 'checkbox';
                 }
 
-                if (leftLabel && rightLabel) {
-                    results.push({
-                        label: [leftLabel, rightLabel],
+                const rect = annot.rect || [0, 0, 0, 0];
+                const [x1, y1, x2, y2] = rect;
+                const x = x1;
+                const y = y1;
+                const width = Math.abs(x2 - x1);
+                const height = Math.abs(y2 - y1);
 
-                        inputField: {
-                            fieldName: annotation.fieldName || "Unnamed Field",
-                            inputType: "Chk",
-                            value: annotation.fieldValue || "",
-                            options: []
-                        }
-                    });
-                }
-            }
-        }
+                // Options are an array (may be empty)
+                const options = (annot.options || []).filter(
+                    (v, i, a) =>
+                        v.exportValue?.trim() &&
+                        v.displayValue?.trim() &&
+                        a.findIndex(
+                            o =>
+                                o.exportValue.trim().toLowerCase() === v.exportValue.trim().toLowerCase() &&
+                                o.displayValue.trim().toLowerCase() === v.displayValue.trim().toLowerCase()
+                        ) === i
+                );
+                console.log(options);
 
-        // Finding associatedLabel with their input text boxes
+                // Handling missing fieldValue (set default to '')
+                const fieldValue = annot.fieldValue !== undefined ? annot.fieldValue : '';
 
-        // Extract and sort text items by Y-coordinate (top to bottom)
-        const sortedTextItems = textContent.items
-            .map(item => {
-                const [, , , , x, y] = item.transform;
-                return { text: item.str.trim(), x, y };
-            })
-            .sort((a, b) => b.y - a.y); // Higher Y means higher on the page
+                const fieldObj = {
+                    fieldType,
+                    label: annot.alternativeText || annot.fieldName,
+                    associatedLabel: annot.alternativeText || annot.fieldName,
+                    inputField: {
+                        fieldName: annot.fieldName,
+                        inputType,
+                        value: fieldValue,
+                        options: options,  // Dropdown options
+                        x,
+                        y,
+                        width,
+                        height,
+                        page: i,
+                    },
+                };
 
-        let currentSectionLabel = null;
-
-        for (const item of sortedTextItems) {
-            const { text, x: labelX, y: labelY } = item;
-
-            // Update current section label if text ends with ":"
-            if (text.endsWith(":")) {
-                currentSectionLabel = text;
-                continue;
-            }
-
-            // Check for list item labels like "a.", "b.", etc.
-            if (/^[a-z]\.$/.test(text)) {
-                let nearestField = null;
-                let minDistance = Infinity;
-
-                for (const annotation of annotations) {
-                    if (annotation.fieldType === "Tx") {
-                        const [x1, y1, x2, y2] = annotation.rect;
-                        const fieldX = (x1 + x2) / 2;
-                        const fieldY = (y1 + y2) / 2;
-
-                        // Check if the field is to the right of the label and horizontally aligned
-                        if (
-                            fieldX > labelX &&
-                            Math.abs(fieldY - labelY) < 10
-                        ) {
-                            const distance = fieldX - labelX;
-                            if (distance < minDistance) {
-                                minDistance = distance;
-                                nearestField = {
-                                    label: text,
-                                    inputField: {
-                                        fieldName: annotation.fieldName || "Unnamed Field",
-                                        inputType: "Txt",
-                                        value: annotation.fieldValue || "",
-                                        options: []
-                                    },
-                                    associatedLabel: currentSectionLabel
-                                };
-                            }
-                        }
-                    }
-                }
-                if (nearestField) {
-                    results.push(nearestField);
-                }
+                results.push(fieldObj);
             }
         }
     }
+
+
     return results;
 }
+

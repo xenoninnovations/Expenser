@@ -10,30 +10,60 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.j
 
 function FillForm({ pdfData, onClose }) {
     const [loading, setLoading] = useState(false);
+    const [formDataFound, setFormDataFound] = useState(false);
+
     const [error, setError] = useState(null);
     const [pdfJsonData, setPdfJsonData] = useState([]);
 
     // Initialize form values
     useEffect(() => {
-        if (!pdfData?.formFields) {
-            setError("No form fields found in this PDF");
-            return;
-        }
+
 
         const convertPdfToJson = async () => {
             try {
                 const jsonResult = await PdfToJson.convertPdfToJson(pdfData.url);
                 setPdfJsonData(jsonResult);
-                // jsonResult[0].inputField.inputType; // This holds what type of field it is
-                //               Tx = text box
-                //               Ch = drop down list 
-                //               Chk = Check boxes
-
-                // jsonResult[0].inputField.options; // This is an array that is set based on the inputType. If Ch, then its a list of options(['Northwest', 'Northeast', 'East', etc.. )
-                // jsonResult[0].inputField.value = "East"; // the value for the first question
-                // jsonResult[0].label;   // the question for the first annotation
-                // jsonResult[0].associatedLabel; // This might not be there but if it exists then theres an association between the question and the associatedLabel
                 console.log(jsonResult);
+
+                /*
+                jsonResult[0] =
+                {
+                    "fieldType": "dropdown",
+                    "label": "Name of Court. Ontario Court of Justice, Superior Court of Justice, Superior Court of Justice Family Court Branch",
+                    "associatedLabel": "Name of Court. Ontario Court of Justice, Superior Court of Justice, Superior Court of Justice Family Court Branch",
+                    "inputField": {
+                        "fieldName": "form1[0].page1[0].body[0].courtDetails[0].court[0].nameOfCourt[0]",
+                        "inputType": "ch",
+                        "value": [
+                            ""
+                        ],
+                        "options": [
+                            {
+                                "exportValue": "Ontario Court of Justice",
+                                "displayValue": "Ontario Court of Justice"
+                            },
+                            {
+                                "exportValue": "Superior Court of Justice",
+                                "displayValue": "Superior Court of Justice"
+                            },
+                            {
+                                "exportValue": "Superior Court of Justice Family Court ",
+                                "displayValue": "Superior Court of Justice Family Court "
+                            }
+                        ],
+                        "x": 33.818,
+                        "y": 713.53,
+                        "width": 335.58500000000004,
+                        "height": 16.18100000000004,
+                        "page": 1
+                    }
+                }
+                */
+
+                if (jsonResult.length === 0) {
+                    setError("No form fields found in this PDF");
+                    return;
+                }
 
             } catch (err) {
                 console.error("Error converting PDF to JSON:", err);
@@ -133,7 +163,7 @@ function FillForm({ pdfData, onClose }) {
 
                 >
                     {pdfJsonData.length === 0 ? (
-                        <p>Loading form…</p>
+                        <p>Attempting to load form…</p>
                     ) : (
                             pdfJsonData.map((fieldObj, idx) => {
                                 const { label, inputField } = fieldObj;
@@ -197,17 +227,35 @@ function FillForm({ pdfData, onClose }) {
                                                 ))}
                                             </select>
                                         )
-                                            // Render Text Input (default)
-                                            : (
-                                                <input
-                                                    type="text"
-                                                    id={name}
-                                                    value={value}
-                                                    onChange={e => handleInputChange(idx, e.target.value)}
-                                                    className="field-input"
-                                                    style={{ height: `${height * 2}px`, width: `${width * 1.5}px`, maxWidth: '100%' }}
-                                                />
-                                            )}
+                                                // If its a larger text input then its most likely a textarea (Unable to detect textarea inputs)
+                                                : height > 20 ? (
+
+                                                    <textarea
+                                                        id={name}
+                                                        value={value}
+                                                        onChange={e => handleInputChange(idx, e.target.value)}
+                                                        className="field-input"
+                                                        style={{
+                                                            height: `${height + 60}px`,
+                                                            width: `${width + 60}px`,
+                                                            maxWidth: '100%',
+                                                            boxSizing: 'border-box',
+                                                            padding: '6px',
+                                                            lineHeight: '1'
+                                                        }}
+                                                    />
+                                                )
+                                                    // Render Text Input (default)
+                                                    : (
+                                                        <input
+                                                            type="text"
+                                                            id={name}
+                                                            value={value}
+                                                            onChange={e => handleInputChange(idx, e.target.value)}
+                                                            className="field-input"
+                                                            style={{ height: `${height * 2}px`, width: `${width * 1.5}px`, maxWidth: '100%' }}
+                                                        />
+                                                    )}
                                 </div>
                             );
                             })

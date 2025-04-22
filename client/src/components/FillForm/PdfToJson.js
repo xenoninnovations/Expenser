@@ -124,7 +124,6 @@ export async function convertPdfToJson(pdfUrl) {
                                 o.displayValue.trim().toLowerCase() === v.displayValue.trim().toLowerCase()
                         ) === i
                 );
-                console.log(options);
 
                 // Handling missing fieldValue (set default to '')
                 const fieldValue = annot.fieldValue !== undefined ? annot.fieldValue : '';

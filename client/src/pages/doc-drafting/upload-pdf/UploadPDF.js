@@ -21,6 +21,7 @@ function UploadPDF() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isFillFormOpen, setIsFillFormOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPCDLoading, setIsPCDLoading] = useState(true);
 
 
   const [selectedPdf, setSelectedPdf] = useState(null);
@@ -64,6 +65,7 @@ function UploadPDF() {
       });
 
       setPdfCollectionData(pdfCollectionList);
+      setIsPCDLoading(false);
 
     } catch (error) {
       console.error("Error fetching pdf files: ", error);
@@ -161,10 +163,17 @@ function UploadPDF() {
                     </td>
                   </tr>
                 ))
-              ) : (
-                <tr>
-                  <td colSpan="6">No PDF Documents Available...</td>
-                </tr>
+              )
+                : isPCDLoading ? (
+                  <tr>
+                    <td colSpan="6">Loading PDF Documents</td>
+                  </tr>
+                )
+                  : !isPCDLoading && pdfCollectionData.length === 0 && (
+                    <tr>
+                      <td colSpan="6">No PDF Documents available</td>
+                    </tr>
+
               )}
             </tbody>
 

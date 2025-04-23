@@ -1,24 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../config';
-import * as pdfjsLib from 'pdfjs-dist';
-import { PDFDocument, rgb } from 'pdf-lib';
 import * as PdfToJson from './PdfToJson';
-
-// Set up the worker for pdf.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 function FillForm({ pdfData, onClose }) {
     const [loading, setLoading] = useState(false);
-    const [formDataFound, setFormDataFound] = useState(false);
 
     const [error, setError] = useState(null);
     const [pdfJsonData, setPdfJsonData] = useState([]);
 
     // Initialize form values
     useEffect(() => {
-
-
         const convertPdfToJson = async () => {
             try {
                 const jsonResult = await PdfToJson.convertPdfToJson(pdfData.url);
@@ -107,15 +97,6 @@ function FillForm({ pdfData, onClose }) {
     };
 
     const generateFilledPDF = async () => {
-        if (!pdfData?.formFields || pdfData.formFields.length === 0) {
-            setError("No form fields to fill out");
-            return;
-        }
-
-        if (!pdfData.originalPdfUrl) {
-            setError("Original PDF URL is missing");
-            return;
-        }
 
         setLoading(true);
         setError(null);

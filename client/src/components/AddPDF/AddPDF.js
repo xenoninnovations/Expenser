@@ -1,11 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { doc, deleteDoc, addDoc, collection } from "firebase/firestore";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import React, { useState } from "react";
+import { getStorage } from "firebase/storage";
 import * as pdfjsLib from 'pdfjs-dist';
 
 import "../../pages/assets/styles/UploadPDF.css";//TODO: Update this to my own css script
 
-import { db } from "../../config.js";
 
 // Set up the worker for pdf.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
@@ -17,8 +15,10 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
     const [error, setError] = useState(null);
     const storage = getStorage();
 
+    //TODO: This should be done no matter because regular files need to be read differently compare to a file like a government file
     const parsePDF = async (file) => {
         try {
+            // This code needs to be improved
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
             const formFields = [];

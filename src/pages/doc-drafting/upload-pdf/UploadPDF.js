@@ -139,7 +139,7 @@ function UploadPDF() {
                   <tr key={pdf_data.id || pdf_data.name} className="table-row">
                     <td>{pdf_data.name || "N/A"}</td>
                     <td>{formatBytes(pdf_data.size) || "N/A"}</td>
-                    <td>{pdf_data.contentType.split('/')[1] || "N/A"}</td>
+                    <td>{pdf_data.contentType?.split('/')[1] || "N/A"}</td>
                     <td>{pdf_data.updated || "N/A"}</td>
                     <td>
                       {pdf_data.url ? (

@@ -38,6 +38,8 @@
   left: 0;
   top: 0;
   transition: width 0.3s ease;
+  z-index: 9999; /* Add high z-index to ensure navbar overlaps everything */
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1); /* Add subtle shadow for depth */
 }
 
 /* Auto-collapse when screen size is 2503px or smaller */

@@ -1,46 +1,170 @@
-import React, { useState, useEffect } from 'react';
-import { doc, updateDoc } from 'firebase/firestore';
+import React, { useState, useEffect, useRef } from 'react';
+import { doc, setDoc } from 'firebase/firestore';
 import { db } from '../../config';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { getStorage, ref, getDownloadURL, uploadBytes, getBlob } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
 import * as pdfjsLib from 'pdfjs-dist';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { Stage, Layer, Text, Image } from 'react-konva';
+import Konva from 'konva';
 
-// Set up the worker for pdf.js
+// Initialize PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 function FillForm({ pdfData, onClose }) {
-    const [formValues, setFormValues] = useState({});
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [pdfUrl, setPdfUrl] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [numPages, setNumPages] = useState(1);
+    const [scale, setScale] = useState(1.5);
+    const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
+    const [pdfImage, setPdfImage] = useState(null);
+    const [textFields, setTextFields] = useState([]);
+    const stageRef = useRef(null);
+    const containerRef = useRef(null);
 
-    // Initialize form values
     useEffect(() => {
-        if (!pdfData?.formFields) {
-            setError("No form fields found in this PDF");
+        if (!pdfData) {
+            setError("No PDF data provided");
             return;
         }
 
-        const initialValues = {};
-        pdfData.formFields.forEach(field => {
-            initialValues[field.id] = field.value || '';
-        });
-        setFormValues(initialValues);
+        const getPdfUrl = async () => {
+            try {
+                const storage = getStorage();
+                const storageRef = ref(storage, `pdfs/${pdfData.name}`);
+                const url = await getDownloadURL(storageRef);
+                setPdfUrl(url);
+                await loadPdfAndRender(url);
+            } catch (error) {
+                console.error('Error getting PDF URL:', error);
+                setError('Error loading PDF: ' + error.message);
+            }
+        };
+
+        getPdfUrl();
     }, [pdfData]);
 
-    const handleInputChange = (fieldId, value) => {
-        setFormValues(prev => ({
-            ...prev,
-            [fieldId]: value
-        }));
+    useEffect(() => {
+        if (pdfUrl) {
+            loadPdfAndRender(pdfUrl);
+        }
+    }, [currentPage, scale]);
+
+    const loadPdfAndRender = async (pdfUrl) => {
+        try {
+            const loadingTask = pdfjsLib.getDocument(pdfUrl);
+            const pdf = await loadingTask.promise;
+            const page = await pdf.getPage(1);
+            
+            const viewport = page.getViewport({ scale: 1 });
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            
+            await page.render({
+                canvasContext: context,
+                viewport: viewport
+            }).promise;
+            
+            const image = new Image();
+            image.src = canvas.toDataURL();
+            
+            image.onload = () => {
+                const konvaImage = new Konva.Image({
+                    image: image,
+                    width: viewport.width,
+                    height: viewport.height
+                });
+                setPdfImage(konvaImage);
+                setStageSize({
+                    width: viewport.width,
+                    height: viewport.height
+                });
+            };
+        } catch (error) {
+            console.error('Error loading PDF:', error);
+            setError('Error loading PDF: ' + error.message);
+        }
     };
 
-    const generateFilledPDF = async () => {
-        if (!pdfData?.formFields || pdfData.formFields.length === 0) {
-            setError("No form fields to fill out");
-            return;
-        }
+    const addTextField = () => {
+        const stage = stageRef.current;
+        const pointerPos = stage.getPointerPosition();
+        
+        const newField = {
+            id: uuidv4(),
+            text: 'Text',
+            x: pointerPos ? pointerPos.x / scale : 50,
+            y: pointerPos ? pointerPos.y / scale : 50,
+            page: currentPage,
+            fontSize: 16,
+            draggable: true
+        };
+        
+        setTextFields(prev => [...prev, newField]);
+    };
 
-        if (!pdfData.originalPdfUrl) {
-            setError("Original PDF URL is missing");
+    const handleDragEnd = (e, id) => {
+        const newPos = e.target.position();
+        setTextFields(prev => prev.map(field => 
+            field.id === id 
+                ? { ...field, x: newPos.x / scale, y: newPos.y / scale }
+                : field
+        ));
+    };
+
+    const handleTextDblClick = (e, id) => {
+        const textNode = e.target;
+        const textPosition = textNode.getAbsolutePosition();
+        
+        // Create textarea over the text
+        const textarea = document.createElement('textarea');
+        document.body.appendChild(textarea);
+
+        textarea.value = textNode.text();
+        textarea.style.position = 'absolute';
+        textarea.style.top = `${textPosition.y}px`;
+        textarea.style.left = `${textPosition.x}px`;
+        textarea.style.width = `${textNode.width()}px`;
+        textarea.style.height = `${textNode.height()}px`;
+        textarea.style.fontSize = `${textNode.fontSize()}px`;
+        textarea.style.border = '1px solid black';
+        textarea.style.padding = '0px';
+        textarea.style.margin = '0px';
+        textarea.style.overflow = 'hidden';
+        textarea.style.background = 'white';
+        textarea.style.outline = 'none';
+        textarea.style.resize = 'none';
+        textarea.style.lineHeight = '1';
+        textarea.style.fontFamily = 'Arial';
+        
+        textarea.focus();
+
+        textarea.addEventListener('keydown', function(e) {
+            if (e.keyCode === 13 && !e.shiftKey) {
+                textNode.text(textarea.value);
+                document.body.removeChild(textarea);
+            }
+        });
+
+        textarea.addEventListener('blur', function() {
+            textNode.text(textarea.value);
+            document.body.removeChild(textarea);
+            
+            setTextFields(prev => prev.map(field => 
+                field.id === id 
+                    ? { ...field, text: textarea.value }
+                    : field
+            ));
+        });
+    };
+
+    const fillAndSavePDF = async () => {
+        if (!pdfUrl) {
+            setError("PDF URL not available");
             return;
         }
 
@@ -48,149 +172,143 @@ function FillForm({ pdfData, onClose }) {
         setError(null);
 
         try {
-            // Validate the URL
-            const pdfUrl = new URL(pdfData.originalPdfUrl);
-            if (!pdfUrl.protocol.startsWith('http')) {
-                throw new Error('Invalid PDF URL protocol');
-            }
+            const response = await fetch(pdfUrl);
+            const pdfBytes = await response.arrayBuffer();
+            const pdfDoc = await PDFDocument.load(pdfBytes, { ignoreEncryption: true });
+            const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+            
+            textFields.forEach(async field => {
+                const pages = pdfDoc.getPages();
+                const page = pages[field.page - 1];
+                
+                page.drawText(field.text, {
+                    x: field.x,
+                    y: page.getHeight() - field.y,
+                    size: field.fontSize,
+                    font: font,
+                    color: rgb(0, 0, 0),
+                });
+            });
+            
+            const filledPdfBytes = await pdfDoc.save();
+            const storage = getStorage();
+            const filledPdfName = `filled_${pdfData.name}`;
+            const storageRef = ref(storage, `filled/${filledPdfName}`);
+            await uploadBytes(storageRef, filledPdfBytes, { contentType: 'application/pdf' });
+            const filledPdfUrl = await getDownloadURL(storageRef);
 
-            // Load the original PDF with timeout and error handling
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-
-            const response = await fetch(pdfData.originalPdfUrl, {
-                signal: controller.signal,
-                headers: {
-                    'Accept': 'application/pdf'
-                }
+            const filledFormId = uuidv4();
+            await setDoc(doc(db, 'filledForms', filledFormId), {
+                originalId: pdfData.id,
+                filledPdfUrl,
+                filledAt: new Date().toISOString(),
+                textFields
             });
 
-            clearTimeout(timeoutId);
-
-            if (!response.ok) {
-                throw new Error(`Failed to load PDF: ${response.status} ${response.statusText}`);
-            }
-
-            const pdfBytes = await response.arrayBuffer();
-            if (!pdfBytes || pdfBytes.byteLength === 0) {
-                throw new Error('Received empty PDF data');
-            }
-
-            const pdfDoc = await PDFDocument.load(pdfBytes);
-
-            // Add text to each page
-            for (const field of pdfData.formFields) {
-                const page = pdfDoc.getPage(field.position.page - 1);
-                const { width, height } = page.getSize();
-                
-                // Convert coordinates to PDF space
-                const x = field.position.x;
-                const y = height - field.position.y; // Flip Y coordinate
-
-                // Add the text
-                page.drawText(formValues[field.id] || '', {
-                    x,
-                    y,
-                    size: 12,
-                    color: rgb(0, 0, 0)
-                });
-            }
-
-            // Save the modified PDF
-            const modifiedPdfBytes = await pdfDoc.save();
-            
-            // Create a download link
-            const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+            const blob = new Blob([filledPdfBytes], { type: 'application/pdf' });
             const downloadUrl = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = downloadUrl;
-            link.download = `filled_${pdfData.name}`;
+            link.download = filledPdfName;
             link.click();
             URL.revokeObjectURL(downloadUrl);
 
-            // Update the form data in Firestore
-            const pdfRef = doc(db, 'pdfs', pdfData.id);
-            await updateDoc(pdfRef, {
-                formValues,
-                lastFilled: new Date().toISOString()
-            });
-
             onClose();
         } catch (error) {
-            console.error('Error generating PDF:', error);
-            if (error.name === 'AbortError') {
-                setError('Request timed out while loading the PDF');
-            } else if (error.message.includes('Failed to load PDF')) {
-                setError('Unable to access the PDF file. Please check if the file exists and is accessible.');
-            } else {
-                setError('Error generating filled PDF: ' + error.message);
-            }
+            console.error('Error filling PDF:', error);
+            setError('Error filling PDF: ' + error.message);
         } finally {
             setLoading(false);
         }
     };
 
-    if (!pdfData?.formFields || pdfData.formFields.length === 0) {
-        return (
-            <div className="fill-form-modal">
-                <div className="fill-form-content">
-                    <h2>Error</h2>
-                    <p>No form fields found in this PDF.</p>
-                    <button className="cancel-button" onClick={onClose}>
-                        Close
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="fill-form-modal">
             <div className="fill-form-content">
-                <h2>Fill Form: {pdfData.name}</h2>
-                
-                <div className="form-fields">
-                    {pdfData.formFields.map((field) => (
-                        <div key={field.id} className="form-field">
-                            <label htmlFor={field.id}>{field.label}</label>
-                            {field.type === 'checkbox' ? (
-                                <input
-                                    type="checkbox"
-                                    id={field.id}
-                                    checked={formValues[field.id] || false}
-                                    onChange={(e) => handleInputChange(field.id, e.target.checked)}
-                                />
-                            ) : field.type === 'signature' ? (
-                                <div className="signature-pad">
-                                    <input
-                                        type="text"
-                                        id={field.id}
-                                        value={formValues[field.id] || ''}
-                                        onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                        placeholder="Type signature"
-                                    />
-                                </div>
-                            ) : (
-                                <input
-                                    type={field.type}
-                                    id={field.id}
-                                    value={formValues[field.id] || ''}
-                                    onChange={(e) => handleInputChange(field.id, e.target.value)}
-                                />
-                            )}
-                        </div>
-                    ))}
+                <div className="editor-header">
+                    <h2>Fill PDF: {pdfData.name}</h2>
+                    <button 
+                        onClick={addTextField}
+                        className="add-text-button"
+                        style={{
+                            padding: '8px 16px',
+                            background: '#4CAF50',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            marginLeft: '10px'
+                        }}
+                    >
+                        Add Text
+                    </button>
                 </div>
 
-                {error && <div className="error">{error}</div>}
+                <div className="editor-container" ref={containerRef}>
+                    <div className="pdf-controls">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                            disabled={currentPage <= 1}
+                        >
+                            Previous Page
+                        </button>
+                        <span>Page {currentPage} of {numPages}</span>
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(numPages, prev + 1))}
+                            disabled={currentPage >= numPages}
+                        >
+                            Next Page
+                        </button>
+                        <button onClick={() => setScale(prev => prev + 0.2)}>
+                            Zoom In
+                        </button>
+                        <button onClick={() => setScale(prev => Math.max(0.5, prev - 0.2))}>
+                            Zoom Out
+                        </button>
+                    </div>
+
+                    <Stage
+                        width={stageSize.width}
+                        height={stageSize.height}
+                        ref={stageRef}
+                        style={{ background: '#f0f0f0' }}
+                    >
+                        <Layer>
+                            {pdfImage && (
+                                <Image
+                                    image={pdfImage}
+                                    width={stageSize.width}
+                                    height={stageSize.height}
+                                />
+                            )}
+                            {textFields
+                                .filter(field => field.page === currentPage)
+                                .map(field => (
+                                    <Text
+                                        key={field.id}
+                                        text={field.text}
+                                        x={field.x * scale}
+                                        y={field.y * scale}
+                                        fontSize={field.fontSize * scale}
+                                        draggable={true}
+                                        onDragEnd={(e) => handleDragEnd(e, field.id)}
+                                        onDblClick={(e) => handleTextDblClick(e, field.id)}
+                                        fill="#000000"
+                                        perfectDrawEnabled={false}
+                                        listening={true}
+                                    />
+                                ))}
+                        </Layer>
+                    </Stage>
+                </div>
 
                 <div className="button-group">
                     <button
                         className="generate-button"
-                        onClick={generateFilledPDF}
+                        onClick={fillAndSavePDF}
                         disabled={loading}
                     >
-                        {loading ? 'Generating PDF...' : 'Generate Filled PDF'}
+                        {loading ? 'Saving PDF...' : 'Save PDF'}
                     </button>
                     <button
                         className="cancel-button"

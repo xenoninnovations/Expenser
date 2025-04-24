@@ -136,7 +136,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -144,13 +144,188 @@
 }
 
 .fill-form-content {
-    background: white;
-    padding: 2rem;
+    background-color: white;
+    padding: 20px;
     border-radius: 8px;
     width: 90%;
-    max-width: 800px;
-    max-height: 90vh;
-    overflow-y: auto;
+    height: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.tool-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.tool-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.tool-button:hover {
+    background-color: #f5f5f5;
+}
+
+.tool-button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #0056b3;
+}
+
+.history-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.history-buttons button {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.history-buttons button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.editor-container {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+}
+
+.pdf-preview {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: auto;
+    background-color: #f5f5f5;
+    cursor: crosshair;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+}
+
+.pdf-preview canvas {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    background-color: white;
+}
+
+.editor-tools {
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.page-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.page-navigation button {
+    padding: 6px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+}
+
+.page-navigation button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.text-tool,
+.signature-tool,
+.watermark-tool {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.text-tool input,
+.signature-tool input,
+.watermark-tool input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.generate-button,
+.cancel-button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.generate-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+}
+
+.generate-button:hover {
+    background-color: #0056b3;
+}
+
+.cancel-button {
+    background-color: white;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+.cancel-button:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.generate-button:disabled,
+.cancel-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .form-fields {
@@ -219,26 +394,6 @@
     font-size: 0.9rem;
 }
 
-.generate-button {
-    background: #4CAF50;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s;
-}
-
-.generate-button:hover {
-    background: #45a049;
-}
-
-.generate-button:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-}
-
 .error {
     color: #f44336;
     margin: 1rem 0;
@@ -253,4 +408,86 @@
     padding: 0.5rem;
     background: #e3f2fd;
     border-radius: 4px;
+}
+
+.text-input-form,
+.watermark-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.text-input-form input,
+.watermark-form input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.text-input-form button,
+.watermark-form button {
+    padding: 8px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.text-input-form button:hover,
+.watermark-form button:hover {
+    background-color: #0056b3;
+}
+
+.instruction-text {
+    padding: 15px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    text-align: center;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.text-style-tools {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.style-button {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.style-button:hover {
+    background-color: #f0f0f0;
+}
+
+.style-button.active {
+    background-color: #e3e3e3;
+    border-color: #ccc;
+}
+
+.text-style-tools select {
+    padding: 6px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
 }

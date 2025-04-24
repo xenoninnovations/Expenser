@@ -7,7 +7,7 @@ module.exports = {
                         test: /pdf\.worker\.(min\.)?js/,
                         type: 'asset/resource',
                         generator: {
-                            filename: 'static/worker/[hash][ext][query]',
+                            filename: 'static/js/[name].[hash:8][ext]'
                         },
                     },
                 ],

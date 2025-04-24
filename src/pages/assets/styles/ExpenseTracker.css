@@ -99,3 +99,135 @@
   justify-content: space-between;
   align-items: center;
 }
+
+.time-tracking-form {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 1.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.task-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: #2d3436;
+  transition: all 0.2s;
+}
+
+.task-input:focus {
+  outline: none;
+  border-color: #00b894;
+  box-shadow: 0 0 0 2px rgba(0,184,148,0.1);
+}
+
+.task-input::placeholder {
+  color: #b2bec3;
+}
+
+.timer-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 0.5rem;
+}
+
+.timer-display {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #2d3436;
+  font-family: monospace;
+}
+
+.timer-controls {
+  display: flex;
+  gap: 1rem;
+}
+
+.timer-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.timer-button:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.timer-button.running {
+  background: #ff7675;
+  color: white;
+}
+
+.timer-button:not(.running):not(.save) {
+  background: #00b894;
+  color: white;
+}
+
+.timer-button.save {
+  background: #0984e3;
+  color: white;
+}
+
+.timer-button:disabled {
+  background: #b2bec3;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.recent-tasks {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.recent-tasks h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3436;
+  margin: 0 0 1rem;
+}
+
+.section-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.section-table th,
+.section-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #f1f2f6;
+}
+
+.section-table th {
+  font-weight: 500;
+  color: #636e72;
+  font-size: 0.875rem;
+}
+
+.section-table td {
+  color: #2d3436;
+  font-size: 0.875rem;
+}
+
+.section-table tr:last-child td {
+  border-bottom: none;
+}

@@ -8,7 +8,10 @@ import "../../pages/assets/styles/UploadPDF.css";//TODO: Update this to my own c
 import { db } from "../../config.js";
 
 // Set up the worker for pdf.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url,
+).toString();
 
 function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
     const [selectedPDFFile, setSelectedPDFFile] = useState(null);

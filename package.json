@@ -4,6 +4,7 @@
   "description": "An all in one business management application. Geared towards service based businesses, with time tracking, invoicing, budgeting and expense management, client management systems and more.",
   "main": "index.js",
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "concurrently": "^9.1.2",
     "nodemon": "^3.1.9"
   },

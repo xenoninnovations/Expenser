@@ -6,12 +6,18 @@
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "concurrently": "^9.1.2",
+    "inquirer": "^8.2.0",
     "nodemon": "^3.1.9"
   },
   "scripts": {
+    "client-install": "cd client && npm install",
+    "server-install": "cd server && npm install",
+    "root-install": "npm install",
     "client": "npm start --prefix client",
     "server": "nodemon server/index.js",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "install-all": "npm run client-install && npm run server-install && npm run root-install",
+    "postinstall": "node post-install.js"
   },
   "repository": {
     "type": "git",

@@ -18,7 +18,17 @@ import Templates from "./pages/doc-drafting/templates/Templates";
 import DocumentLibrary from "./pages/doc-drafting/library/DocumentLibrary";
 import EmailViewer from './components/EmailViewer/EmailViewer';
 
+
+
+import React, { useEffect } from "react";
+
 function App() {
+  useEffect(() => {
+    fetch("http://localhost:5000")
+      .then((res) => res.text())
+      .then((data) => console.log(data));
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -33,12 +43,16 @@ function App() {
         <Route path="/clientmanagement" element={<Clientmanagement />} />
         <Route path="/addclientform" element={<AddClientForm />} />
         <Route path="/revenuetracker" element={<RevenueTracker />} />
+
+        {/* TEMP */}
+        <Route path="/document-drafting" element={<UploadPDF />} />
+
         
         {/* Document Drafting Routes */}
-        <Route path="/uploadpdf" element={<UploadPDF />} />
+        {/* <Route path="/uploadpdf" element={<UploadPDF />} />
         <Route path="/templates" element={<Templates />} />
         <Route path="/document-library" element={<DocumentLibrary />} />
-        <Route path="/email" element={<EmailViewer />} />
+        <Route path="/email" element={<EmailViewer />} /> */}
       </Routes>
     </BrowserRouter>
   );

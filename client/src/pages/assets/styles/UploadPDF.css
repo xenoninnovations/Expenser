@@ -1,54 +1,14 @@
-/* TODO: update everything based on how I want it to change/ change expenses to pdf_list or something */
 
 .header {
     display: flex;
     flex-direction: column;
 }
 
-.expense-buttons {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.expenses-total {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.8519vh;
-    margin-top: 1.8519vh;
-    background-color: #f9f9f9;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.expenses-total h4 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #222;
-}
-
-.expenses-total span {
-    color: #f44336;
-    font-weight: bold;
-    font-size: 1.5rem;
-}
-
-.expenses-total .total-icon {
-    font-size: 1.5rem;
-    color: #4caf50;
-    margin-right: 10px;
-}
 
 .field {
     width: 100%;
-    /* Maintain full width */
     box-sizing: border-box;
-    /* Prevent padding overflow */
     padding: 0.5rem;
-    /* Adjust padding for consistent spacing */
 }
 
 .label {
@@ -65,23 +25,12 @@
     cursor: pointer;
 }
 
-.add-expense-button {
-    background: rgba(255, 255, 0, 0.8);
-    color: black;
-    border: none;
-    border-radius: 5px;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-}
-
 .filters {
     display: flex;
     justify-content: flex-start;
     align-items: center;
     gap: 1rem;
-    /* Spacing between dropdowns and button */
     margin-bottom: 1.5rem;
-    /* Space below the filter section */
 }
 
 .filters select,
@@ -144,7 +93,7 @@
 }
 
 .fill-form-content {
-    background: white;
+    background: #ffffffde;
     padding: 2rem;
     border-radius: 8px;
     width: 90%;
@@ -163,12 +112,14 @@
 .form-field {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+
 }
 
 .form-field label {
     font-weight: 500;
     color: #333;
+    max-width: 37.5rem;
+        gap: 0.1rem;
 }
 
 .form-field input {
@@ -176,6 +127,27 @@
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 1rem;
+}
+.select-dropdown {
+    height: 40px;
+    width: 150px;
+    max-width: 100%;
+    font-size: 16px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.field-input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 .form-field input:focus {
@@ -212,6 +184,8 @@
 
 .field-label {
     font-weight: 500;
+    word-break: break-word;
+        font-weight: bold;
 }
 
 .field-type {
@@ -254,3 +228,47 @@
     background: #e3f2fd;
     border-radius: 4px;
 }
+
+.form-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.field-group h3 {
+    display: flex;
+    flex-direction: column;
+    font-size: 1.3rem;
+}
+
+.group-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.field-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+
+input[type="checkbox"] {
+    transform: scale(1.5);
+    margin: 10px;
+}
+
+select,
+input[type="text"] {
+    width: 400px;
+}
+
+
+
+.checkbox-label {
+    display: inline-block;
+    margin-left: 8px;
+}
+

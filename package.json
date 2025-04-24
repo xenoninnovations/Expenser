@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/Divine-Abhulimen/Expenser/issues"
   },
-  "homepage": "https://github.com/Divine-Abhulimen/Expenser#readme"
+  "homepage": "https://github.com/Divine-Abhulimen/Expenser#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
 }

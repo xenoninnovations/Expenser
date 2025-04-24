@@ -28,7 +28,15 @@
     "@azure/msal-browser": "^4.11.0",
     "@pdf-lib/standard-fonts": "^1.0.0",
     "@pdf-lib/upng": "^1.0.1",
+    "assert": "^2.1.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
     "express": "^5.1.0",
-    "firebase": "^11.6.1"
+    "firebase": "^11.6.1",
+    "process": "^0.11.10",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "stream-browserify": "^3.0.0",
+    "util": "^0.12.5"
   }
 }

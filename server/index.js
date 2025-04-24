@@ -19,7 +19,11 @@ admin.initializeApp({
 });
 
 const bucket = admin.storage().bucket();
+const uploadsDir = 'server/uploads';
 
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -38,6 +42,7 @@ const upload = multer({ storage: storage });
 
 
 app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
+
     if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
     }

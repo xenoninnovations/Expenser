@@ -120,3 +120,9 @@ td {
 .table-container + .table-container {
   margin-top: 2vh;
 }
+
+.finance-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}

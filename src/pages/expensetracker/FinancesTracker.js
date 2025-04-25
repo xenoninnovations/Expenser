@@ -3,7 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../config";
 import Navbar from "../../components/NavBar/NavBar";
 import "../assets/styles/global.css";
-import "../assets/styles/ExpenseTracker.css";
+import "../assets/styles/FinanceTracker.css";
 import dots from "../../images/dots.svg";
 import { FaPen, FaTrash, FaPlus, FaFileExport } from "react-icons/fa";
 import AddExpense from "../../components/AddExpense/AddExpense";
@@ -155,7 +155,7 @@ function FinancesTracker() {
           </div>
         </div>
 
-        <div className="expense-buttons">
+        {/* <div className="expense-buttons">
           <CSVLink
             filename={"your-expenses.csv"}
             data={expenseData}
@@ -164,7 +164,7 @@ function FinancesTracker() {
             <FaFileExport />
             Export as CSV
           </CSVLink>
-        </div>
+        </div> */}
 
         {/** Expense Table */}
         <div className="table-container">
@@ -173,13 +173,23 @@ function FinancesTracker() {
               <span className="yellow-bar exp"></span>
               <h2 className="table-title">My Expenses</h2>
             </div>
-            <GlobalButton
-              bg={"white"}
-              textColor={"#222222"}
-              icon={FaPlus}
-              text={"Add an Expense"}
-              onClick={() => setIsAddModalOpenExpense(true)}
-            />
+            <div className="finance-buttons">
+              <GlobalButton
+                bg={"white"}
+                textColor={"#222222"}
+                icon={FaPlus}
+                text={"Add an Expense"}
+                onClick={() => setIsAddModalOpenExpense(true)}
+              />
+              <CSVLink
+                filename={"your-expenses.csv"}
+                data={expenseData}
+                className="buttons"
+              >
+                <FaFileExport />
+                Export as CSV
+              </CSVLink>
+            </div>
           </div>
           <table className="global-table">
             <thead>

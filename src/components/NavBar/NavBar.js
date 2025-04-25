@@ -78,9 +78,12 @@ export default function NavBar() {
           </div>
           {isNavExpanded && isBudgetingOpen && (
             <ul className="submenu">
-              <li className={isActiveRoute('/expensetracker') ? 'active' : ''}>
-                <Link to="/expensetracker">Expense Tracker</Link>
+              <li className={isActiveRoute('/finances') ? 'active' : ''}>
+                <Link to="/finances">Finances</Link>
               </li>
+              {/* <li className={isActiveRoute('/expensetracker') ? 'active' : ''}>
+                <Link to="/expensetracker">Expense Tracker</Link>
+              </li> */}
               <li className={isActiveRoute('/revenuetracker') ? 'active' : ''}>
                 <Link to="/revenuetracker">Income/Revenue</Link>
               </li>

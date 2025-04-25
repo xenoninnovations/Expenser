@@ -287,3 +287,30 @@ a {
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.4);
 }
+
+.view-toggle {
+  display: flex;
+  border-bottom: 2px solid #ccc;
+}
+
+.toggle-button {
+  background-color: transparent;
+  border-bottom: 2px solid transparent;
+  padding: 10px 16px;
+  margin-right: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #555;
+  border-radius: 0;
+}
+
+.toggle-button:hover {
+  color: #000;
+  border-bottom: 2px solid #aaa;
+}
+
+.toggle-button.active {
+  border-bottom: 2px solid #222;
+  color: #222;
+}
+

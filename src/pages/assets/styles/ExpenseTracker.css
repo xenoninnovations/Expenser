@@ -1,17 +1,24 @@
 .header {
   display: flex;
   flex-direction: column;
+  margin-bottom: 2vh;
 }
 
 td {
   cursor: pointer;
-
 }
 
 .expense-buttons {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  margin: 2vh 0;
+}
+
+.revexp-totals {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2vh;
 }
 
 .expenses-total {
@@ -83,8 +90,7 @@ td {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 1rem; /* Spacing between dropdowns and button */
-  margin-bottom: 1.5rem; /* Space below the filter section */
+  gap: 1rem;
 }
 
 .filters select,
@@ -109,4 +115,8 @@ td {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.table-container + .table-container {
+  margin-top: 2vh;
 }

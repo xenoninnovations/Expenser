@@ -166,6 +166,7 @@ function ExpenseTracker() {
           </CSVLink>
         </div>
 
+        {/** Expense Table */}
         <div className="table-container">
           <div className="table-header exp">
             <div className="exp-spaced">
@@ -229,64 +230,69 @@ function ExpenseTracker() {
             </tbody>
           </table>
         </div>
-      </div>
 
-      <div className="table-container">
-        <div className="table-header rev">
-          <div className="rev-spaced">
-            <span className="yellow-bar rev"></span>
-            <h2 className="table-title">My Revenue</h2>
+        {/** Revenue Table */}
+        <div className="table-container">
+          <div className="table-header rev">
+            <div className="rev-spaced">
+              <span className="yellow-bar rev"></span>
+              <h2 className="table-title">My Revenue</h2>
+            </div>
+            <GlobalButton
+              bg={"white"}
+              textColor={"#222222"}
+              icon={FaPlus}
+              text={"Add a Revenue"}
+              onClick={() => setIsAddModalOpenRevenue(true)}
+            />
           </div>
-          <GlobalButton
-            bg={"white"}
-            textColor={"#222222"}
-            icon={FaPlus}
-            text={"Add a Revenue"}
-            onClick={() => setIsAddModalOpenRevenue(true)}
-          />
-        </div>
-        <table className="global-table">
-          <thead>
-            <tr>
-              {["Source", "Transaction date", "Amount", "Note", "Actions"].map(
-                (head) => (
-                  <th key={head}>{head} ⬍</th>
-                )
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {revenueData.length > 0 ? (
-              revenueData.map((revenue) => (
-                <tr key={revenue.id} className="table-row">
-                  <td>{revenue.source || "N/A"}</td>
-                  <td>{revenue.date}</td>
-                  <td>
-                    $
-                    {revenue.amount
-                      .toFixed(2)
-                      .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                  </td>
-                  <td>{revenue.note || "N/A"}</td>
-                  <td>
-                    <FaPen
-                      className="icon edit-icon"
-                      onClick={() => handleEditClickRevenue(revenue.id)}
-                    />
-                    <FaTrash
-                      className="icon delete-icon"
-                      onClick={() => handleDeleteClickRevenue(revenue.id)}
-                    />
-                  </td>
-                </tr>
-              ))
-            ) : (
+          <table className="global-table">
+            <thead>
               <tr>
-                <td colSpan="5">No revenue data available...</td>
+                {[
+                  "Source",
+                  "Transaction date",
+                  "Amount",
+                  "Note",
+                  "Actions",
+                ].map((head) => (
+                  <th key={head}>{head} ⬍</th>
+                ))}
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {revenueData.length > 0 ? (
+                revenueData.map((revenue) => (
+                  <tr key={revenue.id} className="table-row">
+                    <td>{revenue.source || "N/A"}</td>
+                    <td>{revenue.date}</td>
+                    <td>
+                      $
+                      {revenue.amount
+                        .toFixed(2)
+                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    </td>
+                    <td>{revenue.note || "N/A"}</td>
+                    <td>
+                      <FaPen
+                        className="icon edit-icon"
+                        onClick={() => handleEditClickRevenue(revenue.id)}
+                      />
+                      <FaTrash
+                        className="icon delete-icon"
+                        onClick={() => handleDeleteClickRevenue(revenue.id)}
+                      />
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5">No revenue data available...</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {isAddModalOpenExpense && (

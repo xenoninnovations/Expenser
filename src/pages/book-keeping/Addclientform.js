@@ -406,7 +406,7 @@ function Addclientform({ closeModal }) {
   // Add handler for success modal close
   const handleSuccessClose = () => {
     setShowSuccessModal(false);
-    navigate("/");
+    navigate(`/client/${formData.emailAddress}`);
     closeModal && closeModal();
   };
 

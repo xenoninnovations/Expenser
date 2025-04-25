@@ -15,7 +15,7 @@ import DeleteRevenue from "../../components/DeleteRevenue/DeleteRevenue";
 import { CSVLink } from "react-csv";
 import GlobalButton from "../../components/GlobalButton/GlobalButton";
 
-function ExpenseTracker() {
+function FinancesTracker() {
   const [isAddModalOpenExpense, setIsAddModalOpenExpense] = useState(false);
   const [isEditModalOpenExpense, setIsEditModalOpenExpense] = useState(false);
   const [isDeleteModalOpenExpense, setIsDeleteModalOpenExpense] =
@@ -351,4 +351,4 @@ function ExpenseTracker() {
   );
 }
 
-export default ExpenseTracker;
+export default FinancesTracker;

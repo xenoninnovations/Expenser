@@ -248,13 +248,23 @@ function FinancesTracker() {
               <span className="yellow-bar rev"></span>
               <h2 className="table-title">My Revenue</h2>
             </div>
-            <GlobalButton
-              bg={"white"}
-              textColor={"#222222"}
-              icon={FaPlus}
-              text={"Add a Revenue"}
-              onClick={() => setIsAddModalOpenRevenue(true)}
-            />
+            <div className="finance-buttons">
+              <GlobalButton
+                bg={"white"}
+                textColor={"#222222"}
+                icon={FaPlus}
+                text={"Add a Revenue"}
+                onClick={() => setIsAddModalOpenRevenue(true)}
+              />
+              <CSVLink
+                filename={"your-revenue.csv"}
+                data={revenueData}
+                className="buttons"
+              >
+                <FaFileExport />
+                Export as CSV
+              </CSVLink>
+            </div>
           </div>
           <table className="global-table">
             <thead>

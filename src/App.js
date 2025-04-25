@@ -9,7 +9,7 @@ import Timetracker from "./pages/time-tracking/Timetracking";
 import Clientmanagement from './pages/book-keeping/Clientmanagement';
 import AddClientForm from './pages/book-keeping/Addclientform';
 import ClientInfo from './pages/book-keeping/ClientInfo';
-import ExpenseTracker from "./pages/expensetracker/ExpenseTracker";
+import FinancesTracker from "./pages/expensetracker/FinancesTracker";
 import RevenueTracker from "./pages/revenuetracker/RevenueTracker";
 
 // Document Drafting Routes
@@ -28,11 +28,11 @@ function App() {
         <Route path="/moreinfo" element={<Moreinfo />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
         <Route path="/client/:id" element={<ClientInfo />} />
-        <Route path="/finances" element={<ExpenseTracker />} />
+        <Route path="/finances" element={<FinancesTracker />} />
         <Route path="/timetracker" element={<Timetracker />} />
         <Route path="/clientmanagement" element={<Clientmanagement />} />
         <Route path="/addclientform" element={<AddClientForm />} />
-        <Route path="/revenuetracker" element={<RevenueTracker />} />
+        {/* <Route path="/revenuetracker" element={<RevenueTracker />} /> */}
         
         {/* Document Drafting Routes */}
         <Route path="/uploadpdf" element={<UploadPDF />} />

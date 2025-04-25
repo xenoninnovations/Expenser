@@ -84,9 +84,9 @@ export default function NavBar() {
               {/* <li className={isActiveRoute('/expensetracker') ? 'active' : ''}>
                 <Link to="/expensetracker">Expense Tracker</Link>
               </li> */}
-              <li className={isActiveRoute('/revenuetracker') ? 'active' : ''}>
+              {/* <li className={isActiveRoute('/revenuetracker') ? 'active' : ''}>
                 <Link to="/revenuetracker">Income/Revenue</Link>
-              </li>
+              </li> */}
               <li className={isActiveRoute('/savings') ? 'active' : ''}>
                 <Link to="/savings">Savings</Link>
               </li>

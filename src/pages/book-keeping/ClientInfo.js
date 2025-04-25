@@ -18,6 +18,7 @@ import {
   FaPlus,
   FaEnvelope,
   FaPhone,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 import EditCase from "../../components/EditCase/EditCase";
 import "../../pages/assets/styles/book-keeping.css";
@@ -103,14 +104,16 @@ const ClientInfo = () => {
   // Add this formatting function
   const formatPhoneNumber = (phoneNumber) => {
     // Remove all non-digit characters
-    const cleaned = phoneNumber?.replace(/\D/g, '');
-    
+    const cleaned = phoneNumber?.replace(/\D/g, "");
+
     // Check if the number has 10 digits
     if (cleaned?.length === 10) {
-      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+      return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(
+        6
+      )}`;
     }
     // Return original number if it doesn't match expected format
-    return phoneNumber || 'N/A';
+    return phoneNumber || "N/A";
   };
 
   if (loading) return <p>Loading...</p>;
@@ -122,7 +125,7 @@ const ClientInfo = () => {
       <div className="page-content">
         <div className="client-info">
           <img src={avatar} alt="avatar" className="client-avatar" />
-          
+
           <div className="client-info-container">
             <h1>{client.clientName}</h1>
             <div className="client-info-section">
@@ -132,6 +135,13 @@ const ClientInfo = () => {
             <div className="client-info-section">
               <FaEnvelope />
               <p>{client.emailAddress}</p>
+            </div>
+            <div className="client-info-section">
+              <FaMapMarkerAlt />
+              <p>
+                {client.address.street}, {client.address.city},{" "}
+                {client.address.state} {client.address.zip}
+              </p>
             </div>
           </div>
         </div>
@@ -179,7 +189,9 @@ const ClientInfo = () => {
                       <td>{caseItem.name || caseItem.caseName}</td>
                       <td>{caseItem.lead_attorney || caseItem.leadAttorney}</td>
                       <td>{caseItem.type || caseItem.caseType}</td>
-                      <td>{caseItem.case_desc || caseItem.caseDesc || "N/A"}</td>
+                      <td>
+                        {caseItem.case_desc || caseItem.caseDesc || "N/A"}
+                      </td>
                       <td>{caseItem.status || "N/A"}</td>
                       <td>
                         <FaPen

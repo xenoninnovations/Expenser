@@ -28,7 +28,7 @@ function App() {
         <Route path="/moreinfo" element={<Moreinfo />} />
         <Route path="/forgotpassword" element={<Forgotpassword />} />
         <Route path="/client/:id" element={<ClientInfo />} />
-        <Route path="/expensetracker" element={<ExpenseTracker />} />
+        <Route path="/finances" element={<ExpenseTracker />} />
         <Route path="/timetracker" element={<Timetracker />} />
         <Route path="/clientmanagement" element={<Clientmanagement />} />
         <Route path="/addclientform" element={<AddClientForm />} />

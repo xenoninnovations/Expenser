@@ -13,10 +13,10 @@ import { CSVLink } from "react-csv";
 import GlobalButton from "../../components/GlobalButton/GlobalButton";
 
 function ExpenseTracker() {
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedExpenseId, setSelectedExpenseId] = useState(null);
+  const [isAddModalOpenExpense, setIsAddModalOpenExpense] = useState(false);
+  const [isEditModalOpenExpense, setIsEditModalOpenExpense] = useState(false);
+  const [isDeleteModalOpenExpense, setIsDeleteModalOpenExpense] = useState(false);
+  const [selectedExpenseIdExpense, setSelectedExpenseIdExpense] = useState(null);
 
   const [expenseData, setExpenseData] = useState([]);
   const [totalExpense, setTotalExpense] = useState(0);
@@ -51,14 +51,14 @@ function ExpenseTracker() {
     loadAllExpenses();
   }, []); // Run on component mount
 
-  const handleEditClick = (expenseId) => {
-    setSelectedExpenseId(expenseId);
-    setIsEditModalOpen(true);
+  const handleEditClickExpense = (expenseId) => {
+    setSelectedExpenseIdExpense(expenseId);
+    setIsEditModalOpenExpense(true);
   };
 
-  const handleDeleteClick = (expenseId) => {
-    setSelectedExpenseId(expenseId);
-    setIsDeleteModalOpen(true);
+  const handleDeleteClickExpense = (expenseId) => {
+    setSelectedExpenseIdExpense(expenseId);
+    setIsDeleteModalOpenExpense(true);
   };
 
   return (
@@ -66,7 +66,7 @@ function ExpenseTracker() {
       <Navbar />
       <div className="page-content">
         <div className="header">
-          <h3>Expense Tracker</h3>
+          <h3>Finances Tracker</h3>
           <img src={dots} alt="dots" className="dots" />
         </div>
 
@@ -74,6 +74,15 @@ function ExpenseTracker() {
           <div className="revexp-header">
             <span className="yellow-bar exp"></span>
             <h2 className="revexp-title">Your total expenses</h2>
+            <span className="revexp-total">
+              <strong>
+                ${totalExpense.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              </strong>
+            </span>
+          </div>
+          <div className="revexp-header">
+            <span className="yellow-bar exp"></span>
+            <h2 className="revexp-title">Your total revenues</h2>
             <span className="revexp-total">
               <strong>
                 ${totalExpense.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
@@ -104,7 +113,7 @@ function ExpenseTracker() {
               textColor={"#222222"}
               icon={FaPlus}
               text={"Add an Expense"}
-              onClick={() => setIsAddModalOpen(true)}
+              onClick={() => setIsAddModalOpenExpense(true)}
             />
           </div>
           <table className="global-table">
@@ -139,11 +148,11 @@ function ExpenseTracker() {
                     <td>
                       <FaPen
                         className="icon edit-icon"
-                        onClick={() => handleEditClick(expense.id)}
+                        onClick={() => handleEditClickExpense(expense.id)}
                       />
                       <FaTrash
                         className="icon delete-icon"
-                        onClick={() => handleDeleteClick(expense.id)}
+                        onClick={() => handleDeleteClickExpense(expense.id)}
                       />
                     </td>
                   </tr>
@@ -158,30 +167,30 @@ function ExpenseTracker() {
         </div>
       </div>
 
-      {isAddModalOpen && (
+      {isAddModalOpenExpense && (
         <AddExpense
           closeModal={() => {
-            setIsAddModalOpen(false);
+            setIsAddModalOpenExpense(false);
             loadAllExpenses(); // Refresh after adding
           }}
         />
       )}
-      {isEditModalOpen && (
+      {isEditModalOpenExpense && (
         <EditExpense
           closeModal={() => {
-            setIsEditModalOpen(false);
+            setIsEditModalOpenExpense(false);
             loadAllExpenses(); // Refresh after editing
           }}
-          expenseId={selectedExpenseId}
+          expenseId={selectedExpenseIdExpense}
         />
       )}
-      {isDeleteModalOpen && (
+      {isDeleteModalOpenExpense && (
         <DeleteExpense
           closeModal={() => {
-            setIsDeleteModalOpen(false);
+            setIsDeleteModalOpenExpense(false);
             loadAllExpenses(); // Refresh after deletion
           }}
-          expenseId={selectedExpenseId}
+          expenseId={selectedExpenseIdExpense}
         />
       )}
     </div>

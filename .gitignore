@@ -27,4 +27,4 @@ yarn-error.log*
 
 .boilerplate
 
-server/expenser-2335-firebase-adminsdk-5km77-77b1cd4813.json
+server/private-key.json

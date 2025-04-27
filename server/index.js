@@ -12,14 +12,18 @@ const { exec } = require('child_process');
 app.use(cors());
 
 const admin = require('firebase-admin');
-const serviceAccount = require('./expenser-2335-firebase-adminsdk-5km77-77b1cd4813.json'); // Path to the Firebase service account JSON file. can be downloaded in the project settings
+const serviceAccount = require('./private-key.json'); // Path to the Firebase service account JSON file. can be downloaded in the project settings
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
     storageBucket: 'expenser-2335.firebasestorage.app',
 });
 
 const bucket = admin.storage().bucket();
+const uploadsDir = 'server/uploads';
 
+if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -38,6 +42,7 @@ const upload = multer({ storage: storage });
 
 
 app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
+
     if (!req.file) {
         return res.status(400).json({ message: 'No file uploaded' });
     }

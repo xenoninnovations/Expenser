@@ -16,6 +16,7 @@ import { CSVLink } from "react-csv";
 import GlobalButton from "../../components/GlobalButton/GlobalButton";
 
 function FinancesTracker() {
+  const [activeTab, setActiveTab] = useState('expenses'); // Add tab state
   const [isAddModalOpenExpense, setIsAddModalOpenExpense] = useState(false);
   const [isEditModalOpenExpense, setIsEditModalOpenExpense] = useState(false);
   const [isDeleteModalOpenExpense, setIsDeleteModalOpenExpense] =
@@ -155,163 +156,175 @@ function FinancesTracker() {
           </div>
         </div>
 
-        {/* <div className="expense-buttons">
-          <CSVLink
-            filename={"your-expenses.csv"}
-            data={expenseData}
-            className="buttons"
-          >
-            <FaFileExport />
-            Export as CSV
-          </CSVLink>
-        </div> */}
-
-        {/** Expense Table */}
-        <div className="table-container">
-          <div className="table-header exp">
-            <div className="exp-spaced">
+        <div className="tabs-container">
+          <div className="tabs-header">
+            <button 
+              className={`tab-button ${activeTab === 'expenses' ? 'active' : ''}`}
+              onClick={() => setActiveTab('expenses')}
+            >
               <span className="yellow-bar exp"></span>
-              <h2 className="table-title">My Expenses</h2>
-            </div>
-            <div className="finance-buttons">
-              <GlobalButton
-                bg={"white"}
-                textColor={"#222222"}
-                icon={FaPlus}
-                text={"Add an Expense"}
-                onClick={() => setIsAddModalOpenExpense(true)}
-              />
-              <CSVLink
-                filename={"your-expenses.csv"}
-                data={expenseData}
-                className="buttons"
-              >
-                <FaFileExport />
-                Export as CSV
-              </CSVLink>
-            </div>
-          </div>
-          <table className="global-table">
-            <thead>
-              <tr>
-                {[
-                  "Item",
-                  "Transaction date",
-                  "Amount",
-                  "Category",
-                  "Merchant",
-                  "Actions",
-                ].map((head) => (
-                  <th key={head}>{head} ⬍</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {expenseData.length > 0 ? (
-                expenseData.map((expense) => (
-                  <tr key={expense.id} className="table-row">
-                    <td>{expense.item || "N/A"}</td>
-                    <td>{expense.date}</td>
-                    <td>
-                      $
-                      {expense.amount
-                        .toFixed(2)
-                        .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
-                    </td>
-                    <td>{expense.category || "N/A"}</td>
-                    <td>{expense.merchant || "N/A"}</td>
-                    <td>
-                      <FaPen
-                        className="icon edit-icon"
-                        onClick={() => handleEditClickExpense(expense.id)}
-                      />
-                      <FaTrash
-                        className="icon delete-icon"
-                        onClick={() => handleDeleteClickExpense(expense.id)}
-                      />
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="6">No expense data available...</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/** Revenue Table */}
-        <div className="table-container">
-          <div className="table-header rev">
-            <div className="rev-spaced">
+              Expenses
+            </button>
+            <button 
+              className={`tab-button ${activeTab === 'revenue' ? 'active' : ''}`}
+              onClick={() => setActiveTab('revenue')}
+            >
               <span className="yellow-bar rev"></span>
-              <h2 className="table-title">My Revenue</h2>
-            </div>
-            <div className="finance-buttons">
-              <GlobalButton
-                bg={"white"}
-                textColor={"#222222"}
-                icon={FaPlus}
-                text={"Add a Revenue"}
-                onClick={() => setIsAddModalOpenRevenue(true)}
-              />
-              <CSVLink
-                filename={"your-revenue.csv"}
-                data={revenueData}
-                className="buttons"
-              >
-                <FaFileExport />
-                Export as CSV
-              </CSVLink>
-            </div>
+              Revenue
+            </button>
           </div>
-          <table className="global-table">
-            <thead>
-              <tr>
-                {[
-                  "Source",
-                  "Transaction date",
-                  "Amount",
-                  "Note",
-                  "Actions",
-                ].map((head) => (
-                  <th key={head}>{head} ⬍</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {revenueData.length > 0 ? (
-                revenueData.map((revenue) => (
-                  <tr key={revenue.id} className="table-row">
-                    <td>{revenue.source || "N/A"}</td>
-                    <td>{revenue.date}</td>
-                    <td>
-                      $
-                      {revenue.amount
-                        .toFixed(2)
-                        .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                    </td>
-                    <td>{revenue.note || "N/A"}</td>
-                    <td>
-                      <FaPen
-                        className="icon edit-icon"
-                        onClick={() => handleEditClickRevenue(revenue.id)}
-                      />
-                      <FaTrash
-                        className="icon delete-icon"
-                        onClick={() => handleDeleteClickRevenue(revenue.id)}
-                      />
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="5">No revenue data available...</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+
+          <div className="tab-content">
+            {activeTab === 'expenses' && (
+              <div className="table-container">
+                <div className="table-header exp">
+                  <div className="exp-spaced">
+                    <span className="yellow-bar exp"></span>
+                    <h2 className="table-title">My Expenses</h2>
+                  </div>
+                  <div className="finance-buttons">
+                    <GlobalButton
+                      bg={"white"}
+                      textColor={"#222222"}
+                      icon={FaPlus}
+                      text={"Add an Expense"}
+                      onClick={() => setIsAddModalOpenExpense(true)}
+                    />
+                    <CSVLink
+                      filename={"your-expenses.csv"}
+                      data={expenseData}
+                      className="buttons"
+                    >
+                      <FaFileExport />
+                      Export as CSV
+                    </CSVLink>
+                  </div>
+                </div>
+                <table className="global-table">
+                  <thead>
+                    <tr>
+                      {[
+                        "Item",
+                        "Transaction date",
+                        "Amount",
+                        "Category",
+                        "Merchant",
+                        "Actions",
+                      ].map((head) => (
+                        <th key={head}>{head} ⬍</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {expenseData.length > 0 ? (
+                      expenseData.map((expense) => (
+                        <tr key={expense.id} className="table-row">
+                          <td>{expense.item || "N/A"}</td>
+                          <td>{expense.date}</td>
+                          <td>
+                            $
+                            {expense.amount
+                              .toFixed(2)
+                              .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")}
+                          </td>
+                          <td>{expense.category || "N/A"}</td>
+                          <td>{expense.merchant || "N/A"}</td>
+                          <td>
+                            <FaPen
+                              className="icon edit-icon"
+                              onClick={() => handleEditClickExpense(expense.id)}
+                            />
+                            <FaTrash
+                              className="icon delete-icon"
+                              onClick={() => handleDeleteClickExpense(expense.id)}
+                            />
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6">No expense data available...</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {activeTab === 'revenue' && (
+              <div className="table-container">
+                <div className="table-header rev">
+                  <div className="rev-spaced">
+                    <span className="yellow-bar rev"></span>
+                    <h2 className="table-title">My Revenue</h2>
+                  </div>
+                  <div className="finance-buttons">
+                    <GlobalButton
+                      bg={"white"}
+                      textColor={"#222222"}
+                      icon={FaPlus}
+                      text={"Add a Revenue"}
+                      onClick={() => setIsAddModalOpenRevenue(true)}
+                    />
+                    <CSVLink
+                      filename={"your-revenue.csv"}
+                      data={revenueData}
+                      className="buttons"
+                    >
+                      <FaFileExport />
+                      Export as CSV
+                    </CSVLink>
+                  </div>
+                </div>
+                <table className="global-table">
+                  <thead>
+                    <tr>
+                      {[
+                        "Source",
+                        "Transaction date",
+                        "Amount",
+                        "Note",
+                        "Actions",
+                      ].map((head) => (
+                        <th key={head}>{head} ⬍</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {revenueData.length > 0 ? (
+                      revenueData.map((revenue) => (
+                        <tr key={revenue.id} className="table-row">
+                          <td>{revenue.source || "N/A"}</td>
+                          <td>{revenue.date}</td>
+                          <td>
+                            $
+                            {revenue.amount
+                              .toFixed(2)
+                              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                          </td>
+                          <td>{revenue.note || "N/A"}</td>
+                          <td>
+                            <FaPen
+                              className="icon edit-icon"
+                              onClick={() => handleEditClickRevenue(revenue.id)}
+                            />
+                            <FaTrash
+                              className="icon delete-icon"
+                              onClick={() => handleDeleteClickRevenue(revenue.id)}
+                            />
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5">No revenue data available...</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

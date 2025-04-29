@@ -366,8 +366,8 @@ function Addclientform({ closeModal }) {
 
   const handleOpposingDemo = () => {
     setFormData({
-      clientName: "Marie Tremblay",
-      emailAddress: "marie.tremblay@example.com",
+      clientName: "Robert Johnson",
+      emailAddress: "robert.johnson@example.com",
       phoneNumber: "5149876543",
       companyName: "Tremblay Legal Services",
       websiteUrl: "https://www.tremblaylegal.ca",
@@ -397,8 +397,8 @@ function Addclientform({ closeModal }) {
         witnessContact: "4381234567",
       },
       opposingParty: {
-        opposingPartyName: "Pierre Dubois",
-        opposingPartyEmailAddress: "pierre.dubois@example.com",
+        opposingPartyName: "John Smith",
+        opposingPartyEmailAddress: "john.smith@example.com",
       },
     });
   };

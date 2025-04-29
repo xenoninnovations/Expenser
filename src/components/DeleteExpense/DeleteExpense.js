@@ -1,5 +1,5 @@
 import React from "react";
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
 import "../../pages/assets/styles/RevenueTracker.css";
 import { db } from "../../config.js";
 
@@ -7,14 +7,14 @@ function DeleteExpense({ closeModal, expenseId, refreshExpenses }) {
   const handleDelete = async () => {
     try {
       const expenseRef = doc(db, "expenses", expenseId); // Reference the specific document
-      await deleteDoc(expenseRef); // Delete the document
-      console.log("Expense deleted successfully");
+      await updateDoc(expenseRef, { isHidden: true }); // Update isHidden field instead of deleting
+      console.log("Expense hidden successfully");
 
       // Refresh the list and close modal
       refreshExpenses && refreshExpenses();
       closeModal();
     } catch (error) {
-      console.error("Error deleting expense: ", error);
+      console.error("Error hiding expense: ", error);
     }
   };
 

@@ -26,6 +26,7 @@ function AddExpense({ closeModal, refreshExpenses }) {
       await addDoc(collectionRef, {
         ...formData,
         date: new Date(formData.date).toISOString().split("T")[0], // Save in ISO format
+        isHidden: false, // Set isHidden to false for new expenses
       });
       console.log("Expense added successfully");
       closeModal();

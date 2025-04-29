@@ -51,10 +51,13 @@ function FinancesTracker() {
         };
       });
 
-      setExpenseData(expensesList);
+      // Filter out hidden expenses
+      const visibleExpenses = expensesList.filter(expense => !expense.isHidden);
+      
+      setExpenseData(visibleExpenses);
 
-      // Calculate total expense
-      const total = expensesList.reduce(
+      // Calculate total expense from visible expenses only
+      const total = visibleExpenses.reduce(
         (sum, expense) => sum + (expense.amount || 0),
         0
       );

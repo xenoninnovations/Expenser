@@ -4,11 +4,29 @@ import { collection, addDoc, getDocs, where, query, runTransaction, doc, getDoc,
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { db } from "../../config.js";
 import { FaTrash } from "react-icons/fa";
+//import CreateInvoicePdf from "./CreateInvoicePdf.js";
 
 export default function AddTask( { closeModal, selectedTaskIds, fetchOutstandingTasks }) {
   const { id } = useParams();
   const [client, setClient] = useState(null);
   const [tasks, setTasks] = useState([]);
+
+  const handlePdfPreview = async () => {
+    const newDoc = await CreateInvoicePdf({...client, ...tasks}, true);
+    const pdfBlob = newDoc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    window.open(pdfUrl);
+  }
+
+  const handlePdfUpload = async (invoiceId) => {
+    const newDoc = await CreateInvoicePdf({...client, ...tasks}, false, invoiceId);
+    const pdfBlob = newDoc.output('blob');
+    const storage = getStorage();
+    const storageRef = ref(storage, `pdfs/invoices/invoice_${invoiceId}.pdf`);
+    uploadBytes(storageRef, pdfBlob).then((snapshot) => {
+      console.log("Successfully uploaded pdf");
+    })
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,6 +57,7 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
         )
       );
       
+      handlePdfUpload(invoiceId);
       closeModal();
       fetchOutstandingTasks();
     } catch(e) {
@@ -90,7 +109,7 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
     fetchClient();
     fetchTasks();
 
-  },[])
+  },[id])
 
   return (
     <div className="modal-overlay">
@@ -111,7 +130,7 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
               <hr></hr>
             </div>
             ))}
-            <button type="button" className="modal-button add">Preview Invoice</button>
+            <button type="button" onClick={handlePdfPreview} className="modal-button add">Preview Invoice</button>
             <button type="submit" className="modal-button save">Invoice</button>
         </form>
 

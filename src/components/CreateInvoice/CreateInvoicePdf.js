@@ -6,33 +6,16 @@ import { db } from '../../config';
 
 export default async function CreateInvoicePdf(formData, isPreview, invoiceId) {
   const pdfDoc = new jsPDF();
-  let clientInfo = {};
-
-  try {
-    const docRef = doc(db, "clients", formData.client);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      clientInfo = docSnap.data();
-    }
-  } catch (e) {
-    console.error("Error fetching client: ", e);
-  }
 
   const calcTotal = () => {
     var sum = 0;
-    formData.tasks.forEach((val) => (sum += +val.total));
-    formData.services.forEach((val) => (sum += +val.total));
+    formData.tasks.forEach((task) => (sum += +task.fee));
     return sum;
   };
 
   const tasksColumns = [
     { header: "DESCRIPTION", dataKey: "description" },
     { header: "DURATION", dataKey: "duration" },
-    { header: "TOTAL", dataKey: "total" },
-  ];
-  const servicesColumns = [
-    { header: "DESCRIPTION", dataKey: "description" },
-    { header: "TERM", dataKey: "term" },
     { header: "TOTAL", dataKey: "total" },
   ];
 
@@ -48,30 +31,20 @@ export default async function CreateInvoicePdf(formData, isPreview, invoiceId) {
   pdfDoc.text("Company Phone Number", 20, 51);
 
   pdfDoc.text(`${isPreview ? "Invoice #: Preview": `Invoice #: ${invoiceId}`}`, 140, 30);
-  pdfDoc.text(`Date: ${formData.date}`, 140, 37);
+  pdfDoc.text(`Date: ${new Date().toISOString().split("T")[0]}`, 140, 37);
 
   pdfDoc.setFont("helvetica", "bold");
   pdfDoc.text("Bill To:", 20, 70);
   pdfDoc.setFont("helvetica", "normal");
-  pdfDoc.text(`${clientInfo.clientName || "Client Name"}`, 20, 78);
-  pdfDoc.text(`${clientInfo.address || "Client Address"}`, 20, 85);
-  pdfDoc.text(`${formData.phoneNumber || "Phone Number"}`, 20, 92);
-  pdfDoc.text(`${formData.client || "Client Email"}`, 20, 99);
+  pdfDoc.text(`${formData.client.clientName || "Client Name"}`, 20, 78);
+  pdfDoc.text(`${formData.client.address || "Client Address"}`, 20, 85);
+  pdfDoc.text(`${formData.client.phoneNumber || "Phone Number"}`, 20, 92);
+  pdfDoc.text(`${formData.client.emailAddress || "Client Email"}`, 20, 99);
 
   autoTable(pdfDoc, {
     startY: 110,
     head: [tasksColumns.map(col => col.header)],
-    body: formData.tasks.map(item => [item.taskDescription, item.duration, item.total]),
-    theme: "grid",
-    styles: { fontSize: 9 },
-    headStyles: { fillColor: [0, 0, 0] },
-    alternateRowStyles: { fillColor: [240, 240, 240] },
-  });
-
-  autoTable(pdfDoc, {
-    startY: pdfDoc.lastAutoTable.finalY + 10,
-    head: [servicesColumns.map(col => col.header)],
-    body: formData.services.map(item => [item.service, item.term, item.total]),
+    body: formData.tasks.map(task => [task.taskName, task.duration, task.fee]),
     theme: "grid",
     styles: { fontSize: 9 },
     headStyles: { fillColor: [0, 0, 0] },

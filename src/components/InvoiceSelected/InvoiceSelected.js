@@ -4,7 +4,7 @@ import { collection, addDoc, getDocs, where, query, runTransaction, doc, getDoc,
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { db } from "../../config.js";
 import { FaTrash } from "react-icons/fa";
-//import CreateInvoicePdf from "./CreateInvoicePdf.js";
+import CreateInvoicePdf from "../CreateInvoice/CreateInvoicePdf.js";
 
 export default function AddTask( { closeModal, selectedTaskIds, fetchOutstandingTasks }) {
   const { id } = useParams();
@@ -12,14 +12,15 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
   const [tasks, setTasks] = useState([]);
 
   const handlePdfPreview = async () => {
-    const newDoc = await CreateInvoicePdf({...client, ...tasks}, true);
+    console.log({client, tasks});
+    const newDoc = await CreateInvoicePdf({client, tasks}, true);
     const pdfBlob = newDoc.output('blob');
     const pdfUrl = URL.createObjectURL(pdfBlob);
     window.open(pdfUrl);
   }
 
   const handlePdfUpload = async (invoiceId) => {
-    const newDoc = await CreateInvoicePdf({...client, ...tasks}, false, invoiceId);
+    const newDoc = await CreateInvoicePdf({client, tasks}, false, invoiceId);
     const pdfBlob = newDoc.output('blob');
     const storage = getStorage();
     const storageRef = ref(storage, `pdfs/invoices/invoice_${invoiceId}.pdf`);

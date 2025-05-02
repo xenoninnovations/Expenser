@@ -72,7 +72,7 @@ export default function AddTask( { closeModal, fetchOutstandingTasks }) {
         <form onSubmit={handleSubmit}>
           <h4>Services:</h4>
           {formData.map((task, index) => (
-            <div key={index} className="field-group">
+            <div key={task.id} className="field-group">
               <h5>{index+1}.</h5>
               <input 
                 className="field"

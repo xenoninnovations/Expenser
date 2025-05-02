@@ -5,7 +5,7 @@ import {
   FaPlus,
 } from "react-icons/fa";
 
-export default function ClientInvoicesTable({invoices, setIsAddModalOpen, handleEditClick, handleDeleteClick}) {
+export default function ClientInvoicesTable({invoices, handleEditClick, handleDeleteClick}) {
   return (
     <div className="table-container">
     <div className="table-header exp">
@@ -36,7 +36,7 @@ export default function ClientInvoicesTable({invoices, setIsAddModalOpen, handle
                 <td>{invoice.invoiceId}</td>
                 <td>{invoice.date}</td>
                 <td>{invoice.status}</td>
-                <td>${invoice.total}</td>
+                <td>${parseFloat(invoice.total || 0).toFixed(2)}</td>
                 <td>
                   <FaPen
                     className="icon edit-icon"

@@ -96,6 +96,17 @@ a {
   width: 100%;
 }
 
+.field-group{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.field-group > button {
+  flex: 1
+}
+
 .label {
   display: flex;
   flex-direction: column;
@@ -161,6 +172,10 @@ a {
 
 .delete-icon:hover {
   color: #f44336;
+}
+
+.send-icon:hover {
+  color: #368ff4;
 }
 
 /* Container Styles */
@@ -235,6 +250,16 @@ a {
 
 .modal-button.del {
   background: rgba(255, 0, 0, 0.7);
+  color: white;
+}
+
+.modal-button.add {
+  background: rgb(12, 147, 209);
+  color: white;
+}
+
+.modal-button.alt {
+  background: rgb(13, 175, 67);
   color: white;
 }
 

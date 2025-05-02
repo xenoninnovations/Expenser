@@ -1,4 +1,6 @@
 import React from 'react'
+import { useState } from "react";
+import { useParams } from "react-router-dom";
 import dots from "../../images/dots.svg";
 import GlobalButton from "../../components/GlobalButton/GlobalButton";
 import {
@@ -8,8 +10,28 @@ import {
   FaEnvelope,
   FaPhone,
 } from "react-icons/fa";
+import DeleteCase from "../../components/DeleteCase/DeleteCase";
+import AddCase from "../../components/AddCase/AddCase";
+import EditCase from "../../components/EditCase/EditCase";
 
-export default function ClientCasesTable({client, setIsAddModalOpen, handleEditClick, handleDeleteClick}) {
+export default function ClientCasesTable({client, fetchClientAndCases }) {
+  const { id } = useParams();
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedCase, setSelectedCase] = useState(null);
+
+    
+  const handleEditClick = (caseId) => {
+    setSelectedCase(caseId);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (caseId) => {
+    setSelectedCase(caseId);
+    setIsDeleteModalOpen(true);
+  };
+
   return (
     <div className="table-container">
     <div className="table-header exp">
@@ -73,6 +95,33 @@ export default function ClientCasesTable({client, setIsAddModalOpen, handleEditC
         )}
       </tbody>
     </table>
+    {isAddModalOpen && (
+        <AddCase
+          closeModal={() => {
+            setIsAddModalOpen(false);
+            fetchClientAndCases();
+          }}
+          clientId={id}
+        />
+      )}
+      {isEditModalOpen && (
+        <EditCase
+          closeModal={() => {
+            setIsEditModalOpen(false);
+            fetchClientAndCases();
+          }}
+          caseId={selectedCase}
+        />
+      )}
+      {isDeleteModalOpen && (
+        <DeleteCase
+          closeModal={() => {
+            setIsDeleteModalOpen(false);
+            fetchClientAndCases();
+          }}
+          caseId={selectedCase}
+        />
+      )}
   </div>
   )
 }

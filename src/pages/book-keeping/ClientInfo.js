@@ -10,21 +10,10 @@ import { useEffect, useState } from "react";
 import { db } from "../../config";
 import Navbar from "../../components/NavBar/NavBar";
 import { useParams } from "react-router-dom";
-import dots from "../../images/dots.svg";
-import GlobalButton from "../../components/GlobalButton/GlobalButton";
-import {
-  FaPen,
-  FaTrash,
-  FaPlus,
-  FaEnvelope,
-  FaPhone,
-} from "react-icons/fa";
-import EditCase from "../../components/EditCase/EditCase";
+import { FaEnvelope, FaPhone, } from "react-icons/fa";
 import "../../pages/assets/styles/book-keeping.css";
 import "../../pages/assets/styles/ClientInfo.css";
 import avatar from "../../images/avatar.png";
-import DeleteCase from "../../components/DeleteCase/DeleteCase";
-import AddCase from "../../components/AddCase/AddCase";
 import ClientCasesTable from "../../components/ClientTables/ClientCasesTable";
 import ClientOutstandingFeesTable from "../../components/ClientTables/ClientOutstandingFeesTable";
 import ClientInvoicesTable from "../../components/ClientTables/ClientInvoicesTable";
@@ -32,16 +21,11 @@ import ClientInvoicesTable from "../../components/ClientTables/ClientInvoicesTab
 const ClientInfo = () => {
   const { id } = useParams();
   const [client, setClient] = useState(null);
-  const [selectedCase, setSelectedCase] = useState(null);
   const [loading, setLoading] = useState(true);
   const [caseData, setCaseData] = useState([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [view, setView] = useState("cases")
   const [outstandingTasks, setOutstandingTasks] = useState([])
   const [invoices, setInvoices] = useState([])
-
 
   const fetchClientAndCases = async () => {
     try {
@@ -74,7 +58,7 @@ const ClientInfo = () => {
   const fetchOutstandingTasks = async () => {
     try {
       const outstandingTasksRef = collection(db, "Tasks");
-      const q = query(outstandingTasksRef, where("clientName", "==", id));
+      const q = query(outstandingTasksRef, where("client", "==", id), where("outstanding", "==", true));
       const querySnapshot = await getDocs(q);
   
       const oustandingTasksData = querySnapshot.docs.map((doc) => ({
@@ -109,16 +93,6 @@ const ClientInfo = () => {
     fetchOutstandingTasks();
     fetchInvoices();
   }, [id]);
-
-  const handleEditClick = (caseId) => {
-    setSelectedCase(caseId);
-    setIsEditModalOpen(true);
-  };
-
-  const handleDeleteClick = (caseId) => {
-    setSelectedCase(caseId);
-    setIsDeleteModalOpen(true);
-  };
 
   // Function to load all cases
   const loadAllCases = async () => {
@@ -194,37 +168,10 @@ const ClientInfo = () => {
             ))}
           </div>
         </div>
-        {view === "cases" && <ClientCasesTable client={client} setIsAddModalOpen={setIsAddModalOpen} handleEditClick={handleEditClick} handleDeleteClick={handleDeleteClick}/>}
-        {view === "fees" && <ClientOutstandingFeesTable tasks={outstandingTasks} setIsAddModalOpen={setIsAddModalOpen} handleEditClick={handleEditClick} handleDeleteClick={handleDeleteClick}/>}
-        {view === "invoices" && <ClientInvoicesTable invoices={invoices} setIsAddModalOpen={setIsAddModalOpen} handleEditClick={handleEditClick} handleDeleteClick={handleDeleteClick}/>}
+        {view === "cases" && <ClientCasesTable client={client} fetchClientAndCases={fetchClientAndCases}/>}
+        {view === "fees" && <ClientOutstandingFeesTable tasks={outstandingTasks} fetchOutstandingTasks={fetchOutstandingTasks}/>}
+        {view === "invoices" && <ClientInvoicesTable invoices={invoices}/>}
       </div>
-      {isAddModalOpen && (
-        <AddCase
-          closeModal={() => {
-            setIsAddModalOpen(false);
-            fetchClientAndCases();
-          }}
-          clientId={id}
-        />
-      )}
-      {isEditModalOpen && (
-        <EditCase
-          closeModal={() => {
-            setIsEditModalOpen(false);
-            fetchClientAndCases();
-          }}
-          caseId={selectedCase}
-        />
-      )}
-      {isDeleteModalOpen && (
-        <DeleteCase
-          closeModal={() => {
-            setIsDeleteModalOpen(false);
-            fetchClientAndCases();
-          }}
-          caseId={selectedCase}
-        />
-      )}
     </div>
   );
 };

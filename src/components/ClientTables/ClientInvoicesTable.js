@@ -1,5 +1,4 @@
 import React from 'react'
-import GlobalButton from "../../components/GlobalButton/GlobalButton";
 import {
   FaPen,
   FaTrash,
@@ -12,15 +11,8 @@ export default function ClientInvoicesTable({invoices, setIsAddModalOpen, handle
     <div className="table-header exp">
       <div className="exp-spaced">
         <span className="yellow-bar exp"></span>
-        <h2 className="table-title">Outstanding Fees</h2>
+        <h2 className="table-title">Invoices</h2>
       </div>
-      <GlobalButton
-        bg={"white"}
-        textColor={"#222222"}
-        icon={FaPlus}
-        text={"Add a case"}
-        onClick={() => setIsAddModalOpen(true)}
-      />
     </div>
     <table className="global-table">
       <thead>

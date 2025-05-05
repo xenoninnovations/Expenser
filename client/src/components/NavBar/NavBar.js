@@ -117,9 +117,6 @@ export default function NavBar() {
               <li className={isActiveRoute('/document-drafting') ? 'active' : ''}>
                 <Link to="/document-drafting">Document Drafting</Link>
               </li>
-              <li className={isActiveRoute('/emails') ? 'active' : ''}>
-                <Link to="/emails">Emails</Link>
-              </li>
               <li className={isActiveRoute('/invoicing') ? 'active' : ''}>
                 <Link to="/invoicing">Invoicing & Payments</Link>
               </li>
@@ -140,7 +137,7 @@ export default function NavBar() {
 
         {/* Email */}
         <li className="nav-item">
-          <Link to="/email" className={isActiveRoute('/email') ? 'active' : ''}>
+          <Link to="/emails" className={isActiveRoute('/email') ? 'active' : ''}>
             <FaEnvelope className="nav-icon" />
             {isNavExpanded && <span>Email</span>}
           </Link>

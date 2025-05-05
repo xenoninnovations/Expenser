@@ -11,6 +11,7 @@ import AddClientForm from './pages/book-keeping/Addclientform';
 import ClientInfo from './pages/book-keeping/ClientInfo';
 import ExpenseTracker from "./pages/expensetracker/ExpenseTracker";
 import RevenueTracker from "./pages/revenuetracker/RevenueTracker";
+import Invoicing from "./pages/book-keeping/Invoicing";
 
 // Document Drafting Routes
 import UploadPDF from "./pages/doc-drafting/upload-pdf/UploadPDF";
@@ -23,11 +24,13 @@ import EmailViewer from './components/EmailViewer/EmailViewer';
 import React, { useEffect } from "react";
 
 function App() {
+  /*
   useEffect(() => {
     fetch("http://localhost:5000")
       .then((res) => res.text())
       .then((data) => console.log(data));
   }, []);
+  */
 
   return (
     <BrowserRouter>
@@ -43,6 +46,7 @@ function App() {
         <Route path="/clientmanagement" element={<Clientmanagement />} />
         <Route path="/addclientform" element={<AddClientForm />} />
         <Route path="/revenuetracker" element={<RevenueTracker />} />
+        <Route path="/invoicing" element={<Invoicing />} />
 
         {/* TEMP */}
         <Route path="/document-drafting" element={<UploadPDF />} />

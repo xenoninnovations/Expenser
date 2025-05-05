@@ -287,3 +287,99 @@ a {
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.4);
 }
+
+.field-group{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.field-group > button {
+  flex: 1
+}
+	
+.send-icon:hover {
+  color: #368ff4;
+}
+
+	
+.modal-button.add {
+  background: rgb(12, 147, 209);
+  color: white;
+}
+.modal-button.alt {
+  background: rgb(13, 175, 67);
+  color: white;
+}
+
+		
+.view-toggle {
+  display: flex;
+  border-bottom: 2px solid #ccc;
+}
+.toggle-button {
+  background-color: transparent;
+  border-bottom: 2px solid transparent;
+  padding: 10px 16px;
+  margin-right: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #555;
+  border-radius: 0;
+}
+.toggle-button:hover {
+  color: #000;
+  border-bottom: 2px solid #aaa;
+}
+.toggle-button.active {
+  border-bottom: 2px solid #222;
+  color: #222;
+}
+.field-group{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+.field-group > button {
+  flex: 1
+}
+.right-align {
+  margin-left: auto;
+  display: flex;
+  gap: 20px;
+}
+input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 20px;
+  width: 20px;
+  background-color: #bdbdbd;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+}
+input[type="checkbox"]::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  width: 7px;
+  height: 13px;
+  border: solid white;
+  border-width: 0 3px 3px 0;
+  transform: rotate(40deg);
+  opacity: 0;
+}
+input[type="checkbox"]:checked {
+  background-color: rgb(0, 177, 53);
+}
+input[type="checkbox"]:checked::after {
+  opacity: 1;
+}
+input[type="checkbox"]:hover {
+  background-color: #7a7a7a;
+}
+input[type="checkbox"]:checked:hover {
+  background-color: rgb(0, 116, 35);
+}

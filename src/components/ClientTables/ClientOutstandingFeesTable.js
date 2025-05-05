@@ -4,7 +4,7 @@ import { FaPen, FaTrash, FaPlus } from "react-icons/fa";
 import AddTask from '../AddTask/AddTask';
 import InvoiceSelected from '../InvoiceSelected/InvoiceSelected'
 
-export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTasks }) {
+export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTasks}) {
 
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false)
   const [isInvoiceSelectedModalOpen, setIsInvoiceSelectedModalOpen] = useState(false)

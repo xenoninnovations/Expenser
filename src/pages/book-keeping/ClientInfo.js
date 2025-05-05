@@ -26,6 +26,8 @@ const ClientInfo = () => {
   const [view, setView] = useState("cases")
   const [outstandingTasks, setOutstandingTasks] = useState([])
   const [invoices, setInvoices] = useState([])
+  const [updateSignal, setUpdateSignal] = useState(0);
+  const refresh = () => setUpdateSignal(prev => prev+1);
 
   const fetchClientAndCases = async () => {
     try {
@@ -61,15 +63,17 @@ const ClientInfo = () => {
       const q = query(outstandingTasksRef, where("client", "==", id), where("outstanding", "==", true));
       const querySnapshot = await getDocs(q);
   
-      const oustandingTasksData = querySnapshot.docs.map((doc) => ({
+      const outstandingTasksData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
   
-      setOutstandingTasks(oustandingTasksData);
+      setOutstandingTasks(outstandingTasksData);
     } catch (error) {
       console.error("Error fetching fees: ", error);
     }
+    //fetchInvoices is called here (rather than in useEffect()) so that it rechecks all invoices whenever outstanding tasks change (they change on invoice creation typically)
+    fetchInvoices();
   };
 
   const fetchInvoices = async () => {
@@ -91,7 +95,6 @@ const ClientInfo = () => {
   useEffect(() => {
     fetchClientAndCases();
     fetchOutstandingTasks();
-    fetchInvoices();
   }, [id]);
 
   // Function to load all cases

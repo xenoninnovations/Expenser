@@ -4,8 +4,23 @@ import {
   FaTrash,
   FaPlus,
 } from "react-icons/fa";
+import { FaFilePdf } from "react-icons/fa6";
+import { IoSend } from "react-icons/io5";
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
-export default function ClientInvoicesTable({invoices, handleEditClick, handleDeleteClick}) {
+export default function ClientInvoicesTable({invoices}) {
+
+    const handleViewClick = async (invoiceId) => {
+      const storage = getStorage();
+      const pathRef = ref(storage, `pdfs/invoices/invoice_${invoiceId}.pdf`)
+     const url = await getDownloadURL(pathRef);
+     window.open(url, "_blank");
+    };
+
+    const handleSendClick = (invoiceId) => {
+      return;
+    };
+
   return (
     <div className="table-container">
     <div className="table-header exp">
@@ -35,16 +50,16 @@ export default function ClientInvoicesTable({invoices, handleEditClick, handleDe
               <tr key={invoice.id} className="table-row">
                 <td>{invoice.invoiceId}</td>
                 <td>{invoice.date}</td>
-                <td>{invoice.status}</td>
+                <td className={invoice.status.toLowerCase()}>{invoice.status}</td>
                 <td>${parseFloat(invoice.total || 0).toFixed(2)}</td>
                 <td>
-                  <FaPen
-                    className="icon edit-icon"
-                    onClick={() => handleEditClick(invoice.id)}
+                  <FaFilePdf 
+                    className='icon edit-icon'
+                    onClick={() => handleViewClick(invoice.invoiceId)}
                   />
-                  <FaTrash
-                    className="icon delete-icon"
-                    onClick={() => handleDeleteClick(invoice.id)}
+                  <IoSend
+                    className='icon send-icon'
+                    onClick={() => handleSendClick(invoice.invoiceId)}
                   />
                 </td>
               </tr>

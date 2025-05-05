@@ -10,31 +10,24 @@ import { useEffect, useState } from "react";
 import { db } from "../../config";
 import Navbar from "../../components/NavBar/NavBar";
 import { useParams } from "react-router-dom";
-import dots from "../../images/dots.svg";
-import GlobalButton from "../../components/GlobalButton/GlobalButton";
-import {
-  FaPen,
-  FaTrash,
-  FaPlus,
-  FaEnvelope,
-  FaPhone,
-} from "react-icons/fa";
-import EditCase from "../../components/EditCase/EditCase";
+import { FaEnvelope, FaPhone, } from "react-icons/fa";
 import "../../pages/assets/styles/book-keeping.css";
 import "../../pages/assets/styles/ClientInfo.css";
 import avatar from "../../images/avatar.png";
-import DeleteCase from "../../components/DeleteCase/DeleteCase";
-import AddCase from "../../components/AddCase/AddCase";
+import ClientCasesTable from "../../components/ClientTables/ClientCasesTable";
+import ClientOutstandingFeesTable from "../../components/ClientTables/ClientOutstandingFeesTable";
+import ClientInvoicesTable from "../../components/ClientTables/ClientInvoicesTable";
 
 const ClientInfo = () => {
   const { id } = useParams();
   const [client, setClient] = useState(null);
-  const [selectedCase, setSelectedCase] = useState(null);
   const [loading, setLoading] = useState(true);
   const [caseData, setCaseData] = useState([]);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [view, setView] = useState("cases")
+  const [outstandingTasks, setOutstandingTasks] = useState([])
+  const [invoices, setInvoices] = useState([])
+  const [updateSignal, setUpdateSignal] = useState(0);
+  const refresh = () => setUpdateSignal(prev => prev+1);
 
   const fetchClientAndCases = async () => {
     try {
@@ -64,19 +57,45 @@ const ClientInfo = () => {
     }
   };
 
+  const fetchOutstandingTasks = async () => {
+    try {
+      const outstandingTasksRef = collection(db, "Tasks");
+      const q = query(outstandingTasksRef, where("client", "==", id), where("outstanding", "==", true));
+      const querySnapshot = await getDocs(q);
+  
+      const outstandingTasksData = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+  
+      setOutstandingTasks(outstandingTasksData);
+    } catch (error) {
+      console.error("Error fetching fees: ", error);
+    }
+    //fetchInvoices is called here (rather than in useEffect()) so that it rechecks all invoices whenever outstanding tasks change (they change on invoice creation typically)
+    fetchInvoices();
+  };
+
+  const fetchInvoices = async () => {
+    try{
+      const invoicesRef = collection(db, "invoices");
+      const q = query(invoicesRef, where("client", "==", id));
+      const querySnapShot = await getDocs(q);
+      
+      const invoiceData = querySnapShot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setInvoices(invoiceData);
+    } catch (error) {
+      console.error("Error Fetching Invoices: ", error)
+    }
+  }
+
   useEffect(() => {
     fetchClientAndCases();
+    fetchOutstandingTasks();
   }, [id]);
-
-  const handleEditClick = (caseId) => {
-    setSelectedCase(caseId);
-    setIsEditModalOpen(true);
-  };
-
-  const handleDeleteClick = (caseId) => {
-    setSelectedCase(caseId);
-    setIsDeleteModalOpen(true);
-  };
 
   // Function to load all cases
   const loadAllCases = async () => {
@@ -136,100 +155,26 @@ const ClientInfo = () => {
           </div>
         </div>
         <div className="header">
-          <h3>Cases</h3>
-          <img src={dots} alt="dots" className="dots" />
-        </div>
-        <div className="table-container">
-          <div className="table-header exp">
-            <div className="exp-spaced">
-              <span className="yellow-bar exp"></span>
-              <h2 className="table-title">{client.clientName}'s Cases</h2>
-            </div>
-            <GlobalButton
-              bg={"white"}
-              textColor={"#222222"}
-              icon={FaPlus}
-              text={"Add a case"}
-              onClick={() => setIsAddModalOpen(true)}
-            />
+          <div className="view-toggle">
+            {[
+              { label: "Cases", value: "cases" },
+              { label: "Outstanding Fees", value: "fees" },
+              { label: "Invoices", value: "invoices" }
+            ].map(({ label, value }) => (
+              <button
+                key={value}
+                className={`toggle-button ${view === value ? "active" : ""}`}
+                onClick={() => setView(value)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
-          <table className="global-table">
-            <thead>
-              <tr>
-                {[
-                  "Case number",
-                  "Case name",
-                  "Case Attorney",
-                  "Case Type",
-                  "Case Description",
-                  "Case Status",
-                  "Actions",
-                ].map((head) => (
-                  <th key={head}>{head} ⬍</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {client.cases && client.cases.length > 0 ? (
-                client.cases.map((caseItem) => {
-                  console.log("Rendering case item:", caseItem);
-                  return (
-                    <tr key={caseItem.id} className="table-row">
-                      <td>{caseItem.id}</td>
-                      <td>{caseItem.name || caseItem.caseName}</td>
-                      <td>{caseItem.lead_attorney || caseItem.leadAttorney}</td>
-                      <td>{caseItem.type || caseItem.caseType}</td>
-                      <td>{caseItem.case_desc || caseItem.caseDesc || "N/A"}</td>
-                      <td>{caseItem.status || "N/A"}</td>
-                      <td>
-                        <FaPen
-                          className="icon edit-icon"
-                          onClick={() => handleEditClick(caseItem.id)}
-                        />
-                        <FaTrash
-                          className="icon delete-icon"
-                          onClick={() => handleDeleteClick(caseItem.id)}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan="7">No case data available...</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
         </div>
+        {view === "cases" && <ClientCasesTable client={client} fetchClientAndCases={fetchClientAndCases}/>}
+        {view === "fees" && <ClientOutstandingFeesTable tasks={outstandingTasks} fetchOutstandingTasks={fetchOutstandingTasks}/>}
+        {view === "invoices" && <ClientInvoicesTable invoices={invoices}/>}
       </div>
-      {isAddModalOpen && (
-        <AddCase
-          closeModal={() => {
-            setIsAddModalOpen(false);
-            fetchClientAndCases();
-          }}
-          clientId={id}
-        />
-      )}
-      {isEditModalOpen && (
-        <EditCase
-          closeModal={() => {
-            setIsEditModalOpen(false);
-            fetchClientAndCases();
-          }}
-          caseId={selectedCase}
-        />
-      )}
-      {isDeleteModalOpen && (
-        <DeleteCase
-          closeModal={() => {
-            setIsDeleteModalOpen(false);
-            fetchClientAndCases();
-          }}
-          caseId={selectedCase}
-        />
-      )}
     </div>
   );
 };

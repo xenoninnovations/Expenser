@@ -155,7 +155,7 @@ const ClientInfo = () => {
           </div>
         </div>
         <div className="header">
-          <div className="view-toggle">
+          <div className="tabs-header">
             {[
               { label: "Cases", value: "cases" },
               { label: "Outstanding Fees", value: "fees" },
@@ -163,7 +163,7 @@ const ClientInfo = () => {
             ].map(({ label, value }) => (
               <button
                 key={value}
-                className={`toggle-button ${view === value ? "active" : ""}`}
+                className={`tab-button ${view === value ? "active" : ""}`}
                 onClick={() => setView(value)}
               >
                 {label}

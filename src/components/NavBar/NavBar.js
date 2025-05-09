@@ -68,7 +68,12 @@ export default function NavBar() {
         <li className="nav-item">
           <div 
             className={`nav-link ${isBudgetingOpen ? 'open' : ''} ${location.pathname.includes('/budgeting') ? 'active' : ''}`}
-            onClick={() => setIsBudgetingOpen(!isBudgetingOpen)}
+            onClick={() => {
+              setIsBudgetingOpen(!isBudgetingOpen);
+              if (!isBudgetingOpen) {
+                setIsBookKeepingOpen(false);
+              }
+            }}
           >
             <div className="nav-link-content">
               <FaWallet className="nav-icon" />
@@ -101,7 +106,12 @@ export default function NavBar() {
         <li className="nav-item">
           <div 
             className={`nav-link ${isBookKeepingOpen ? 'open' : ''} ${location.pathname.includes('/bookkeeping') ? 'active' : ''}`}
-            onClick={() => setIsBookKeepingOpen(!isBookKeepingOpen)}
+            onClick={() => {
+              setIsBookKeepingOpen(!isBookKeepingOpen);
+              if (!isBookKeepingOpen) {
+                setIsBudgetingOpen(false);
+              }
+            }}
           >
             <div className="nav-link-content">
               <FaBook className="nav-icon" />

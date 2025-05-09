@@ -1,8 +1,8 @@
 .buttons {
   cursor: pointer;
   width: 15vw;
-  background-color: white;
-  color: #222222;
+  background-color: #222222;
+  color: #fff;
   border: none;
   border-radius: 9px;
   font-weight: 500;

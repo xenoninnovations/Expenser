@@ -27,6 +27,13 @@ function Addclientform({ closeModal }) {
     industry: "",
     budget: "",
     source: "",
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "Canada"
+    },
     caseName: "",
     caseType: "",
     jurisdiction: "",
@@ -206,6 +213,7 @@ function Addclientform({ closeModal }) {
         industry: formData.industry || "",
         budget: formData.budget || "",
         source: formData.source || "",
+        address: formData.address,
         hasConflict: hasConflict,
       };
 
@@ -281,7 +289,21 @@ function Addclientform({ closeModal }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    
+    // Handle nested address fields
+    if (name.startsWith('address.')) {
+      const addressField = name.split('.')[1];
+      setFormData({
+        ...formData,
+        address: {
+          ...formData.address,
+          [addressField]: value
+        }
+      });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+    
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors({
@@ -305,65 +327,78 @@ function Addclientform({ closeModal }) {
 
   const handleDemo = () => {
     setFormData({
-      clientName: "Michael Rodriguez",
-      emailAddress: "michael@greenearthcafe.com",
+      clientName: "John Smith",
+      emailAddress: "john.smith@example.com",
       phoneNumber: "4161234567",
-      companyName: "Green Earth Cafe",
-      websiteUrl: "https://www.greenearthcafe.com",
-      industry: "Food and Beverage",
-      budget: "100000",
+      companyName: "Smith Enterprises",
+      websiteUrl: "https://www.smithenterprises.ca",
+      industry: "Technology",
+      budget: "50000",
       source: "Referral",
-      caseName: "Michael Rodriguez v. Jane Doe",
-      caseType: 0,
-      jurisdiction: "Federal",
-      caseDesc: "Michael is suing Jane for a contract breach.",
-      caseNotes:
-        "- Get documents from Michael - Prepare opening statement - Contact witness and prepare them",
-      leadAttorney: "Melissa Felicity",
-      courtNumber: "1234567890",
+      address: {
+        street: "123 King Street West, Suite 100",
+        city: "Toronto",
+        state: "ON",
+        zipCode: "M5H 3T9",
+        country: "Canada"
+      },
+      caseName: "Smith v. Johnson",
+      caseType: "Civil",
+      jurisdiction: "Ontario Superior Court",
+      caseDesc: "Contract dispute",
+      caseNotes: "Initial consultation completed",
+      leadAttorney: "Jane Wilson",
+      courtNumber: "CV-2023-12345",
       supportingAttornies: {
-        attorneyName: "Melissa Stephens",
-        attorneyContact: "4161234567",
+        attorneyName: "Mike Brown",
+        attorneyContact: "4169876543",
       },
       witnesses: {
-        witnessName: "Caleb Smith",
-        witnessContact: "5634234567",
+        witnessName: "Sarah Davis",
+        witnessContact: "6471234567",
       },
       opposingParty: {
-        opposingPartyName: "Jane Doe",
-        opposingPartyEmailAddress: "jane@doe.com",
+        opposingPartyName: "Robert Johnson",
+        opposingPartyEmailAddress: "robert.johnson@example.com",
       },
     });
   };
 
   const handleOpposingDemo = () => {
     setFormData({
-      clientName: "Jane Doe",
-      emailAddress: "jane@doe.com",
-      phoneNumber: "4161234567",
-      companyName: "Jane Doe Inc.",
-      websiteUrl: "https://www.janedoe.com",
-      industry: "Food and Beverage",
-      budget: "100000",
-      source: "Referral",
-      caseName: "Jane Doe v. Michael Rodriguez",
-      caseType: 0,
-      jurisdiction: "Ontario",
-      caseDesc: "Jane Doe is counter-suing John Doe for $100,000",
-      caseNotes: "N/A",
-      leadAttorney: "Kelly Smith",
-      courtNumber: "3452341234",
+      clientName: "Robert Johnson",
+      emailAddress: "robert.johnson@example.com",
+      phoneNumber: "5149876543",
+      companyName: "Tremblay Legal Services",
+      websiteUrl: "https://www.tremblaylegal.ca",
+      industry: "Legal Services",
+      budget: "75000",
+      source: "Direct Contact",
+      address: {
+        street: "456 René-Lévesque Boulevard West, Suite 200",
+        city: "Montreal",
+        state: "QC",
+        zipCode: "H2Z 1A1",
+        country: "Canada"
+      },
+      caseName: "Tremblay v. Dubois",
+      caseType: "Civil",
+      jurisdiction: "Quebec Superior Court",
+      caseDesc: "Property dispute",
+      caseNotes: "Settlement negotiations in progress",
+      leadAttorney: "Jean-Pierre Bouchard",
+      courtNumber: "SC-2023-78901",
       supportingAttornies: {
-        attorneyName: "Kevin Sparks",
-        attorneyContact: "6545432345",
+        attorneyName: "Sophie Lavoie",
+        attorneyContact: "5145551234",
       },
       witnesses: {
-        witnessName: "Anthony Padilla",
-        witnessContact: "9879877777",
+        witnessName: "Jacques Gagnon",
+        witnessContact: "4381234567",
       },
       opposingParty: {
-        opposingPartyName: "Michael Rodriguez",
-        opposingPartyEmailAddress: "michael@greenearthcafe.com",
+        opposingPartyName: "John Smith",
+        opposingPartyEmailAddress: "john.smith@example.com",
       },
     });
   };
@@ -371,7 +406,7 @@ function Addclientform({ closeModal }) {
   // Add handler for success modal close
   const handleSuccessClose = () => {
     setShowSuccessModal(false);
-    navigate("/");
+    navigate(`/client/${formData.emailAddress}`);
     closeModal && closeModal();
   };
 
@@ -434,6 +469,76 @@ function Addclientform({ closeModal }) {
                   name="companyName"
                   value={formData.companyName}
                   onChange={handleChange}
+                />
+              </label>
+              
+              {/* Address Fields - Updated for Canadian format */}
+              <label className="label">
+                Street Address:
+                <input
+                  className="fields"
+                  type="text"
+                  name="address.street"
+                  value={formData.address.street}
+                  onChange={handleChange}
+                  placeholder="e.g., 123 Main Street, Apt 4B"
+                />
+              </label>
+              <label className="label">
+                City:
+                <input
+                  className="fields"
+                  type="text"
+                  name="address.city"
+                  value={formData.address.city}
+                  onChange={handleChange}
+                />
+              </label>
+              <label className="label">
+                Province/Territory:
+                <select
+                  className="fields"
+                  name="address.state"
+                  value={formData.address.state}
+                  onChange={handleChange}
+                >
+                  <option value="">Select Province/Territory</option>
+                  <option value="AB">Alberta</option>
+                  <option value="BC">British Columbia</option>
+                  <option value="MB">Manitoba</option>
+                  <option value="NB">New Brunswick</option>
+                  <option value="NL">Newfoundland and Labrador</option>
+                  <option value="NS">Nova Scotia</option>
+                  <option value="NT">Northwest Territories</option>
+                  <option value="NU">Nunavut</option>
+                  <option value="ON">Ontario</option>
+                  <option value="PE">Prince Edward Island</option>
+                  <option value="QC">Quebec</option>
+                  <option value="SK">Saskatchewan</option>
+                  <option value="YT">Yukon</option>
+                </select>
+              </label>
+              <label className="label">
+                Postal Code:
+                <input
+                  className="fields"
+                  type="text"
+                  name="address.zipCode"
+                  value={formData.address.zipCode}
+                  onChange={handleChange}
+                  placeholder="e.g., A1A 1A1"
+                  maxLength="7"
+                />
+              </label>
+              <label className="label">
+                Country:
+                <input
+                  className="fields"
+                  type="text"
+                  name="address.country"
+                  value={formData.address.country}
+                  readOnly
+                  disabled
                 />
               </label>
             </div>

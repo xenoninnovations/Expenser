@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../../components/NavBar/NavBar";
 import "../assets/styles/global.css";
-import "../assets/styles/ExpenseTracker.css";
+import "../assets/styles/FinanceTracker.css";
 import { db } from "../../config";
 import { CSVLink } from "react-csv";
 import { collection, getDocs, addDoc } from "firebase/firestore";

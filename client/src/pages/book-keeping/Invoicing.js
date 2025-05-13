@@ -70,6 +70,7 @@ export default function Invoicing() {
               <span className='yellow-bar'></span>
               <h2 className='table-title'>Invoices</h2>
             </div>
+            {/*
             <GlobalButton 
               bg={"white"}
               textColor={"#222222"}
@@ -77,6 +78,7 @@ export default function Invoicing() {
               text={"Create Invoice"}
               onClick={() => setIsCreateInvoiceModalOpen(true)}
             />
+            */}
           </div>
 
           <table className='global-table'>

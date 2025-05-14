@@ -50,17 +50,36 @@ inquirer
     .then((devAnswer) => {
         if (devAnswer && devAnswer.runDev) {
             console.log('Starting both the client and server...');
-            exec('npm run dev', (err, stdout, stderr) => {
-                if (err) {
-                    console.error(`Error: ${err}`);
+
+            // First, install nodemon globally if not already installed
+            console.log('Checking if nodemon is installed...');
+
+            exec('npm list -g nodemon', (err, stdout, stderr) => {
+                if (stderr && stderr.includes('empty')) {
+                    console.log('nodemon not found. Installing globally...');
+                    exec('npm install -g nodemon', (installErr, installStdout, installStderr) => {
+                        if (installErr) {
+                            console.error(`Error installing nodemon: ${installErr}`);
+                            return;
+                        }
+                        if (installStderr) {
+                            console.error(`Error installing nodemon: ${installStderr}`);
+                            return;
+                        }
+                        console.log(`Successfully installed nodemon: ${installStdout}`);
+
+                        // Now, run the server
+                        startServer();
+                    });
+                } else if (err) {
+                    console.error(`Error checking nodemon installation: ${err}`);
                     return;
+                } else {
+                    console.log('nodemon is already installed.');
+                    startServer();
                 }
-                if (stderr) {
-                    console.error(`stderr: ${stderr}`);
-                    return;
-                }
-                console.log(`stdout: ${stdout}`);
             });
+
         } else if (devAnswer) {
             console.log('Setup complete. You can start the app later with "npm run dev".');
         }
@@ -68,6 +87,20 @@ inquirer
     .catch(error => {
         console.error('Error during prompt:', error);
     });
+
+function startServer() {
+    exec('npm run dev', (err, stdout, stderr) => {
+        if (err) {
+            console.error(`Error: ${err}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`stderr: ${stderr}`);
+            return;
+        }
+        console.log(`stdout: ${stdout}`);
+    });
+}
 
 function generateMissingMessage(envExists, keyExists) {
     const messages = [];

@@ -68,7 +68,12 @@ export default function NavBar() {
         <li className="nav-item">
           <div 
             className={`nav-link ${isBudgetingOpen ? 'open' : ''} ${location.pathname.includes('/budgeting') ? 'active' : ''}`}
-            onClick={() => setIsBudgetingOpen(!isBudgetingOpen)}
+            onClick={() => {
+              setIsBudgetingOpen(!isBudgetingOpen);
+              if (!isBudgetingOpen) {
+                setIsBookKeepingOpen(false);
+              }
+            }}
           >
             <div className="nav-link-content">
               <FaWallet className="nav-icon" />
@@ -78,12 +83,15 @@ export default function NavBar() {
           </div>
           {isNavExpanded && isBudgetingOpen && (
             <ul className="submenu">
-              <li className={isActiveRoute('/expensetracker') ? 'active' : ''}>
+              <li className={isActiveRoute('/finances') ? 'active' : ''}>
+                <Link to="/finances">Finances</Link>
+              </li>
+              {/* <li className={isActiveRoute('/expensetracker') ? 'active' : ''}>
                 <Link to="/expensetracker">Expense Tracker</Link>
-              </li>
-              <li className={isActiveRoute('/revenuetracker') ? 'active' : ''}>
+              </li> */}
+              {/* <li className={isActiveRoute('/revenuetracker') ? 'active' : ''}>
                 <Link to="/revenuetracker">Income/Revenue</Link>
-              </li>
+              </li> */}
               <li className={isActiveRoute('/savings') ? 'active' : ''}>
                 <Link to="/savings">Savings</Link>
               </li>
@@ -98,7 +106,12 @@ export default function NavBar() {
         <li className="nav-item">
           <div 
             className={`nav-link ${isBookKeepingOpen ? 'open' : ''} ${location.pathname.includes('/bookkeeping') ? 'active' : ''}`}
-            onClick={() => setIsBookKeepingOpen(!isBookKeepingOpen)}
+            onClick={() => {
+              setIsBookKeepingOpen(!isBookKeepingOpen);
+              if (!isBookKeepingOpen) {
+                setIsBudgetingOpen(false);
+              }
+            }}
           >
             <div className="nav-link-content">
               <FaBook className="nav-icon" />

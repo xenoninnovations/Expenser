@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const inquirer = require('inquirer');
+const prompt = inquirer.createPromptModule(); // 👈 Required fix
 const { exec } = require('child_process');
 
 console.log("Running post-install script...");
@@ -14,7 +15,6 @@ let firebaseKeyExists = false;
 if (fs.existsSync(privateKeyFilePath)) {
     try {
         const content = JSON.parse(fs.readFileSync(privateKeyFilePath, 'utf8'));
-        // Check for expected keys in the Firebase service account key
         if (content.type === 'service_account' && content.private_key && content.client_email) {
             firebaseKeyExists = true;
         }
@@ -23,22 +23,21 @@ if (fs.existsSync(privateKeyFilePath)) {
     }
 }
 
-inquirer
-    .prompt([
-        {
-            type: 'confirm',
-            name: 'continueInstall',
-            message: generateMissingMessage(envExists, firebaseKeyExists),
-            default: false,
-        },
-    ])
+prompt([
+    {
+        type: 'confirm',
+        name: 'continueInstall',
+        message: generateMissingMessage(envExists, firebaseKeyExists),
+        default: false,
+    },
+])
     .then(({ continueInstall }) => {
         if (!continueInstall) {
             console.log('Aborting setup. Add the missing files and try again.');
             return;
         }
 
-        return inquirer.prompt([
+        return prompt([
             {
                 type: 'confirm',
                 name: 'runDev',
@@ -51,24 +50,16 @@ inquirer
         if (devAnswer && devAnswer.runDev) {
             console.log('Starting both the client and server...');
 
-            // First, install nodemon globally if not already installed
             console.log('Checking if nodemon is installed...');
-
             exec('npm list -g nodemon', (err, stdout, stderr) => {
                 if (stderr && stderr.includes('empty')) {
                     console.log('nodemon not found. Installing globally...');
                     exec('npm install -g nodemon', (installErr, installStdout, installStderr) => {
-                        if (installErr) {
-                            console.error(`Error installing nodemon: ${installErr}`);
-                            return;
-                        }
-                        if (installStderr) {
-                            console.error(`Error installing nodemon: ${installStderr}`);
+                        if (installErr || installStderr) {
+                            console.error(`Error installing nodemon: ${installErr || installStderr}`);
                             return;
                         }
                         console.log(`Successfully installed nodemon: ${installStdout}`);
-
-                        // Now, run the server
                         startServer();
                     });
                 } else if (err) {
@@ -79,7 +70,6 @@ inquirer
                     startServer();
                 }
             });
-
         } else if (devAnswer) {
             console.log('Setup complete. You can start the app later with "npm run dev".');
         }

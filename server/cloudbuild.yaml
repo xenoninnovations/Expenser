@@ -1,0 +1,12 @@
+steps:
+  # Build the container image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/expenser-2335/expenser-server', '.']
+    dir: 'server'
+    
+# Images to push to Container Registry
+images:
+  - 'gcr.io/expenser-2335/expenser-server'
+
+options:
+  logging: CLOUD_LOGGING_ONLY 

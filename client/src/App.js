@@ -24,9 +24,18 @@ import React, { useEffect } from "react";
 
 function App() {
   useEffect(() => {
-    fetch("http://localhost:5000")
+    fetch(process.env.REACT_APP_API_URL, {
+      method: 'GET',
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'omit'
+    })
       .then((res) => res.text())
-      .then((data) => console.log(data));
+      .then((data) => console.log(data))
+      .catch(error => console.error('Error:', error));
   }, []);
 
   return (

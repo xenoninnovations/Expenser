@@ -1,0 +1,10 @@
+# Ignore everything
+*
+
+# Then explicitly allow only the files we need
+!index.js
+!package.json
+!package-lock.json
+!Dockerfile
+!private-key.json
+!.dockerignore 

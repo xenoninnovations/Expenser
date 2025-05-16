@@ -1,3 +1,4 @@
+// export default AddPDF;
 import React, { useState } from "react";
 import { getStorage } from "firebase/storage";
 import * as pdfjsLib from 'pdfjs-dist';
@@ -22,21 +23,21 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
             const formFields = [];
-            
+
             // Process each page
             for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
                 const page = await pdf.getPage(pageNum);
                 const textContent = await page.getTextContent();
-                
+
                 // Get page dimensions
                 const viewport = page.getViewport({ scale: 1.0 });
-                
+
                 // Process text items on the page
                 textContent.items.forEach((item, index) => {
                     // Look for common form field indicators
                     const text = item.str.toLowerCase();
                     const isLabel = text.includes(':') || text.includes('?') || text.includes('(');
-                    
+
                     if (isLabel) {
                         // Calculate the position of the potential input field
                         const fieldPosition = {
@@ -67,7 +68,7 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
                     }
                 });
             }
-            
+
             return formFields;
         } catch (error) {
             console.error("PDF Parsing Error:", error);
@@ -106,28 +107,36 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
             // TODO: Look more into this to keep the website more secure
 
             // const token = localStorage.getItem('authToken'); // get a JWT token
-            const response = await fetch('http://localhost:5000/upload-pdf', { //TODO: change to a server name if the website is gonna be stored on firebase hosting
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/upload-pdf`, {
                 method: 'POST',
                 body: formData,
-                // headers: {
-                //     'Authorization': `Bearer ${token}`, // Attach JWT token in the header
-                // }
+                mode: 'cors',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                credentials: 'omit'
             });
 
+            let data;
             const text = await response.text();
-            const data = JSON.parse(text);
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error('Failed to parse response:', text);
+                throw new Error('Invalid server response');
+            }
 
             if (!response.ok) {
                 throw new Error(data.message || "Upload failed");
             }
-            
+
             if (refreshUploadPDF) await refreshUploadPDF();
             closeModal();
         } catch (error) {
             console.error("Error uploading PDF:", error);
             setError(error.message || "Something went wrong");
         } finally {
-           setLoading(false);
+            setLoading(false);
         }
     };
 
@@ -155,7 +164,7 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
             setError("Error selecting file: " + error.message);
         }
     };
- 
+
     return (
         <div className="modal-overlay">
             <div className="modal-content">
@@ -165,7 +174,7 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
                 </p>
 
                 <p>Selected File: {selectedPDFFile?.name || "No file selected"}</p>
-                
+
                 {loading && <div className="loading">Processing PDF...</div>}
                 {error && <div className="error">{error}</div>}
 
@@ -184,22 +193,22 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
                 )}
 
                 <div className="button-group">
-                    <button 
-                        className="modal-button" 
+                    <button
+                        className="modal-button"
                         onClick={browseFile}
                         disabled={loading}
                     >
                         Browse File
                     </button>
-                    <button 
-                        className="modal-button" 
+                    <button
+                        className="modal-button"
                         onClick={handleUpload}
                         disabled={loading || !selectedPDFFile}
                     >
                         Upload PDF File
                     </button>
-                    <button 
-                        className="cancel-button" 
+                    <button
+                        className="cancel-button"
                         onClick={closeModal}
                         disabled={loading}
                     >

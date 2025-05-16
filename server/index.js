@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const PORT = 5000;
+const PORT = parseInt(process.env.PORT) || 8080;
 
 const multer = require('multer');
 const path = require('path');
@@ -9,7 +9,17 @@ const fs = require('fs');
 
 const { exec } = require('child_process');
 
-app.use(cors());
+// Enable CORS for all routes with specific configuration
+app.use(cors({
+    origin: ['https://expenser-2335.web.app', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+    credentials: false,
+    optionsSuccessStatus: 200
+}));
+
+// Handle preflight requests
+app.options('*', cors());
 
 const admin = require('firebase-admin');
 const serviceAccount = require('./private-key.json'); // Path to the Firebase service account JSON file. can be downloaded in the project settings
@@ -39,7 +49,6 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
 
 app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
 
@@ -89,7 +98,6 @@ app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
     }
 });
 
-
 // Function to run the qpdf command as a Promise
 const runQpdf = (inputPath, outputPath) => {
     const command = `qpdf --decrypt "${inputPath}" "${outputPath}"`;
@@ -131,10 +139,39 @@ const clearUploadsFolder = (folderPath) => {
     });
 };
 
-app.listen(PORT, () => {
-    console.log(`Server is listening on http://localhost:${PORT}`);
+// Add health check endpoint
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
 });
 
 app.get("/", (req, res) => {
     res.send("Backend is running!");
+});
+
+// Add detailed logging for startup
+console.log('Starting server with configuration:', {
+    port: PORT,
+    environment: process.env.NODE_ENV,
+    corsOrigins: ['https://expenser-2335.web.app', 'http://localhost:3000']
+});
+
+// Error handling for uncaught exceptions
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.exit(1);
+});
+
+// Start the server with error handling
+const server = app.listen(PORT, '0.0.0.0', (err) => {
+    if (err) {
+        console.error('Failed to start server:', err);
+        process.exit(1);
+    }
+    console.log(`Server is running on 0.0.0.0:${PORT}`);
+    console.log('Server started successfully');
 });

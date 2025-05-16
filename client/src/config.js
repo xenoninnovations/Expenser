@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
@@ -20,4 +21,7 @@ const auth = getAuth(app);
 //database
 const db = getFirestore(app);
 
-export {auth, db}
+//cloud functions
+const functions = getFunctions(app);
+
+export {auth, db, functions}

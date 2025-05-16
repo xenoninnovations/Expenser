@@ -11,9 +11,9 @@ export default function AddTask( { closeModal, fetchOutstandingTasks }) {
   const [formData, setFormData] = useState([{
     client: id,
     date: new Date().toISOString().split("T")[0],
-    taskName: "",
-    duration: "",
-    fee: 0,
+    description: "",
+    amount: 0,
+    currency: "CAD",
     outstanding: true
   }]);
 
@@ -32,9 +32,9 @@ export default function AddTask( { closeModal, fetchOutstandingTasks }) {
       {
         client: id,
         date: new Date().toISOString().split("T")[0],
-        taskName: "",
-        duration: "",
-        fee: 0,
+        description: "",
+        amount: 0,
+        currency: "CAD",
         outstanding: true,
       },
     ]);
@@ -72,12 +72,12 @@ export default function AddTask( { closeModal, fetchOutstandingTasks }) {
         <form onSubmit={handleSubmit}>
           <h4>Services:</h4>
           {formData.map((task, index) => (
-            <div key={task.id} className="field-group">
+            <div key={index} className="field-group">
               <h5>{index+1}.</h5>
               <input 
                 className="field"
                 type="text"
-                name="taskName"
+                name="description"
                 placeholder="Service"
                 value={task.taskName}
                 onChange={(e) => handleChange(index, e)}
@@ -93,19 +93,10 @@ export default function AddTask( { closeModal, fetchOutstandingTasks }) {
               />
               <input 
                 className="field"
-                type="text"
-                name="duration"
-                placeholder="Duration"
-                value={task.duration}
-                onChange={(e) => handleChange(index, e)}
-                required
-              />
-              <input 
-                className="field"
                 type="number"
-                name="fee"
+                name="amount"
                 placeholder="Fee"
-                value={task.fee}
+                value={task.amount}
                 onChange={(e) => handleChange(index, e)}
                 required
               />
@@ -114,8 +105,8 @@ export default function AddTask( { closeModal, fetchOutstandingTasks }) {
               </button>
             </div>
             ))}
-            <button type="button" onClick={addTask} className="modal-button add">+ Add Service</button>
-            <button type="submit" className="modal-button save">Add Task(s)</button>
+            <button type="button" onClick={addTask} className="modal-button add">+ Add Additional Service</button>
+            <button type="submit" className="modal-button save">Save Services</button>
         </form>
 
         <button className="cancel-button" onClick={closeModal}>Cancel</button>

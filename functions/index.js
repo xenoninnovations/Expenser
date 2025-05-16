@@ -48,7 +48,7 @@ exports.createInvoice = onCall(async (data, context) => {
     if (task.client !== email) {
       throw new Error(`Task ${doc.id} belongs to ${task.client} NOT ${email}`);
     }
-    if (!task.fee || !task.description) {
+    if (!task.amount || !task.description) {
       throw new Error(`Task ${doc.id} is missing invoice fields`);
     }
 

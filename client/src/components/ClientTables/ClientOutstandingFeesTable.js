@@ -18,7 +18,7 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
 
   // Calculate total amount
   const totalAmount = tasks?.reduce((sum, task) => {
-    const amount = parseFloat(task.fee);
+    const amount = parseFloat(task.amount);
     return sum + (isNaN(amount) ? 0 : amount);
   }, 0).toFixed(2);
 
@@ -51,7 +51,6 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
             {[
               "Task",
               "Date",
-              "Period",
               "Fee",
               "Invoice",
               "Actions",
@@ -64,10 +63,9 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
           {tasks && tasks.length > 0 ? (
             tasks.map((task) => (
               <tr key={task.id} className="table-row">
-                <td>{task.taskName}</td>
+                <td>{task.description}</td>
                 <td>{task.date}</td>
-                <td>{task.duration}</td>
-                <td>${parseFloat(task.fee || 0).toFixed(2)}</td>
+                <td>${parseFloat(task.amount || 0).toFixed(2)}</td>
                 <td>
                   <div className='centerMe'>
                     <input
@@ -99,9 +97,8 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
           {/* Total Row */}
           <tr className="table-row">
             <td><strong>Total Due:</strong></td>
-            <td colSpan="3"></td>
+            <td colSpan={2}></td>
             <td><strong>${totalAmount}</strong></td>
-            <td></td>
           </tr>
         </tbody>
       </table>

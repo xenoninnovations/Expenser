@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { collection, addDoc, getDocs, where, query, runTransaction, doc, getDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
-import { db } from "../../config.js";
+import { db, functions } from "../../config.js";
 import { FaTrash } from "react-icons/fa";
 import CreateInvoicePdf from "../CreateInvoice/CreateInvoicePdf.js";
+import { httpsCallable } from "firebase/functions";
 
 export default function AddTask( { closeModal, selectedTaskIds, fetchOutstandingTasks }) {
   const { id } = useParams();
@@ -32,6 +33,16 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    try{
+      const invoice = await httpsCallable(functions, "createInvoice")({
+        email: id,
+        taskIds: selectedTaskIds
+      });
+      console.log("INVOICED:", invoice.data)
+    } catch (error) {
+      console.error("ERROR INVOICING: ", error.message)
+    }
+    /*
     try {
       const invoiceId = await runTransaction(db, async (transaction) => {
         const counterRef = doc(db, "metadata", "invoiceNumber");
@@ -64,6 +75,7 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
     } catch(e) {
       console.error("Failed to create invoice: ", e)
     }
+    */
   };
 
   const calcTotal = () => {
@@ -115,17 +127,16 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>Invoice</h2>
+        <h2>Invoicing</h2>
         <form onSubmit={handleSubmit}>
           <h4>Services:</h4>
           {tasks.map((task, index) => (
             <div  key={task.id} >
               <div className="field-group">
                 <h5>{index+1}.</h5>
-                <div><strong>{task.taskName}</strong></div>
+                <div><strong>{task.description}</strong></div>
                 <div><strong>{task.date}</strong></div>
-                <div><strong>{task.duration}</strong></div>
-                <div><strong>${parseFloat(task.fee || 0).toFixed(2)}</strong></div>
+                <div><strong>${parseFloat(task.amount || 0).toFixed(2)}</strong></div>
                 <div></div>
               </div>
               <hr></hr>

@@ -57,7 +57,14 @@ function FillForm({ pdfData, onClose }) {
 
             } catch (err) {
                 console.error("Error converting PDF to JSON:", err);
-                setError("Failed to parse form fields");
+                let errorMsg = "Failed to parse form fields.";
+                if (err && err.message) {
+                    errorMsg += ` Error message: ${err.message}`;
+                }
+                if (err && err.stack) {
+                    errorMsg += `\nStack trace: ${err.stack}`;
+                }
+                setError(errorMsg);
             }
         };
         convertPdfToJson();

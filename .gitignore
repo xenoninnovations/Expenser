@@ -22,9 +22,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Ignore environment variable files
-.env
-**/env/
+# Ignore all environment variable files
+**/.env
 
 .boilerplate
 

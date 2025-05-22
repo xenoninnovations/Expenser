@@ -26,7 +26,7 @@ import React, { useEffect } from "react";
 function App() {
 
   useEffect(() => {
-    fetch("http://localhost:5000")
+    fetch("http://localhost:3000")
       .then((res) => res.text())
       .then((data) => console.log(data));
   }, []);
@@ -46,17 +46,10 @@ function App() {
         <Route path="/clientmanagement" element={<Clientmanagement />} />
         <Route path="/addclientform" element={<AddClientForm />} />
         <Route path="/revenuetracker" element={<RevenueTracker />} />
-        <Route path="/invoicing" element={<Invoicing />} />
+        <Route path="/emails" element={<EmailViewer />} />
 
         {/* TEMP */}
         <Route path="/document-drafting" element={<UploadPDF />} />
-
-        
-        {/* Document Drafting Routes */}
-        {/* <Route path="/uploadpdf" element={<UploadPDF />} />
-        <Route path="/templates" element={<Templates />} />
-        <Route path="/document-library" element={<DocumentLibrary />} />
-        <Route path="/email" element={<EmailViewer />} /> */}
       </Routes>
     </BrowserRouter>
   );

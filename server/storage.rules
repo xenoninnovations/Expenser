@@ -1,0 +1,22 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow public read and write access to PDFs
+    match /pdfs/{fileName} {
+      allow read: if request.origin.matches('http://localhost:3000') || request.origin.matches('https://expenser-2335.web.app');
+      allow write: if true;  // Anyone can write PDFs
+    }
+
+    // Allow authenticated users to write filled forms
+    match /filledForms/{formId} {
+      allow read: if request.auth != null;  // Only authenticated users can read their filled forms
+      allow write: if request.auth != null;  // Only authenticated users can write filled forms
+    }
+
+    // Default deny for all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+} 

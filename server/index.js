@@ -83,62 +83,113 @@ const upload = multer({
 });
 
 // Enable CORS
+const allowedOrigins = [
+    'http://localhost:3000',  // Development
+    'https://expenser-2335.web.app'  // Production
+];
+
 app.use(cors({
-    origin: ['https://expenser-2335.web.app', 'http://localhost:3000'],
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
-    credentials: true
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }));
 
 // Parse JSON bodies
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Add error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Server error:', err);
+    res.status(500).json({
+        success: false,
+        error: {
+            message: err.message || 'Internal server error',
+            details: err.stack
+        }
+    });
+});
 
 // PDF Upload endpoint
 app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
-    console.log('Received upload request:', {
-        hasFile: !!req.file,
-        body: req.body,
-        headers: req.headers
-    });
-
-    if (!req.file) {
-        console.error('No file uploaded');
-        return res.status(400).json({
-            success: false,
-            error: {
-                code: 'NO_FILE',
-                message: 'No file uploaded',
-                details: 'Please select a PDF file to upload'
-            }
-        });
-    }
-
-    console.log('File received:', {
+    console.log('\n=== SERVER: Upload Request Received ===');
+    console.log('Time:', new Date().toISOString());
+    console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
+    console.log('Request Body:', JSON.stringify(req.body, null, 2));
+    console.log('Request File:', req.file ? {
         filename: req.file.filename,
         originalname: req.file.originalname,
-        path: req.file.path,
         size: req.file.size,
-        mimetype: req.file.mimetype
-    });
-
-    // Use absolute paths
-    const inputPath = req.file.path;
-    const outputPath = path.join('/usr/src/app/uploads', `decrypted-${req.file.originalname}`);
-
-    console.log('File paths:', {
-        inputPath,
-        outputPath,
-        exists: {
-            input: fs.existsSync(inputPath),
-            output: fs.existsSync(outputPath)
-        },
-        permissions: {
-            input: fs.statSync(inputPath).mode,
-            uploadsDir: fs.statSync('/usr/src/app/uploads').mode
-        }
-    });
+        mimetype: req.file.mimetype,
+        path: req.file.path
+    } : 'No file');
 
     try {
+        if (!req.file) {
+            console.error('SERVER ERROR: No file uploaded');
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'NO_FILE',
+                    message: 'No file uploaded',
+                    details: 'Please select a PDF file to upload'
+                }
+            });
+        }
+
+        // Use absolute paths
+        const inputPath = req.file.path;
+        const outputPath = path.join('/usr/src/app/uploads', `decrypted-${req.file.originalname}`);
+
+        console.log('\n=== SERVER: File Paths ===');
+        console.log('Input Path:', inputPath);
+        console.log('Output Path:', outputPath);
+        console.log('File Exists:', {
+            input: fs.existsSync(inputPath),
+            output: fs.existsSync(outputPath)
+        });
+
+        // Check if this is a password-protected PDF
+        const isPasswordProtected = req.body.isPasswordProtected === 'true';
+        const password = req.body.password;
+
+        console.log('\n=== SERVER: PDF Protection Status ===');
+        console.log('Is Password Protected:', isPasswordProtected);
+        if (isPasswordProtected) {
+            console.log('Password provided:', password ? 'Yes' : 'No');
+        }
+
+        // Check file permissions
+        try {
+            const inputStats = fs.statSync(inputPath);
+            const uploadsDirStats = fs.statSync('/usr/src/app/uploads');
+            console.log('\n=== SERVER: File Permissions ===');
+            console.log('Input File:', {
+                mode: inputStats.mode,
+                uid: inputStats.uid,
+                gid: inputStats.gid
+            });
+            console.log('Uploads Directory:', {
+                mode: uploadsDirStats.mode,
+                uid: uploadsDirStats.uid,
+                gid: uploadsDirStats.gid
+            });
+        } catch (statError) {
+            console.error('\n=== SERVER ERROR: File Stats ===');
+            console.error('Error checking file stats:', statError);
+        }
+
+        console.log('\n=== SERVER: Starting PDF Processing ===');
         // Verify input file exists and is readable
         if (!fs.existsSync(inputPath)) {
             throw {
@@ -151,11 +202,17 @@ app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
         // Ensure output directory exists
         const outputDir = path.dirname(outputPath);
         if (!fs.existsSync(outputDir)) {
+            console.log('Creating output directory:', outputDir);
             fs.mkdirSync(outputDir, { recursive: true, mode: 0o755 });
         }
 
-        console.log('Attempting to decrypt PDF...');
-        const qpdfCommand = `qpdf --decrypt "${inputPath}" "${outputPath}"`;
+        console.log('\n=== SERVER: Attempting PDF Decryption ===');
+        let qpdfCommand;
+        if (isPasswordProtected && password) {
+            qpdfCommand = `qpdf --password="${password}" --decrypt "${inputPath}" "${outputPath}"`;
+        } else {
+            qpdfCommand = `qpdf --decrypt "${inputPath}" "${outputPath}"`;
+        }
         console.log('Running qpdf command:', qpdfCommand);
 
         try {
@@ -163,6 +220,15 @@ app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
             console.log('qpdf stdout:', stdout);
             if (stderr) console.log('qpdf stderr:', stderr);
         } catch (qpdfError) {
+            console.error('\n=== SERVER ERROR: QPDF Error ===');
+            console.error('Error details:', qpdfError);
+            if (isPasswordProtected) {
+                throw {
+                    code: 'INVALID_PASSWORD',
+                    message: 'Invalid password for PDF',
+                    details: qpdfError.message
+                };
+            }
             throw {
                 code: 'QPDF_ERROR',
                 message: 'Failed to decrypt PDF',
@@ -180,7 +246,8 @@ app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
             };
         }
 
-        console.log('PDF decrypted successfully, size:', fs.statSync(outputPath).size);
+        console.log('\n=== SERVER: PDF Processing Complete ===');
+        console.log('Decrypted file size:', fs.statSync(outputPath).size);
 
         console.log('Uploading to Firebase Storage...');
         const file = bucket.file(`pdfs/${req.file.originalname}`);
@@ -349,12 +416,11 @@ app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
             }
         });
     } catch (error) {
-        console.error("Error uploading PDF:", {
-            code: error.code,
-            message: error.message,
-            details: error.details,
-            stack: error.stack
-        });
+        console.error('\n=== SERVER ERROR: Upload Process ===');
+        console.error('Error Type:', error.name);
+        console.error('Error Message:', error.message);
+        console.error('Error Stack:', error.stack);
+        console.error('Full Error:', JSON.stringify(error, null, 2));
 
         // Clean up any files that might have been created
         try {
@@ -376,6 +442,65 @@ app.post('/upload-pdf', upload.single('pdf'), async (req, res) => {
                 code: error.code || 'UNKNOWN_ERROR',
                 message: error.message || 'An unknown error occurred',
                 details: error.details || error.stack
+            }
+        });
+    }
+});
+
+// Add the update-pdf-fields endpoint
+app.post('/update-pdf-fields', async (req, res) => {
+    console.log('=== SERVER: Update PDF Fields Request ===');
+    try {
+        const { pdfUrl, formFields } = req.body;
+
+        if (!pdfUrl || !formFields) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    message: 'Missing required fields: pdfUrl and formFields are required'
+                }
+            });
+        }
+
+        // Get the file path from the URL
+        const filePath = pdfUrl.split('/o/')[1].split('?')[0];
+        const decodedPath = decodeURIComponent(filePath);
+        const fileName = decodedPath.split('/').pop();
+
+        // Update the file metadata in Firestore
+        const db = admin.firestore();
+        const pdfsRef = db.collection('pdfs');
+
+        // Find the document with matching URL
+        const querySnapshot = await pdfsRef.where('url', '==', pdfUrl).get();
+
+        if (querySnapshot.empty) {
+            return res.status(404).json({
+                success: false,
+                error: {
+                    message: 'PDF document not found'
+                }
+            });
+        }
+
+        // Update the first matching document
+        const docRef = querySnapshot.docs[0].ref;
+        await docRef.update({
+            formFields: formFields,
+            updatedAt: new Date().toISOString()
+        });
+
+        console.log('=== SERVER: PDF Fields Updated Successfully ===');
+        res.status(200).json({
+            success: true,
+            message: 'PDF fields updated successfully'
+        });
+    } catch (error) {
+        console.error('=== SERVER ERROR: Update PDF Fields ===', error);
+        res.status(500).json({
+            success: false,
+            error: {
+                message: error.message || 'Failed to update PDF fields'
             }
         });
     }
@@ -489,30 +614,18 @@ async function startServer() {
     }
 }
 
-// Handle uncaught exceptions
+// Add error handling for uncaught exceptions
 process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', {
-        code: error.code,
-        message: error.message,
-        stack: error.stack
-    });
-    // Give time for logging before exit
-    setTimeout(() => {
-        process.exit(1);
-    }, 1000);
+    console.error('=== SERVER CRASH: Uncaught Exception ===');
+    console.error('Error:', error);
+    console.error('Stack:', error.stack);
 });
 
-// Handle unhandled promise rejections
+// Add error handling for unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', {
-        promise: promise,
-        reason: reason,
-        stack: reason.stack
-    });
-    // Give time for logging before exit
-    setTimeout(() => {
-        process.exit(1);
-    }, 1000);
+    console.error('=== SERVER CRASH: Unhandled Promise Rejection ===');
+    console.error('Reason:', reason);
+    console.error('Promise:', promise);
 });
 
 // Start the server
@@ -524,4 +637,10 @@ startServer().catch(error => {
         stack: error.stack
     });
     process.exit(1);
+});
+
+// Add a test endpoint to verify server is running
+app.get('/test', (req, res) => {
+    console.log('=== SERVER: Test Endpoint Hit ===');
+    res.json({ status: 'ok', message: 'Server is running' });
 });

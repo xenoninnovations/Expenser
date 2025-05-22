@@ -22,7 +22,7 @@ function UploadPDF() {
   const [isFillFormOpen, setIsFillFormOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPCDLoading, setIsPCDLoading] = useState(true);
-
+  const [deletingPdfs, setDeletingPdfs] = useState(new Set()); // Track PDFs being deleted
 
   const [selectedPdf, setSelectedPdf] = useState(null);
   const [pdfCollectionData, setPdfCollectionData] = useState([]);
@@ -85,11 +85,26 @@ function UploadPDF() {
     setIsFillFormOpen(true);
   };
 
-  const handleDelete = async (pdf) => {
+  const handleDeleteStart = (pdfId) => {
+    setDeletingPdfs(prev => {
+      if (prev.has(pdfId)) return prev; // Already deleting
+      const newSet = new Set(prev);
+      newSet.add(pdfId);
+      return newSet;
+    });
+    setPdfCollectionData(prevPdfs => prevPdfs.filter(pdf => pdf.id !== pdfId));
+    setIsDeleteModalOpen(false);
+    setSelectedPdf(null);
+  };
+
+  const handleDelete = (pdf) => {
+    // Don't allow deletion if this PDF is already being deleted
+    if (deletingPdfs.has(pdf.id)) {
+      return;
+    }
     setSelectedPdf(pdf);
     setIsDeleteModalOpen(true);
   };
-
 
   return (
     <div className="page">
@@ -140,7 +155,7 @@ function UploadPDF() {
                   <tr key={pdf_data.id || pdf_data.name} className="table-row">
                     <td>{pdf_data.name || "N/A"}</td>
                     <td>{formatBytes(pdf_data.size) || "N/A"}</td>
-                    <td>{pdf_data.contentType.split('/')[1] || "N/A"}</td>
+                    <td>{pdf_data.contentType ? pdf_data.contentType.split('/')[1] : "N/A"}</td>
                     <td>{pdf_data.updated || "N/A"}</td>
                     <td>
                       {pdf_data.url ? (
@@ -155,10 +170,15 @@ function UploadPDF() {
                       <FaPen
                         className="icon edit-icon"
                         onClick={() => handleFillForm(pdf_data)}
+                        style={{ opacity: deletingPdfs.has(pdf_data.id) ? 0.5 : 1 }}
                       />
                       <FaTrash
                         className="icon delete-icon"
                         onClick={() => handleDelete(pdf_data)}
+                        style={{
+                          opacity: deletingPdfs.has(pdf_data.id) ? 0.5 : 1,
+                          cursor: deletingPdfs.has(pdf_data.id) ? 'not-allowed' : 'pointer'
+                        }}
                       />
                     </td>
                   </tr>
@@ -205,11 +225,11 @@ function UploadPDF() {
         <DeletePDF
           closeModal={() => {
             setIsDeleteModalOpen(false);
-            loadAllPdfs(); // Refresh after deleting
+            setSelectedPdf(null);
           }}
           pdf={selectedPdf}
           refreshAllPdfs={loadAllPdfs}
-
+          onDeleteStart={handleDeleteStart}
         />
       )}
     </div>
@@ -217,6 +237,10 @@ function UploadPDF() {
 }
 
 function formatBytes(bytes) {
+  if (bytes === undefined || bytes === null) {
+    return "N/A";
+  }
+
   const units = ["bytes", "KB", "MB", "GB", "TB"];
   let index = 0;
 

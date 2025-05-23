@@ -96,7 +96,7 @@ function App() {
           <Route path="/clientmanagement" element={<Clientmanagement />} />
           <Route path="/addclient" element={<AddClientForm />} />
           <Route path="/client/:id" element={<ClientInfo />} />
-          <Route path="/expensetracker" element={<ExpenseTracker />} />
+          {/* <Route path="/expensetracker" element={<ExpenseTracker />} /> */}
           <Route path="/revenuetracker" element={<RevenueTracker />} />
 
           {/* Document Drafting Routes */}

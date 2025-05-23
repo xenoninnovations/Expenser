@@ -18,20 +18,16 @@ function DeletePDF({ closeModal, pdf, refreshAllPdfs, onDeleteStart }) {
             // Start the deletion process in the background
             (async () => {
                 try {
-                    // Start both deletions in parallel
-                    await Promise.all([
-                        // Delete the PDF file from storage
-                        (async () => {
-                            const storage = getStorage();
-                            const fileRef = ref(storage, `pdfs/${pdf.name}`);
-                            await deleteObject(fileRef);
-                        })(),
+                    // Add a small delay to prevent rapid-fire deletions
+                    await new Promise(resolve => setTimeout(resolve, 100));
 
-                        // Delete metadata from Firestore
-                        (async () => {
-                            await deleteDoc(doc(db, 'pdfs', pdf.id));
-                        })()
-                    ]);
+                    // Delete the PDF file from storage first
+                    const storage = getStorage();
+                    const fileRef = ref(storage, `pdfs/${pdf.name}`);
+                    await deleteObject(fileRef);
+
+                    // Then delete metadata from Firestore
+                    await deleteDoc(doc(db, 'pdfs', pdf.id));
 
                     // Only refresh if the optimistic update wasn't provided
                     if (!onDeleteStart && refreshAllPdfs) {

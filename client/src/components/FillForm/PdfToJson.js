@@ -1,5 +1,5 @@
 import * as pdfjsLib from 'pdfjs-dist';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, rgb } from 'pdf-lib';
 import { getStorage, ref, getDownloadURL, getBytes } from 'firebase/storage';
 
 // Add debug logging for PDF.js version
@@ -84,9 +84,21 @@ export async function DownloadUpdatedJsonToPdf(pdfData, jsonResult) {
         const pdfDoc = await PDFDocument.load(arrayBuffer);
         const form = pdfDoc.getForm();
 
-        // Set values
+        // // Set empty values for editable input fields before filling the PDF
+        // for (let i = 0; i < jsonResult.length; i++) {
+        //     const inputField = jsonResult[i].inputField;
+        //     const fieldType = jsonResult[i].fieldType;
+        //     if (
+        //         fieldType === 'text' &&
+        //         (!inputField.value || inputField.value === '')
+        //     ) {
+        //         inputField.value = 'Empty';
+        //     }
+        // }
+
+        // Now fill the PDF fields using the updated values
         for (let i = 0; i < jsonResult.length; i++) {
-            const { fieldName, value: fieldValue, options } = jsonResult[i].inputField;
+            const { fieldName, value: fieldValue, options, x, y, width, height, page } = jsonResult[i].inputField;
             const field = form.getFieldMaybe?.(fieldName);
 
             if (!field) {
@@ -99,6 +111,7 @@ export async function DownloadUpdatedJsonToPdf(pdfData, jsonResult) {
             console.log(`Processing field: ${fieldName}, Type: ${fieldType}, Value: ${fieldValue}`);
 
             try {
+                // Only handle normal field filling, do not draw any lines or dots for fields
                 switch (fieldType) {
                     case 'text':
                         if (typeof field.setText === 'function') {
@@ -148,6 +161,31 @@ export async function DownloadUpdatedJsonToPdf(pdfData, jsonResult) {
                 }
             } catch (fieldError) {
                 console.error(`Error setting value for field ${fieldName}:`, fieldError);
+            }
+        }
+
+        // Add a red dot at the top-left corner of each editable text field
+        for (let i = 0; i < jsonResult.length; i++) {
+            const inputField = jsonResult[i].inputField;
+            const fieldType = jsonResult[i].fieldType;
+            if (
+                fieldType === 'text' &&
+                inputField.rect &&
+                (!inputField.value || inputField.value === '')
+            ) {
+                const pdfPage = pdfDoc.getPage(inputField.page - 1);
+                const [x1, y1, x2, y2] = inputField.rect;
+                const left = Math.min(x1, x2);
+                const right = Math.max(x1, x2);
+                const bottom = Math.min(y1, y2);
+                const top = Math.max(y1, y2);
+
+                pdfPage.drawLine({
+                    start: { x: left, y: top },
+                    end: { x: right, y: bottom },
+                    thickness: 1.5,
+                    color: rgb(0, 0, 0),
+                });
             }
         }
 
@@ -284,6 +322,7 @@ async function processPdfData(arrayBuffer) {
                             width,
                             height,
                             page: i,
+                            rect: rect,
                         },
                     };
 

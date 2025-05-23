@@ -4,65 +4,25 @@ import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 
 function FillForm({ pdfData, onClose }) {
     const [loading, setLoading] = useState(false);
-    const [parsingLoading, setParsingLoading] = useState(true);
     const [error, setError] = useState(null);
     const [pdfJsonData, setPdfJsonData] = useState([]);
 
-    // Initialize form values
     useEffect(() => {
         const convertPdfToJson = async () => {
-            setParsingLoading(true);
-            setError(null);
-
             try {
-                console.log('=== PDF Form Processing ===');
-                console.log('PDF Data:', pdfData);
-                console.log('PDF URL:', pdfData?.url);
-
-                if (!pdfData?.url) {
-                    throw new Error('No PDF URL provided');
-                }
-
-                // Check if URL is from Firebase Storage
-                if (pdfData.url.includes('firebasestorage.googleapis.com')) {
-                    console.log('PDF is hosted on Firebase Storage');
-                } else {
-                    console.log('PDF is hosted on:', new URL(pdfData.url).origin);
-                }
-
-                console.log('Attempting to fetch PDF...');
                 const jsonResult = await PdfToJson.convertPdfToJson(pdfData.url);
-                console.log('Form fields extracted:', jsonResult);
+                setPdfJsonData(jsonResult);
+                console.log(jsonResult);
 
-                if (!jsonResult || jsonResult.length === 0) {
-                    setError("No form fields found in this PDF. This might be a regular PDF without form fields.");
+                if (jsonResult.length === 0) {
+                    setError("No form fields found in this PDF");
                     return;
                 }
-
-                setPdfJsonData(jsonResult);
             } catch (err) {
-                console.error("=== PDF Processing Error ===");
-                console.error("Error type:", err.name);
-                console.error("Error message:", err.message);
-                console.error("Error stack:", err.stack);
-
-                let errorMsg = "Failed to parse form fields.";
-
-                if (err.message) {
-                    errorMsg = err.message;
-                }
-
-                // Add more context to network errors
-                if (err.name === 'TypeError' && err.message.includes('fetch')) {
-                    errorMsg = `Network error: Unable to reach the PDF server. Please check if the PDF URL is accessible: ${pdfData?.url}`;
-                }
-
-                setError(errorMsg);
-            } finally {
-                setParsingLoading(false);
+                console.error("Error converting PDF to JSON:", err);
+                setError("Failed to parse form fields");
             }
         };
-
         convertPdfToJson();
     }, [pdfData]);
 
@@ -105,42 +65,24 @@ function FillForm({ pdfData, onClose }) {
             onClose();
         } catch (error) {
             console.error('Error generating PDF:', error);
-            setError(error.message || 'Failed to generate filled PDF');
+            if (error.name === 'AbortError') {
+                setError('Request timed out while loading the PDF');
+            } else if (error.message.includes('Failed to load PDF')) {
+                setError('Unable to access the PDF file. Please check if the file exists and is accessible.');
+            } else {
+                setError('Error generating filled PDF: ' + error.message);
+            }
         } finally {
             setLoading(false);
         }
     };
 
-    if (parsingLoading) {
-        return (
-            <div className="fill-form-modal">
-                <div className="fill-form-content">
-                    <LoadingSpinner size="large" text="Loading form fields..." />
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
+    if (!pdfData?.formFields || pdfData.formFields.length === 0) {
         return (
             <div className="fill-form-modal">
                 <div className="fill-form-content">
                     <h2>Error</h2>
-                    <p>{error}</p>
-                    <button className="cancel-button" onClick={onClose}>
-                        Close
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    if (!pdfJsonData || pdfJsonData.length === 0) {
-        return (
-            <div className="fill-form-modal">
-                <div className="fill-form-content">
-                    <h2>No Form Fields</h2>
-                    <p>This PDF does not contain any form fields that can be filled out.</p>
+                    <p>No form fields found in this PDF.</p>
                     <button className="cancel-button" onClick={onClose}>
                         Close
                     </button>
@@ -155,46 +97,47 @@ function FillForm({ pdfData, onClose }) {
                 <h2>Fill Form: {pdfData.name}</h2>
 
                 <div className="form-fields">
-                    {pdfJsonData.map((fieldObj, idx) => {
-                        const { label, inputField } = fieldObj;
-                        const name = inputField.fieldName;
-                        const type = (inputField.inputType || '').toLowerCase();
-                        let value = inputField.value ?? '';
-                        const options = inputField.options || [];
-                        const { width, height } = inputField;
+                    {pdfJsonData.length === 0 ? (
+                        <p>Attempting to load form…</p>
+                    ) : (
+                        pdfJsonData.map((fieldObj, idx) => {
+                            const { label, inputField } = fieldObj;
+                            const name = inputField.fieldName;
+                            const type = (inputField.inputType || '').toLowerCase();
+                            let value = inputField.value ?? '';
+                            const options = inputField.options || [];
+                            const { width, height } = inputField;
 
-                        //Ignore the ones we dont want
-                        if (type === '' || /^field\s?\d+$/i.test(label.trim().toLowerCase())) {
-                            return null;
-                        }
+                            if (type === '' || /^field\s?\d+$/i.test(label.trim().toLowerCase())) {
+                                return null;
+                            }
 
-                        // Handling multi-value checkboxes
-                        if (type === 'ch' && Array.isArray(value)) {
-                            value = value[0] || '';
-                        }
+                            if (type === 'ch' && Array.isArray(value)) {
+                                value = value[0] || '';
+                            }
 
-                        return (
-                            <div key={idx} className="form-field">
-                                <label htmlFor={name} className="field-label">
-                                    {Array.isArray(label) ? label[0] : label}
-                                </label>
+                            return (
+                                <div key={idx} className="form-field">
+                                    <label htmlFor={name} className="field-label">
+                                        {Array.isArray(label) ? label[0] : label}
+                                    </label>
 
-                                {type === 'chk' ? (
-                                    <div className="checkbox-container">
-                                        <input
-                                            type="checkbox"
+                                    {type === 'chk' ? (
+                                        <div className="checkbox-container">
+                                            <input
+                                                type="checkbox"
+                                                id={name}
+                                                checked={value !== 'Off' && !!value}
+                                                onChange={e => handleInputChange(idx, e.target.checked)}
+                                                className="field-input"
+                                            />
+                                            {Array.isArray(label) && label[1] && (
+                                                <span className="checkbox-label">{label[1]}</span>
+                                            )}
+                                        </div>
+                                    ) : type === 'ch' ? (
+                                        <select
                                             id={name}
-                                            checked={!!value}
-                                            onChange={e => handleInputChange(idx, e.target.checked)}
-                                            className="field-input"
-                                        />
-                                        {Array.isArray(label) && label[1] && (
-                                            <span className="checkbox-label">{label[1]}</span>
-                                        )}
-                                    </div>
-                                ) : type === 'ch' ? (
-                                    <select
-                                        id={name}
                                             value={value || ''}
                                             onChange={e => handleInputChange(idx, e.target.value)}
                                             className="field-input select-dropdown"
@@ -206,7 +149,7 @@ function FillForm({ pdfData, onClose }) {
                                                 </option>
                                             ))}
                                         </select>
-                                    ) : (
+                                        ) : height > 20 ? (
                                         <textarea
                                             id={name}
                                             value={value}
@@ -221,11 +164,23 @@ function FillForm({ pdfData, onClose }) {
                                                 lineHeight: '1'
                                             }}
                                         />
-                                )}
-                            </div>
-                        );
-                    })}
+                                            ) : (
+                                                <input
+                                                    type="text"
+                                                    id={name}
+                                                    value={value}
+                                                    onChange={e => handleInputChange(idx, e.target.value)}
+                                                    className="field-input"
+                                                    style={{ height: `${height * 2}px`, width: `${width * 1.5}px`, maxWidth: '100%' }}
+                                                />
+                                    )}
+                                </div>
+                            );
+                        })
+                    )}
                 </div>
+
+                {error && <div className="error">{error}</div>}
 
                 <div className="button-group" style={{ marginTop: '24px' }}>
                     <button

@@ -68,7 +68,7 @@ function IncomeRevenue() {
 
   useEffect(() => {
     fetchRevenueData();
-  }, []);
+  }, [fetchRevenueData]);
 
   return (
     <div className="page">

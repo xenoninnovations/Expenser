@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { PublicClientApplication } from "@azure/msal-browser";
 import { db } from "../../config";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs, doc, getDoc } from "firebase/firestore";
 import Navbar from "../NavBar/NavBar";
 import "../../pages/assets/styles/global.css";
 import "./EmailViewer.css";
@@ -55,15 +55,6 @@ function EmailViewer() {
       };
 
       const response = await msalInstance.loginPopup(loginRequest);
-
-      // Store the access token in Firestore
-      const userDoc = await addDoc(collection(db, "users"), {
-        uid: response.account.username,
-        email: response.account.username,
-        accessToken: response.accessToken,
-        refreshToken: response.refreshToken,
-        createdAt: new Date().toISOString(),
-      });
 
       setIsAuthenticated(true);
       await fetchEmails(response.accessToken);

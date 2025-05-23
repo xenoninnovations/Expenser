@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Navbar from "../../components/NavBar/NavBar";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../config";
@@ -11,26 +11,20 @@ function Home() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   let navigate = useNavigate();
 
-  const handleSignup = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-      setSuccess("Account Created Successfully");
-      console.log(success);
-      navigate('/moreinfo');
+      await createUserWithEmailAndPassword(auth, email, password);
+      navigate('/signin');
     } catch (error) {
-      console.log(error);
+      setError(error.message);
     }
   };
+
   return (
     <div className="page" id="signin-page">
       <div className="signin-container">
@@ -41,7 +35,7 @@ function Home() {
             information with anyone!
           </p>
         </div>
-        <form id="signin-form" onSubmit={handleSignup}>
+        <form id="signin-form" onSubmit={handleSubmit}>
           <input
             name="email"
             type="email"

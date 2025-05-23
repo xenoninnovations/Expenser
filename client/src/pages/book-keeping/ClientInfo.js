@@ -66,7 +66,7 @@ const ClientInfo = () => {
 
   useEffect(() => {
     fetchClientAndCases();
-  }, [id]);
+  }, [fetchClientAndCases]);
 
   const handleEditClick = (caseId) => {
     setSelectedCase(caseId);

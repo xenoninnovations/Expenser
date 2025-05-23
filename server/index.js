@@ -644,3 +644,27 @@ app.get('/test', (req, res) => {
     console.log('=== SERVER: Test Endpoint Hit ===');
     res.json({ status: 'ok', message: 'Server is running' });
 });
+
+// Add this near your other endpoints
+app.get('/debug/versions', async (req, res) => {
+    try {
+        const { exec } = require('child_process');
+        exec('npm list pdf-lib pdfjs-dist', (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error: ${error}`);
+                return res.status(500).json({ error: error.message });
+            }
+            if (stderr) {
+                console.error(`Stderr: ${stderr}`);
+            }
+            res.json({
+                versions: stdout,
+                environment: process.env.NODE_ENV,
+                nodeVersion: process.version
+            });
+        });
+    } catch (error) {
+        console.error('Debug endpoint error:', error);
+        res.status(500).json({ error: error.message });
+    }
+});

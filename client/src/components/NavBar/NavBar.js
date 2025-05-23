@@ -92,12 +92,12 @@ export default function NavBar() {
               {/* <li className={isActiveRoute('/revenuetracker') ? 'active' : ''}>
                 <Link to="/revenuetracker">Income/Revenue</Link>
               </li> */}
-              <li className={isActiveRoute('/savings') ? 'active' : ''}>
+              {/* <li className={isActiveRoute('/savings') ? 'active' : ''}>
                 <Link to="/savings">Savings</Link>
               </li>
               <li className={isActiveRoute('/transactions') ? 'active' : ''}>
                 <Link to="/transactions">Transactions</Link>
-              </li>
+              </li> */}
             </ul>
           )}
         </li>
@@ -124,18 +124,18 @@ export default function NavBar() {
               <li className={isActiveRoute('/clientmanagement') ? 'active' : ''}>
                 <Link to="/clientmanagement">Client Management</Link>
               </li>
-              <li className={isActiveRoute('/conflict-check') ? 'active' : ''}>
+              {/* <li className={isActiveRoute('/conflict-check') ? 'active' : ''}>
                 <Link to="/conflict-check">Conflict Check</Link>
-              </li>
+              </li> */}
               <li className={isActiveRoute('/document-drafting') ? 'active' : ''}>
                 <Link to="/document-drafting">Document Drafting</Link>
               </li>
-              <li className={isActiveRoute('/invoicing') ? 'active' : ''}>
+              {/* <li className={isActiveRoute('/invoicing') ? 'active' : ''}>
                 <Link to="/invoicing">Invoicing & Payments</Link>
-              </li>
-              <li className={isActiveRoute('/cost-breakdown') ? 'active' : ''}>
+              </li> */}
+              {/* <li className={isActiveRoute('/cost-breakdown') ? 'active' : ''}>
                 <Link to="/cost-breakdown">Cost Breakdown</Link>
-              </li>
+              </li> */}
             </ul>
           )}
         </li>
@@ -150,7 +150,7 @@ export default function NavBar() {
 
         {/* Email */}
         <li className="nav-item">
-          <Link to="/emails" className={isActiveRoute('/email') ? 'active' : ''}>
+          <Link to="/emailviewer" className={isActiveRoute('/emailviewer') ? 'active' : ''}>
             <FaEnvelope className="nav-icon" />
             {isNavExpanded && <span>Email</span>}
           </Link>

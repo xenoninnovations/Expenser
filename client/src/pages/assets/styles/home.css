@@ -140,6 +140,7 @@
 
 /* --- Clients Section --- */
 .clients-section {
+  display: none;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0,0,0,0.08);
@@ -185,8 +186,8 @@
   font-size: 3rem;
   color: #bbb;
   margin-bottom: 8px;
-  width: 106px;
-  height: 106px;
+  width: 1vh;
+  height: 1vh;
   border-radius: 50%;
   border: 3px solid #ffda16;
 }

@@ -167,21 +167,43 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
         try {
             const arrayBuffer = await file.arrayBuffer();
             try {
-                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-                // Detect AcroForm (regular PDF) using pdf._pdfInfo.acroForm
+                const pdf = await pdfjsLib.getDocument({
+                    data: arrayBuffer,
+                    cMapUrl: "https://unpkg.com/pdfjs-dist@latest/cmaps/",
+                    cMapPacked: true,
+                    standardFontDataUrl: "https://unpkg.com/pdfjs-dist@latest/standard_fonts/",
+                }).promise;
+
+                console.log('PDF Info:', pdf._pdfInfo);
+
+                // Check for XFA form
+                if (pdf._pdfInfo && pdf._pdfInfo.xfa) {
+                    console.log('Detected XFA form');
+                    setPdfType("XFA Form");
+                    // Handle XFA form differently if needed
+                }
+
+                // Check for AcroForm
                 if (pdf._pdfInfo && pdf._pdfInfo.acroForm) {
+                    console.log('Detected AcroForm');
                     setPdfType("AcroForm/Regular PDF");
                     return await extractFormFieldsFromAcroForm(pdf);
                 }
+
+                // If no form detected, try to detect form fields from text
+                console.log('No form detected, attempting to detect fields from text');
                 setPdfType("Plain PDF (no AcroForm)");
                 const formFields = [];
+
                 for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
                     const page = await pdf.getPage(pageNum);
                     const textContent = await page.getTextContent();
                     const viewport = page.getViewport({ scale: 1.0 });
+
                     textContent.items.forEach((item, index) => {
                         const text = item.str.toLowerCase();
                         const isLabel = text.includes(':') || text.includes('?') || text.includes('(');
+
                         if (isLabel) {
                             const fieldPosition = {
                                 x: item.transform[4],
@@ -190,6 +212,7 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
                                 height: 20,
                                 page: pageNum
                             };
+
                             let fieldType = 'text';
                             if (text.includes('date')) fieldType = 'date';
                             if (text.includes('email')) fieldType = 'email';
@@ -197,6 +220,7 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
                             if (text.includes('amount') || text.includes('$')) fieldType = 'number';
                             if (text.includes('signature')) fieldType = 'signature';
                             if (text.includes('check') || text.includes('box')) fieldType = 'checkbox';
+
                             formFields.push({
                                 id: `field_${pageNum}_${index}`,
                                 label: item.str,
@@ -208,8 +232,10 @@ function AddPDF({ closeModal, pdfID, refreshUploadPDF }) {
                         }
                     });
                 }
+
                 return formFields;
             } catch (error) {
+                console.error('PDF parsing error:', error);
                 if (error.name === 'PasswordException') {
                     setShowPasswordModal(true);
                     throw new Error('Password required');

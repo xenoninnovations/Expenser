@@ -1,0 +1,32 @@
+[
+    {
+        "origin": [
+            "http://localhost:3000",
+            "https://expenser-2335.web.app"
+        ],
+        "method": [
+            "GET",
+            "POST",
+            "PUT",
+            "DELETE",
+            "HEAD"
+        ],
+        "maxAgeSeconds": 3600,
+        "responseHeader": [
+            "Content-Type",
+            "Content-Length",
+            "Content-Disposition",
+            "Content-Encoding",
+            "Content-Language",
+            "Cache-Control",
+            "Expires",
+            "Last-Modified",
+            "ETag",
+            "Access-Control-Allow-Origin",
+            "Access-Control-Allow-Methods",
+            "Access-Control-Allow-Headers",
+            "Access-Control-Expose-Headers",
+            "Access-Control-Max-Age"
+        ]
+    }
+]

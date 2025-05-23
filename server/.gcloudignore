@@ -1,0 +1,24 @@
+# Ignore everything
+*
+
+# Then explicitly allow only the files we need
+!index.js
+!package.json
+!package-lock.json
+!Dockerfile
+!private-key.json
+!.dockerignore
+
+# Ignore node_modules and other unnecessary files
+node_modules/
+.git/
+.gitignore
+.env
+*.log
+uploads/
+*.md
+.DS_Store
+coverage/
+build/
+.env.*
+deploy-server 

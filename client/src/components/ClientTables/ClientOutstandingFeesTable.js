@@ -3,9 +3,13 @@ import GlobalButton from "../../components/GlobalButton/GlobalButton";
 import { FaPen, FaTrash, FaPlus } from "react-icons/fa";
 import AddTask from '../AddTask/AddTask';
 import InvoiceSelected from '../InvoiceSelected/InvoiceSelected'
+import { db, functions } from "../../config.js";
+import { httpsCallable } from "firebase/functions";
 
 export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTasks}) {
 
+  const [products, setProducts] = useState([])
+  const [coupons, setCoupons] = useState([])
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false)
   const [isInvoiceSelectedModalOpen, setIsInvoiceSelectedModalOpen] = useState(false)
   const [selectedTaskIds, setSelectedTaskIds] = useState([]);
@@ -18,9 +22,24 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
 
   // Calculate total amount
   const totalAmount = tasks?.reduce((sum, task) => {
-    const amount = parseFloat(task.amount);
+    const amount = parseFloat(task.price);
     return sum + (isNaN(amount) ? 0 : amount);
   }, 0).toFixed(2);
+
+useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const getStripeItems = httpsCallable(functions, "getStripeItems");
+      const result = await getStripeItems();
+      setProducts(result.data.products);
+      setCoupons(result.data.coupons);
+    } catch (error) {
+      console.error("ERROR FETCHING ITEMS: ", error.message);
+    }
+  };
+
+  fetchData();
+}, []);
 
   return (
     <div className="table-container">
@@ -65,7 +84,7 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
               <tr key={task.id} className="table-row">
                 <td>{task.description}</td>
                 <td>{task.date}</td>
-                <td>${parseFloat(task.amount || 0).toFixed(2)}</td>
+                <td>${parseFloat(task.price || 0).toFixed(2)}</td>
                 <td>
                   <div className='centerMe'>
                     <input
@@ -104,7 +123,7 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
       </table>
     
       {isInvoiceSelectedModalOpen && (<InvoiceSelected closeModal={() => { setIsInvoiceSelectedModalOpen(false)}}  selectedTaskIds = {selectedTaskIds} fetchOutstandingTasks={ fetchOutstandingTasks }/>)}
-      {isAddTaskModalOpen && (<AddTask closeModal={() => { setIsAddTaskModalOpen(false)}}  fetchOutstandingTasks={ fetchOutstandingTasks }/>)}
+      {isAddTaskModalOpen && (<AddTask closeModal={() => { setIsAddTaskModalOpen(false)}}  fetchOutstandingTasks={ fetchOutstandingTasks } products={products} coupons={coupons} />)}
     </div>
   );
 }

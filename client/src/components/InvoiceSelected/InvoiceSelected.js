@@ -31,9 +31,13 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
   }
 
   const handleSubmit = async (e) => {
+    console.log("INSIDE ME")
+    console.log(functions)
     e.preventDefault();
 
     try{
+      console.log("email:", id);
+      console.log("taskIds:", selectedTaskIds);
       const invoice = await httpsCallable(functions, "createInvoice")({
         email: id,
         taskIds: selectedTaskIds

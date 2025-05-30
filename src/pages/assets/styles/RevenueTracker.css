@@ -1,0 +1,31 @@
+
+
+.buttons.white {
+  background-color: white;
+  color: #222;
+  padding: 1.25vh;
+}
+
+.table-header.rev {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rev-spaced {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-section-content {
+  justify-content: space-between;
+  width: 100%;
+}
+
+.form-section-content label {
+  width: 100%;
+}
+
+
+
+

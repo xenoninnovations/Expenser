@@ -1,0 +1,10 @@
+.page-content {
+  background: rgb(255, 255, 255);
+  background: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgb(248, 255, 230) 100%
+  );
+  width: 100%;
+  height: 100vh;
+}

@@ -84,7 +84,7 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
 
   const calcTotal = () => {
     let sum = 0;
-    tasks.forEach((task) => (sum += parseFloat(task.fee) || 0))
+    tasks.forEach((task) => (sum += parseFloat(task.price) || 0))
     return sum;
   }
 
@@ -140,7 +140,7 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
                 <h5>{index+1}.</h5>
                 <div><strong>{task.description}</strong></div>
                 <div><strong>{task.date}</strong></div>
-                <div><strong>${parseFloat(task.amount || 0).toFixed(2)}</strong></div>
+                <div><strong>${parseFloat(task.price || 0).toFixed(2)}</strong></div>
                 <div></div>
               </div>
               <hr></hr>

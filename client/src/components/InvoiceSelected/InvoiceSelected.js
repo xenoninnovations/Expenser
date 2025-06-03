@@ -31,8 +31,6 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
   }
 
   const handleSubmit = async (e) => {
-    console.log("INSIDE ME")
-    console.log(functions)
     e.preventDefault();
 
     try{

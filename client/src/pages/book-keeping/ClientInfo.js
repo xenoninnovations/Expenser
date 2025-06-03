@@ -7,7 +7,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { db } from "../../config";
+import { db, functions } from "../../config";
 import Navbar from "../../components/NavBar/NavBar";
 import { useParams } from "react-router-dom";
 import { FaEnvelope, FaPhone, } from "react-icons/fa";
@@ -17,6 +17,7 @@ import avatar from "../../images/avatar.png";
 import ClientCasesTable from "../../components/ClientTables/ClientCasesTable";
 import ClientOutstandingFeesTable from "../../components/ClientTables/ClientOutstandingFeesTable";
 import ClientInvoicesTable from "../../components/ClientTables/ClientInvoicesTable";
+import { httpsCallable } from "firebase/functions";
 
 const ClientInfo = () => {
   const { id } = useParams();
@@ -73,10 +74,21 @@ const ClientInfo = () => {
       console.error("Error fetching fees: ", error);
     }
     //fetchInvoices is called here (rather than in useEffect()) so that it rechecks all invoices whenever outstanding tasks change (they change on invoice creation typically)
-    fetchInvoices();
+    fetchInvoices(id);
   };
 
-  const fetchInvoices = async () => {
+  const fetchInvoices = async (id) => {
+    try{
+      const invoices = await httpsCallable(functions, "getCustomerInvoices")({
+        email: id
+      });
+      setInvoices(invoices.data.invoices)
+      console.log(invoices.data.invoices)
+    } catch(e) {
+      console.error(`ERROR retrieving invoices for ${id} `, e.message)
+    }
+
+    /*
     try{
       const invoicesRef = collection(db, "invoices");
       const q = query(invoicesRef, where("client", "==", id));
@@ -90,6 +102,7 @@ const ClientInfo = () => {
     } catch (error) {
       console.error("Error Fetching Invoices: ", error)
     }
+      */
   }
 
   useEffect(() => {

@@ -159,3 +159,43 @@ exports.getStripeItems = onCall(async (request) => {
     );
   }
 });
+
+
+exports.getCustomerInvoices = onCall(async (data, context) => {
+  const stripe = require("stripe")(process.env.STRIPE_API_KEY);
+
+  const email = data.data.email;
+
+  const clientRef = admin.firestore().doc(`clients/${email}`);
+  const clientDoc = await clientRef.get();
+  if (!clientDoc.exists) {
+    throw new HttpsError(
+        "not-found",
+        "Client not found",
+    );
+  }
+  const clientData = clientDoc.data();
+
+  const stripeClientId = clientData.stripeClientId;
+
+  if (!stripeClientId) {
+    throw new HttpsError(
+        "not-found",
+        `Client ${email} did not have stripeClientId`,
+    );
+  }
+
+  try {
+    const invoices = await stripe.invoices.list({
+      customer: stripeClientId,
+      limit: 100,
+    });
+
+    return {invoices: invoices.data};
+  } catch (e) {
+    throw new HttpsError(
+        "internal",
+        `Unable to retrieve ${email} invoices`,
+    );
+  }
+});

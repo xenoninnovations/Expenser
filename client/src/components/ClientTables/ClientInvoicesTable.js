@@ -34,9 +34,11 @@ export default function ClientInvoicesTable({invoices}) {
         <tr>
           {[
             "Invoice ID",
-            "Date",
+            "Date Issued",
+            "Date Due",
             "Status",
-            "Amount",
+            "Amount Due",
+            "Amount Paid",
             "Actions",
           ].map((head) => (
             <th key={head}>{head} ⬍</th>
@@ -48,10 +50,12 @@ export default function ClientInvoicesTable({invoices}) {
           invoices.map((invoice) => {
             return (
               <tr key={invoice.id} className="table-row">
-                <td>{invoice.invoiceId}</td>
-                <td>{invoice.date}</td>
-                <td className={invoice.status.toLowerCase()}>{invoice.status}</td>
-                <td>${parseFloat(invoice.total || 0).toFixed(2)}</td>
+                <td>{invoice.number}</td>
+                <td>{new Date(invoice.created * 1000).toLocaleDateString()}</td>
+                <td>{new Date(invoice.due_date * 1000).toLocaleDateString()}</td>
+                <td className={invoice.status}>{invoice.status}</td>
+                <td>${parseFloat(invoice.total/100 || 0).toFixed(2)}</td>
+                <td>${parseFloat(invoice.amount_paid/100 || 0).toFixed(2)}</td>
                 <td>
                   <FaFilePdf 
                     className='icon edit-icon'

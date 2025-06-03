@@ -22,7 +22,7 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
 
   // Calculate total amount
   const totalAmount = tasks?.reduce((sum, task) => {
-    const amount = parseFloat(task.price);
+    const amount = parseFloat(task.price) * parseFloat(task.amount);
     return sum + (isNaN(amount) ? 0 : amount);
   }, 0).toFixed(2);
 
@@ -68,9 +68,11 @@ useEffect(() => {
         <thead>
           <tr>
             {[
-              "Task",
+              "Service",
               "Date",
               "Fee",
+              "Quantity",
+              "Total Due",
               "Invoice",
               "Actions",
             ].map((head) => (
@@ -85,6 +87,8 @@ useEffect(() => {
                 <td>{task.description}</td>
                 <td>{task.date}</td>
                 <td>${parseFloat(task.price || 0).toFixed(2)}</td>
+                <td>{task.amount}</td>
+                <td>${(parseFloat(task.price || 0) * parseFloat(task.amount || 0)).toFixed(2)}</td>
                 <td>
                   <div className='centerMe'>
                     <input
@@ -116,7 +120,7 @@ useEffect(() => {
           {/* Total Row */}
           <tr className="table-row">
             <td><strong>Total Due:</strong></td>
-            <td colSpan={2}></td>
+            <td colSpan={3}></td>
             <td><strong>${totalAmount}</strong></td>
           </tr>
         </tbody>

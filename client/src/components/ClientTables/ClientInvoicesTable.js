@@ -10,11 +10,8 @@ import { getDownloadURL, getStorage, ref } from "firebase/storage";
 
 export default function ClientInvoicesTable({invoices}) {
 
-    const handleViewClick = async (invoiceId) => {
-      const storage = getStorage();
-      const pathRef = ref(storage, `pdfs/invoices/invoice_${invoiceId}.pdf`)
-     const url = await getDownloadURL(pathRef);
-     window.open(url, "_blank");
+    const handleViewClick = async (invoice) => {
+      window.open(invoice, '_blank');
     };
 
     const handleSendClick = (invoiceId) => {
@@ -59,7 +56,7 @@ export default function ClientInvoicesTable({invoices}) {
                 <td>
                   <FaFilePdf 
                     className='icon edit-icon'
-                    onClick={() => handleViewClick(invoice.invoiceId)}
+                    onClick={() => handleViewClick(invoice.hosted_invoice_url)}
                   />
                   <IoSend
                     className='icon send-icon'

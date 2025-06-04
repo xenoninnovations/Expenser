@@ -30,17 +30,15 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
     })
   }
 
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try{
-      console.log("email:", id);
-      console.log("taskIds:", selectedTaskIds);
       const invoice = await httpsCallable(functions, "createInvoice")({
         email: id,
         taskIds: selectedTaskIds
       });
-      console.log("INVOICED:", invoice.data)
     } catch (error) {
       console.error("ERROR INVOICING: ", error.message)
     }
@@ -144,7 +142,6 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
               <hr></hr>
             </div>
             ))}
-            <button type="button" onClick={handlePdfPreview} className="modal-button add">Preview Invoice</button>
             <button type="submit" className="modal-button save">Invoice</button>
         </form>
 

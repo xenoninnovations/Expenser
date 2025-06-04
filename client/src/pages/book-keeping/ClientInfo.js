@@ -58,10 +58,11 @@ const ClientInfo = () => {
     }
   };
 
-  const fetchOutstandingTasks = async () => {
+  const fetchOutstandingTasks = async (outstanding = true, active = true) => {
+    console.log(outstanding, active)
     try {
       const outstandingTasksRef = collection(db, "Tasks");
-      const q = query(outstandingTasksRef, where("client", "==", id), where("outstanding", "==", true));
+      const q = query(outstandingTasksRef, where("client", "==", id), where("outstanding", "==", outstanding), where("active", "==", active));
       const querySnapshot = await getDocs(q);
   
       const outstandingTasksData = querySnapshot.docs.map((doc) => ({

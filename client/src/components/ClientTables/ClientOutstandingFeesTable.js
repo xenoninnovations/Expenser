@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import GlobalButton from "../../components/GlobalButton/GlobalButton";
-import { FaPen, FaTrash, FaPlus } from "react-icons/fa";
+import { FaTrash, FaPlus } from "react-icons/fa";
 import AddTask from '../AddTask/AddTask';
 import InvoiceSelected from '../InvoiceSelected/InvoiceSelected'
 import { db, functions } from "../../config.js";
 import { httpsCallable } from "firebase/functions";
+import { doc, updateDoc } from "firebase/firestore";
 
 export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTasks}) {
 
@@ -13,6 +14,8 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false)
   const [isInvoiceSelectedModalOpen, setIsInvoiceSelectedModalOpen] = useState(false)
   const [selectedTaskIds, setSelectedTaskIds] = useState([]);
+  const [activeFilter, setActiveFilter] = useState(true);
+  const [outstandingFilter, setOutstandingFilter] = useState(true)
 
   const handleCheckboxChange = (taskId) => {
     setSelectedTaskIds((prev) =>
@@ -26,20 +29,57 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
     return sum + (isNaN(amount) ? 0 : amount);
   }, 0).toFixed(2);
 
-useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const getStripeItems = httpsCallable(functions, "getStripeItems");
-      const result = await getStripeItems();
-      setProducts(result.data.products);
-      setCoupons(result.data.coupons);
-    } catch (error) {
-      console.error("ERROR FETCHING ITEMS: ", error.message);
-    }
-  };
+  const handleDeleteClick = async (taskId) => {
+    const docRef = doc(db, "Tasks", taskId);
+    await updateDoc(docRef, {
+      active: false
+    });
+    fetchOutstandingTasks()
+  }
 
-  fetchData();
-}, []);
+  const handleChangeOutstandingFilter = (e) => {
+    setOutstandingFilter(e === 'true')
+  }
+  const handleChangeActiveFilter = (e) => {
+    setActiveFilter(e === 'true')
+  }
+
+  
+  useEffect(() => {
+    fetchOutstandingTasks(outstandingFilter, activeFilter)
+  },[activeFilter, outstandingFilter])
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const getStripeItems = httpsCallable(functions, "getStripeItems");
+        const result = await getStripeItems();
+        setProducts(result.data.products);
+        setCoupons(result.data.coupons);
+      } catch (error) {
+        console.error("ERROR FETCHING ITEMS: ", error.message);
+      }
+    };
+
+    fetchData();
+  }, []);
+/*
+{[
+              { label: "Cases", value: "cases" },
+              { label: "Outstanding Fees", value: "fees" },
+              { label: "Invoices", value: "invoices" }
+            ].map(({ label, value }) => (
+              <button
+                key={value}
+                className={`toggle-button ${view === value ? "active" : ""}`}
+                onClick={() => setView(value)}
+              >
+                {label}
+              </button>
+            ))}
+*/
+
 
   return (
     <div className="table-container">
@@ -49,6 +89,40 @@ useEffect(() => {
           <h2 className="table-title">Outstanding Fees</h2>
         </div>
         <div className='right-align'>
+          <select
+            style={{width: '150px'}}
+            className='field'
+            name='activeFilter'
+            value={outstandingFilter}
+            onChange={(e) => handleChangeOutstandingFilter(e.target.value)}
+            required
+          >
+            {[
+              {label: "Outstanding", value: true},
+              {label: "Invoiced", value: false}
+            ].map(({label, value}) => (
+              <option key={label} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+          <select
+            style={{width: '150px'}}
+            className='field'
+            name='activeFilter'
+            value={activeFilter}
+            onChange={(e) => handleChangeActiveFilter(e.target.value)}
+            required
+          >
+            {[
+              {label: "Active", value: true},
+              {label: "Deleted", value: false}
+            ].map(({label, value}) => (
+              <option key={label} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
           <GlobalButton
             bg={"white"}
             textColor={"#222222"}
@@ -100,13 +174,9 @@ useEffect(() => {
                   </div>
                 </td>
                 <td>
-                  <FaPen
-                    className="icon edit-icon"
-                    //onClick={() => handleEditClick(task.id)}
-                  />
                   <FaTrash
                     className="icon delete-icon"
-                    //onClick={() => handleDeleteClick(task.id)}
+                    onClick={() => handleDeleteClick(task.id)}
                   />
                 </td>
               </tr>

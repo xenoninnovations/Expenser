@@ -58,11 +58,10 @@ const ClientInfo = () => {
     }
   };
 
-  const fetchOutstandingTasks = async (outstanding = true, active = true) => {
-    console.log(outstanding, active)
+  const fetchOutstandingTasks = async (status = "outstanding") => {
     try {
       const outstandingTasksRef = collection(db, "Tasks");
-      const q = query(outstandingTasksRef, where("client", "==", id), where("outstanding", "==", outstanding), where("active", "==", active));
+      const q = query(outstandingTasksRef, where("client", "==", id), where("status", "==", status));
       const querySnapshot = await getDocs(q);
   
       const outstandingTasksData = querySnapshot.docs.map((doc) => ({
@@ -84,7 +83,6 @@ const ClientInfo = () => {
         email: id
       });
       setInvoices(invoices.data.invoices)
-      console.log(invoices.data.invoices)
     } catch(e) {
       console.error(`ERROR retrieving invoices for ${id} `, e.message)
     }
@@ -172,7 +170,7 @@ const ClientInfo = () => {
           <div className="view-toggle">
             {[
               { label: "Cases", value: "cases" },
-              { label: "Outstanding Fees", value: "fees" },
+              { label: "Service History", value: "fees" },
               { label: "Invoices", value: "invoices" }
             ].map(({ label, value }) => (
               <button

@@ -16,8 +16,7 @@ export default function AddTask( { closeModal, fetchOutstandingTasks, products, 
     price: 0,
     price_id: "",
     amount: 0,
-    outstanding: true,
-    active: true,
+    status: "outstanding"
   }]);
 
   const handleChange = (index, e) => {
@@ -63,8 +62,7 @@ export default function AddTask( { closeModal, fetchOutstandingTasks, products, 
         product_id: "",
         date: new Date().toISOString().split("T")[0],
         description: "",
-        outstanding: true,
-        active: true,
+        status: "outstanding"
       },
     ]);
   };
@@ -77,7 +75,7 @@ export default function AddTask( { closeModal, fetchOutstandingTasks, products, 
     formData.forEach(async (task) => {
       try {
         await addDoc(collectionRef, task);
-        fetchOutstandingTasks()
+        //fetchOutstandingTasks()
         closeModal()
       } catch (e) {
         console.error("Failed to add Task(s): ", e)

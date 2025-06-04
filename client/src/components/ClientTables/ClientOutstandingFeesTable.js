@@ -5,7 +5,7 @@ import AddTask from '../AddTask/AddTask';
 import InvoiceSelected from '../InvoiceSelected/InvoiceSelected'
 import { db, functions } from "../../config.js";
 import { httpsCallable } from "firebase/functions";
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, getDoc } from "firebase/firestore";
 
 export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTasks}) {
 
@@ -14,8 +14,7 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false)
   const [isInvoiceSelectedModalOpen, setIsInvoiceSelectedModalOpen] = useState(false)
   const [selectedTaskIds, setSelectedTaskIds] = useState([]);
-  const [activeFilter, setActiveFilter] = useState(true);
-  const [outstandingFilter, setOutstandingFilter] = useState(true)
+  const [taskFilter, setTaskFilter] = useState("outstanding");
 
   const handleCheckboxChange = (taskId) => {
     setSelectedTaskIds((prev) =>
@@ -31,23 +30,34 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
 
   const handleDeleteClick = async (taskId) => {
     const docRef = doc(db, "Tasks", taskId);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+      console.error("Task not found");
+      return;
+    }
+
+    const currentStatus = docSnap.data().status;
+
+    if (currentStatus === "invoiced") {
+      console.error("Cannot delete a task that has been invoiced.");
+      return;
+    }
+
     await updateDoc(docRef, {
-      active: false
+      status: "deleted",
     });
-    fetchOutstandingTasks()
-  }
+    fetchOutstandingTasks();
+  };
 
-  const handleChangeOutstandingFilter = (e) => {
-    setOutstandingFilter(e === 'true')
-  }
-  const handleChangeActiveFilter = (e) => {
-    setActiveFilter(e === 'true')
-  }
 
-  
+  const handleChangeFilter = (e) => {
+    setTaskFilter(e)
+  }
+ 
   useEffect(() => {
-    fetchOutstandingTasks(outstandingFilter, activeFilter)
-  },[activeFilter, outstandingFilter])
+    fetchOutstandingTasks(taskFilter)
+  },[taskFilter])
 
 
   useEffect(() => {
@@ -65,19 +75,10 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
     fetchData();
   }, []);
 /*
-{[
-              { label: "Cases", value: "cases" },
-              { label: "Outstanding Fees", value: "fees" },
-              { label: "Invoices", value: "invoices" }
-            ].map(({ label, value }) => (
-              <button
-                key={value}
-                className={`toggle-button ${view === value ? "active" : ""}`}
-                onClick={() => setView(value)}
-              >
-                {label}
-              </button>
-            ))}
+STATUS:
+INVOICED,
+OUTSTANDING,
+DELETED
 */
 
 
@@ -86,37 +87,21 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
       <div className="table-header exp">
         <div className="exp-spaced">
           <span className="yellow-bar exp"></span>
-          <h2 className="table-title">Outstanding Fees</h2>
+          <h2 className="table-title">Service History</h2>
         </div>
         <div className='right-align'>
           <select
             style={{width: '150px'}}
             className='field'
             name='activeFilter'
-            value={outstandingFilter}
-            onChange={(e) => handleChangeOutstandingFilter(e.target.value)}
+            value={taskFilter}
+            onChange={(e) => handleChangeFilter(e.target.value)}
             required
           >
             {[
-              {label: "Outstanding", value: true},
-              {label: "Invoiced", value: false}
-            ].map(({label, value}) => (
-              <option key={label} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-          <select
-            style={{width: '150px'}}
-            className='field'
-            name='activeFilter'
-            value={activeFilter}
-            onChange={(e) => handleChangeActiveFilter(e.target.value)}
-            required
-          >
-            {[
-              {label: "Active", value: true},
-              {label: "Deleted", value: false}
+              {label: "Outstanding", value: "outstanding"},
+              {label: "Invoiced", value: "invoiced"},
+              {label: "Deleted", value: "deleted"},
             ].map(({label, value}) => (
               <option key={label} value={value}>
                 {label}
@@ -143,6 +128,7 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
           <tr>
             {[
               "Service",
+              "Status",
               "Date",
               "Fee",
               "Quantity",
@@ -159,6 +145,7 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
             tasks.map((task) => (
               <tr key={task.id} className="table-row">
                 <td>{task.description}</td>
+                <td>{task.status}</td>
                 <td>{task.date}</td>
                 <td>${parseFloat(task.price || 0).toFixed(2)}</td>
                 <td>{task.amount}</td>
@@ -190,14 +177,14 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
           {/* Total Row */}
           <tr className="table-row">
             <td><strong>Total Due:</strong></td>
-            <td colSpan={3}></td>
+            <td colSpan={4}></td>
             <td><strong>${totalAmount}</strong></td>
           </tr>
         </tbody>
       </table>
     
       {isInvoiceSelectedModalOpen && (<InvoiceSelected closeModal={() => { setIsInvoiceSelectedModalOpen(false)}}  selectedTaskIds = {selectedTaskIds} fetchOutstandingTasks={ fetchOutstandingTasks }/>)}
-      {isAddTaskModalOpen && (<AddTask closeModal={() => { setIsAddTaskModalOpen(false)}}  fetchOutstandingTasks={ fetchOutstandingTasks } products={products} coupons={coupons} />)}
+      {isAddTaskModalOpen && (<AddTask closeModal={() => { setIsAddTaskModalOpen(false); fetchOutstandingTasks(taskFilter)}}  fetchOutstandingTasks={ fetchOutstandingTasks } products={products} coupons={coupons} />)}
     </div>
   );
 }

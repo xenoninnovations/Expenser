@@ -47,7 +47,7 @@ export default function ClientOutstandingFeesTable({ tasks, fetchOutstandingTask
     await updateDoc(docRef, {
       status: "deleted",
     });
-    fetchOutstandingTasks();
+    fetchOutstandingTasks(taskFilter);
   };
 
 
@@ -145,7 +145,7 @@ DELETED
             tasks.map((task) => (
               <tr key={task.id} className="table-row">
                 <td>{task.description}</td>
-                <td>{task.status}</td>
+                <td>{task.status === "invoiced" ? task.invoiceNumber : task.status}</td>
                 <td>{task.date}</td>
                 <td>${parseFloat(task.price || 0).toFixed(2)}</td>
                 <td>{task.amount}</td>
@@ -154,6 +154,7 @@ DELETED
                   <div className='centerMe'>
                     <input
                       type="checkbox"
+                      disabled={task.status === 'invoiced' || task.status === 'deleted'}
                       checked={selectedTaskIds.includes(task.id)}
                       onChange={() => handleCheckboxChange(task.id)}
                     />
@@ -170,7 +171,7 @@ DELETED
             ))
           ) : (
             <tr>
-              <td colSpan="6">No outstanding fees...</td>
+              <td colSpan="6">No {taskFilter} fees...</td>
             </tr>
           )}
 
@@ -183,7 +184,7 @@ DELETED
         </tbody>
       </table>
     
-      {isInvoiceSelectedModalOpen && (<InvoiceSelected closeModal={() => { setIsInvoiceSelectedModalOpen(false)}}  selectedTaskIds = {selectedTaskIds} fetchOutstandingTasks={ fetchOutstandingTasks }/>)}
+      {isInvoiceSelectedModalOpen && (<InvoiceSelected closeModal={() => { setIsInvoiceSelectedModalOpen(false); fetchOutstandingTasks(taskFilter)}}  selectedTaskIds = {selectedTaskIds} fetchOutstandingTasks={ fetchOutstandingTasks }/>)}
       {isAddTaskModalOpen && (<AddTask closeModal={() => { setIsAddTaskModalOpen(false); fetchOutstandingTasks(taskFilter)}}  fetchOutstandingTasks={ fetchOutstandingTasks } products={products} coupons={coupons} />)}
     </div>
   );

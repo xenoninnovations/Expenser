@@ -57,7 +57,7 @@ exports.createInvoice = onCall(async (data, context) => {
     }
     const task = doc.data();
 
-    if (!task.outstanding) {
+    if (task.status !== "outstanding") {
       throw new HttpsError(
           "failed-precondition",
           `Task ${doc.id} is not outstanding`,
@@ -106,14 +106,15 @@ exports.createInvoice = onCall(async (data, context) => {
     });
   }
 
-  await stripe.invoices.finalizeInvoice(invoice.id);
+  const finalInvoice = await stripe.invoices.finalizeInvoice(invoice.id);
 
   // Update tasks
   const batch = admin.firestore().batch();
   validTasks.forEach((task) => {
     batch.update(task.ref, {
-      outstanding: false,
-      invoiceId: invoice.id,
+      status: "invoiced",
+      invoiceId: finalInvoice.id,
+      invoiceNumber: finalInvoice.number,
       invoicedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
   });

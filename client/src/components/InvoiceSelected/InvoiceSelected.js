@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { collection, addDoc, getDocs, where, query, runTransaction, doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { db, functions } from "../../config.js";
-import { FaTrash } from "react-icons/fa";
 import CreateInvoicePdf from "../CreateInvoice/CreateInvoicePdf.js";
 import { httpsCallable } from "firebase/functions";
 
@@ -42,6 +41,7 @@ export default function AddTask( { closeModal, selectedTaskIds, fetchOutstanding
     } catch (error) {
       console.error("ERROR INVOICING: ", error.message)
     }
+    closeModal()
     /*
     try {
       const invoiceId = await runTransaction(db, async (transaction) => {

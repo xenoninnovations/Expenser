@@ -100,14 +100,45 @@ export async function DownloadUpdatedJsonToPdf(pdfData, jsonResult) {
         for (let i = 0; i < jsonResult.length; i++) {
             const { fieldName, value: fieldValue, options, x, y, width, height, page } = jsonResult[i].inputField;
             const field = form.getFieldMaybe?.(fieldName);
+            const fieldType = jsonResult[i].fieldType;
+
+            // Inject signature image if this is a signature field and value is a data URL
+            if (
+                fieldType === 'signature' &&
+                typeof fieldValue === 'string' &&
+                fieldValue.startsWith('data:image/')
+            ) {
+                const pdfPage = pdfDoc.getPage(page - 1);
+                const image = fieldValue.startsWith('data:image/png')
+                    ? await pdfDoc.embedPng(fieldValue)
+                    : await pdfDoc.embedJpg(fieldValue);
+                const imageWidth = width * 0.8;
+                const imageHeight = height;
+
+                pdfPage.drawImage(image, {
+                    x: x + (width - imageWidth) / 2,
+                    y,
+                    width: imageWidth,
+                    height: imageHeight,
+                });
+                // If the field exists, clear its value so the data URL is not shown as text
+                if (field) {
+                    try {
+                        if (typeof field.setText === 'function') {
+                            field.setText('');
+                        }
+                    } catch (e) {
+                        // ignore
+                    }
+                }
+                continue; // Skip normal field filling for this field
+            }
 
             if (!field) {
                 console.warn(`Field '${fieldName}' not found.`);
                 continue;
             }
 
-            // Get the field type from our form data instead of the constructor
-            const fieldType = jsonResult[i].fieldType;
             console.log(`Processing field: ${fieldName}, Type: ${fieldType}, Value: ${fieldValue}`);
 
             try {
@@ -286,6 +317,12 @@ async function processPdfData(arrayBuffer) {
                     } else if (annot.fieldType === 'Btn' && annot.checkBox) {
                         inputType = 'chk';
                         fieldType = 'checkbox';
+                    }
+
+                    // Detect signature fields by label or fieldName
+                    const labelText = (annot.alternativeText || annot.fieldName || '').toLowerCase();
+                    if (labelText.includes('signature')) {
+                        fieldType = 'signature';
                     }
 
                     const rect = annot.rect || [0, 0, 0, 0];

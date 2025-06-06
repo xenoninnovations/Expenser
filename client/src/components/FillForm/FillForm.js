@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as PdfToJson from './PdfToJson';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import SignaturePad from '../SignaturePad/SignaturePad';
 
 function FillForm({ pdfData, onClose }) {
     const [loading, setLoading] = useState(false);
@@ -112,13 +113,45 @@ function FillForm({ pdfData, onClose }) {
                                 return null;
                             }
 
+                            // Check if this is a signature field
+                            const isSignatureField = label.toLowerCase().includes('signature');
+                            if (isSignatureField) {
+                                return (
+                                    <div key={idx} className="form-field">
+                                        <label htmlFor={name} className="field-label no-select">
+                                            {Array.isArray(label) ? label[0] : label}
+                                        </label>
+                                        <SignaturePad
+                                            width={width * 2}
+                                            height={height * 5}
+
+                                            onChange={dataUrl => {
+                                                setPdfJsonData(prevData => {
+                                                    const updated = [...prevData];
+                                                    if (updated[idx] && updated[idx].inputField) {
+                                                        updated[idx] = {
+                                                            ...updated[idx],
+                                                            inputField: {
+                                                                ...updated[idx].inputField,
+                                                                value: dataUrl
+                                                            }
+                                                        };
+                                                    }
+                                                    return updated;
+                                                });
+                                            }}
+                                        />
+                                    </div>
+                                );
+                            }
+
                             if (type === 'ch' && Array.isArray(value)) {
                                 value = value[0] || '';
                             }
 
                             return (
                                 <div key={idx} className="form-field">
-                                    <label htmlFor={name} className="field-label">
+                                    <label htmlFor={name} className="field-label no-select">
                                         {Array.isArray(label) ? label[0] : label}
                                     </label>
 
@@ -140,7 +173,7 @@ function FillForm({ pdfData, onClose }) {
                                             id={name}
                                             value={value || ''}
                                             onChange={e => handleInputChange(idx, e.target.value)}
-                                            className="field-input select-dropdown"
+                                                className="field-input select-dropdown no-select"
                                         >
                                             <option value="">-- select --</option>
                                             {options.map(opt => (

@@ -439,3 +439,9 @@ input[type="text"] {
     margin: 1rem 0;
     text-align: center;
 }
+.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}

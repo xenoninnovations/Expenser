@@ -1,0 +1,36 @@
+.signature-container {
+    border: 1px solid #ccc;
+    padding: 10px;
+    box-sizing: content-box;
+    background: #fafafa;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.signature-pad {
+    border: 1px solid #ddd;
+    background: #fff;
+    display: block;
+    cursor: crosshair;
+    box-sizing: border-box;
+    border-radius: 4px;
+}
+
+.clear-signature-btn {
+    display: block;
+    margin-left: auto;
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.no-select {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}

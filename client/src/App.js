@@ -39,6 +39,10 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [serverStatus, setServerStatus] = useState(null);
 
+  // Add these lines to see which environment is being used
+  console.log('Current NODE_ENV:', process.env.NODE_ENV);
+  console.log('API URL:', process.env.REACT_APP_API_URL);
+
   useEffect(() => {
     const checkServerStatus = async () => {
       try {

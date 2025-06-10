@@ -5,6 +5,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const admin = require('firebase-admin');
 const fs = require('fs');
+require('dotenv').config();
 const app = express();
 const PORT = parseInt(process.env.PORT) || 8080;
 const util = require('util');

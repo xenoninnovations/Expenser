@@ -17,8 +17,7 @@ import UploadPDF from "./pages/doc-drafting/upload-pdf/UploadPDF";
 import Templates from "./pages/doc-drafting/templates/Templates";
 import DocumentLibrary from "./pages/doc-drafting/library/DocumentLibrary";
 import EmailViewer from './components/EmailViewer/EmailViewer';
-
-
+import Users from "./pages/auth/Users";
 
 import React, { useEffect } from "react";
 
@@ -43,6 +42,7 @@ function App() {
         <Route path="/clientmanagement" element={<Clientmanagement />} />
         <Route path="/addclientform" element={<AddClientForm />} />
         <Route path="/revenuetracker" element={<RevenueTracker />} />
+        <Route path="/users" element={<Users />} />
 
         {/* TEMP */}
         <Route path="/document-drafting" element={<UploadPDF />} />

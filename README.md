@@ -1,4 +1,4 @@
-# Welcome to Expenser!!!
+# Welcome to Expenser!
 
 ## Currently under development
 

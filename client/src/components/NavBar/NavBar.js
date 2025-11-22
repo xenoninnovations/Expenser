@@ -126,6 +126,9 @@ export default function NavBar() {
               <li className={isActiveRoute('/cost-breakdown') ? 'active' : ''}>
                 <Link to="/cost-breakdown">Cost Breakdown</Link>
               </li>
+              <li className={isActiveRoute('/users') ? 'active' : ''}>
+                <Link to="/users">Users</Link>
+              </li>
             </ul>
           )}
         </li>

@@ -2,7 +2,7 @@ import React from 'react'
 
 function Moreinfo() {
   return (
-    <div>Moreinfo</div>
+    <div></div>
   )
 }
 

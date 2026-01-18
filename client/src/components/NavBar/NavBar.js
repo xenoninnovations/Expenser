@@ -8,7 +8,8 @@ import {
   FaBook, 
   FaEnvelope,
   FaChevronDown,
-  FaBars 
+  FaBars,
+  FaCalendar
 } from 'react-icons/fa';
 
 export default function NavBar() {
@@ -153,6 +154,12 @@ export default function NavBar() {
           <Link to="/emailviewer" className={isActiveRoute('/emailviewer') ? 'active' : ''}>
             <FaEnvelope className="nav-icon" />
             {isNavExpanded && <span>Email</span>}
+          </Link>
+        </li>
+        <li className="nav-item">
+          <Link to="/calendar" className={isActiveRoute('/calendar') ? 'active' : ''}>
+            <FaCalendar className="nav-icon" />
+            {isNavExpanded && <span>Calendar</span>}
           </Link>
         </li>
       </ul>

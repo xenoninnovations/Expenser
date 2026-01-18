@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
@@ -5,10 +6,19 @@ const path = require('path');
 const { exec } = require('child_process');
 const admin = require('firebase-admin');
 const fs = require('fs');
+const { google } = require('googleapis');
+const { OAuth2Client } = require('google-auth-library');
 const app = express();
 const PORT = parseInt(process.env.PORT) || 8080;
 const util = require('util');
 const execPromise = util.promisify(exec);
+
+// Google Calendar configuration
+const oauth2Client = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  'http://localhost:3000/auth/google/callback' // Changed to match client-side redirect
+);
 
 // Initialize Firebase Admin
 let bucket;
@@ -667,4 +677,90 @@ app.get('/debug/versions', async (req, res) => {
         console.error('Debug endpoint error:', error);
         res.status(500).json({ error: error.message });
     }
+});
+
+// Google Calendar Authentication Endpoints
+app.get('/auth/google', (req, res) => {
+  const scopes = [
+    'https://www.googleapis.com/auth/calendar',
+    'https://www.googleapis.com/auth/calendar.events'
+  ];
+
+  const authUrl = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: scopes,
+    prompt: 'consent',
+    include_granted_scopes: true,
+    redirect_uri: 'http://localhost:3000/auth/google/callback'
+  });
+
+  res.json({ authUrl });
+});
+
+app.get('/auth/google/callback', async (req, res) => {
+  const { code } = req.query;
+  
+  try {
+    const { tokens } = await oauth2Client.getToken({
+      code,
+      redirect_uri: 'http://localhost:3000/auth/google/callback'
+    });
+    
+    oauth2Client.setCredentials(tokens);
+
+    // Store tokens in session or database
+    // For now, we'll just send them back to the client
+    res.redirect(`http://localhost:3000/calendar?tokens=${encodeURIComponent(JSON.stringify(tokens))}`);
+  } catch (error) {
+    console.error('Error getting Google tokens:', error);
+    res.redirect(`http://localhost:3000/calendar?error=${encodeURIComponent(error.message)}`);
+  }
+});
+
+app.post('/events/google', async (req, res) => {
+  try {
+    const { title, start, end, description } = req.body;
+    const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+
+    const event = {
+      summary: title,
+      description: description,
+      start: {
+        dateTime: start,
+        timeZone: 'UTC',
+      },
+      end: {
+        dateTime: end,
+        timeZone: 'UTC',
+      },
+    };
+
+    const response = await calendar.events.insert({
+      calendarId: 'primary',
+      resource: event,
+    });
+
+    res.json({
+      success: true,
+      event: response.data
+    });
+  } catch (error) {
+    console.error('Error creating Google Calendar event:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+app.get('/auth/status', (req, res) => {
+  // Check if we have valid tokens
+  const hasValidTokens = oauth2Client.credentials && 
+    oauth2Client.credentials.access_token && 
+    oauth2Client.credentials.refresh_token;
+
+  res.json({
+    google: hasValidTokens,
+    outlook: false // We'll implement this later
+  });
 });

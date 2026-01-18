@@ -18,6 +18,7 @@ import EmailViewer from './components/EmailViewer/EmailViewer';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import LoadingSpinner from './components/LoadingSpinner/LoadingSpinner';
 import Finances from './pages/expensetracker/FinancesTracker';
+import Calendar from './pages/calendar/calendar';
 import React, { useEffect, useState } from "react";
 
 // Add error handler for Chrome extension errors
@@ -97,7 +98,7 @@ function App() {
           <Route path="/revenuetracker" element={<RevenueTracker />} />
           <Route path="/addclientform" element={<AddClientForm />} />
           <Route path="/finances" element={<Finances />} />
-
+          <Route path="/calendar" element={<Calendar />} />
           
 
           {/* Document Drafting Routes */}
